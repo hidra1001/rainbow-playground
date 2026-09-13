@@ -782,7 +782,7 @@
     $("tag").textContent = LEVEL_NAME[L] + DIFF_TXT() + ' · ' + modeName(m, L);
     renderStars();
     const em = $('emoji');
-    em.textContent = (q.dict && DIFF > -1) ? "🔊" : isSentFill ? "❓" : q.e;   // 쉬운 난이도에선 받아쓰기에도 그림을 보여 줘요
+    em.textContent = isSentFill ? "❓" : q.e;   // 받아쓰기도 그림을 보여 줘요
     em.classList.toggle('small', isSentFill || isSentOrder);
     em.style.animation = 'none'; void em.offsetWidth; em.style.animation = '';
     const wordEl = $('word');
@@ -836,6 +836,7 @@
     state.wrongTiles = 0;
     if (m === "cons" && L !== "nine" && !q.jamo) speak(q.w);
     if (q.dict || q.mimic) speak(q.w);
+    if (m === "word") speak(q.w);   // 낱말 찾기는 바로 읽어 줘요
     if (m === 'order' && L !== 'nine') speak(q.w);
     if (isSentOrder) speak(q.sent);
   }

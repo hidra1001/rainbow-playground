@@ -6,7 +6,7 @@
     const byId = ids => ids.map(id => document.getElementById(id)).filter(Boolean);
     let L = [], R = [], wide = false;
     if (document.getElementById('answers')) {            // 아케이드: 무대 | 규칙·답·안내
-      L = byId(['area']); R = byId(['ask', 'answers', 'feedback']); wide = true;
+      L = byId(['area']); R = byId(['ask', 'answers', 'skip-btn', 'feedback']); wide = true;
     } else if (document.getElementById('area')) {        // 두뇌: 판 | 안내
       L = byId(['area']); R = byId(['ask', 'feedback']); wide = true;
     } else if (document.getElementById('pad')) {         // 산수: 문제 | 보기·숫자판

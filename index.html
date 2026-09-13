@@ -33,6 +33,7 @@
       radial-gradient(circle at 20% 80%, #FFDDEC 0 70px, transparent 71px);
   }
   [hidden] { display: none !important; }
+  html, body { overflow: hidden; height: 100dvh; }
   .wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
 
   .hero { display: flex; align-items: center; gap: 14px; padding: 4px 4px 0; flex-wrap: wrap; }
@@ -159,11 +160,10 @@
     .games { grid-template-columns: 1fr 1fr; gap: 10px; }
     .modes { grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
     .modes a { font-size: 15px; padding: 7px 10px; min-height: 44px; border-radius: 14px; }
-    #tab-chars .card { max-height: calc(100dvh - 140px); overflow: auto; }
     .chars { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; }
     .char { font-size: 24px; border-radius: 12px; }
     .tier h3 { margin: 4px 0 6px; font-size: 15px; }
-    #tab-settings { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: start; max-height: calc(100dvh - 84px); overflow: auto; }
+    #tab-settings { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: start; }
     #tab-settings .card + .card { margin-top: 0; }
     .pickrow { margin: 6px 0 10px; gap: 8px; }
     .pick { width: 48px; height: 48px; font-size: 24px; }
@@ -175,6 +175,7 @@
   }
 </style>
 <script src="voice.js"></script>
+<script src="fit.js"></script>
 <script>if ('serviceWorker' in navigator) addEventListener('load', () => { navigator.serviceWorker.register("sw.js").catch(() => {}); navigator.serviceWorker.addEventListener("controllerchange", () => { if (!window.__rp_reloaded) { window.__rp_reloaded = 1; location.reload(); } }); });</script>
 </head>
 <body>

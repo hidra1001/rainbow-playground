@@ -12,6 +12,7 @@
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="voice.js"></script>
 <script src="layout.js"></script>
+<script src="fit.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(() => {}); navigator.serviceWorker.addEventListener("controllerchange", () => { if (!window.__rp_reloaded) { window.__rp_reloaded = 1; location.reload(); } }); })</script>
 <title>무지개 두뇌 놀이</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -565,10 +566,14 @@
     return { seq: seq.map(num), ans: num(a), choices: shuffle([num(a), ...shuffle(cands).slice(0, 3)]), kind: 'num' };
   }
   function nextPattern() {
-    const q = makePattern(); state.q = q; state.tried = false;
+    const q = makePattern(); state.tried = false;
+    // 빈칸을 아무 자리에나: 마지막이 아닐 수도 있어요
+    const full = [...q.seq, q.ans], bi = rnd(full.length), ans2 = full[bi];
+    if (key(ans2) !== key(q.ans)) { q.ans = ans2; q.choices = shuffle(uniq([ans2, ...q.choices.filter(c => key(c) !== key(ans2))]).slice(0, q.choices.length)); }
+    q.full = full; q.blank = bi; state.q = q;
     setRound();
-    ask(q.kind === 'num' ? '규칙을 찾아 다음 숫자를 골라요' : q.kind === 'dots' ? '점이 어떻게 변하는지 보고 다음을 골라요' : '규칙을 찾아 다음에 올 것을 골라요');
-    $('area').innerHTML = `<div class="prow">${q.seq.map(itemHTML).join('')}<span class="pitem q">?</span></div>
+    ask(q.kind === 'num' ? '규칙을 찾아 빈칸의 숫자를 골라요' : q.kind === 'dots' ? '점이 어떻게 변하는지 보고 빈칸을 골라요' : '규칙을 찾아 빈칸에 올 것을 골라요');
+    $('area').innerHTML = `<div class="prow">${q.full.map((it, i) => i === q.blank ? '<span class="pitem q">?</span>' : itemHTML(it)).join('')}</div>
       <div class="choices${q.choices.length === 4 ? ' four' : ''}">${q.choices.map((c, i) =>
         `<button class="btn choice pc${c.t === 'num' ? ' num' : ''}" id="pch-${i}" data-i="${i}">${inner(c)}</button>`).join('')}</div>`;
     say('');

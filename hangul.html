@@ -12,6 +12,7 @@
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="voice.js"></script>
 <script src="layout.js"></script>
+<script src="fit.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(() => {}); navigator.serviceWorker.addEventListener("controllerchange", () => { if (!window.__rp_reloaded) { window.__rp_reloaded = 1; location.reload(); } }); })</script>
 <title>무지개 한글 놀이</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -566,6 +567,7 @@
   function wordPoolRaw() {
     const l = state.level, m = state.mode;
     if (m === "e" || m === "f") return extraPool();
+    if (l === "easy" && m === "cons") return WORDS.filter(w => w[0].length >= 2 && w[0].length <= 3 && jamoTargets(w[0]).length);
     if (l === "easy") { const mx = EFF() >= 2 ? 4 : EFF() <= -2 ? 2 : 3; return WORDS.filter(w => m === "order" ? w[0].length >= 2 && w[0].length <= mx : w[0].length <= mx); }
     if (l === 'hard') return m === 'order' ? WORDS.filter(w => w[0].length >= 3) : WORDS;
     if (l === 'pro') return m === 'order' ? WORDS.filter(w => w[0].length >= 4) : WORDS.filter(w => w[0].length >= 2);
@@ -615,6 +617,8 @@
     for (const c of C) for (const v of V) for (const j of J) s.add(makeSyl(CHO.indexOf(c), v, j));
     return s;
   })();
+  const VOWCH = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+  const jamoTargets = w => [...w].map((ch, i) => ({ ch, i, d: decomp(ch) })).filter(x => x.d && [0, 2, 4, 6, 8, 12, 13, 17, 18, 20].includes(x.d.jung) && (x.d.jong === 0 || EFF() >= 2));
   const isCommon = x => [...x].every(ch => COMMON.has(ch));
   function similarSyllables(target, w, n) {
     const d = decomp(target), out = new Set();
@@ -725,24 +729,19 @@
       const dis = shuffle(SENTS.map(s => s[0]).filter(x => x !== w)).sort((a, b) => Math.abs(a.length - w.length) - Math.abs(b.length - w.length)).slice(0, 6);
       choices = shuffle([w, ...shuffle(dis).slice(0, nC - 1)]);
     } else if (m === 'cons' && L === 'easy') {
-      // 6살: 자음 + 모음 = 글자
-      const CONS = EFF() <= -2 ? ["ㄱ","ㄴ","ㅁ","ㅅ"] : ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅎ"];
-      const VOW = EFF() <= -2 ? [["ㅏ",0],["ㅗ",8],["ㅜ",13],["ㅣ",20]] : [["ㅏ",0],["ㅑ",2],["ㅓ",4],["ㅕ",6],["ㅗ",8],["ㅛ",12],["ㅜ",13],["ㅠ",17],["ㅡ",18],["ㅣ",20]];
-      const c = pick(CONS), [v, vi] = pick(VOW);
-      const ci = CHO.indexOf(c);
-      ans = makeSyl(ci, vi, 0);
-      const sameC = shuffle(VOW.filter(x => x[0] !== v)).slice(0, 2).map(x => makeSyl(ci, x[1], 0));
-      const sameV = shuffle(CONS.filter(x => x !== c)).slice(0, 1).map(x => makeSyl(CHO.indexOf(x), vi, 0));
-      if (EFF() >= 2 && Math.random() < .5) {
-        // 어려우면 받침 붙이기: 가 + ㅇ = 강
-        const J = [["ㄴ",4],["ㅇ",21],["ㅁ",16],["ㄹ",8]];
-        const [jc, ji] = pick(J);
-        const base = ans, full = makeSyl(ci, vi, ji);
-        const others = shuffle(J.filter(x => x[0] !== jc)).slice(0, nC - 1).map(x => makeSyl(ci, vi, x[1]));
-        return { w: full, e: "🔤", sent: "", ans: full, choices: shuffle([full, ...others]), blank: -1, blanks: [], tiles: [], jamo: { c: base, v: jc } };
-      }
-      choices = shuffle([ans, ...shuffle([...sameC, ...sameV]).slice(0, nC - 1)]);
-      return { w: ans, e: '🔤', sent: '', ans, choices, blank: -1, blanks: [], tiles: [], jamo: { c, v } };
+      // 5·6살 글자 만들기: 낱말 속 한 글자를 비우고, 그 글자를 자음 + 모음(+받침)으로 만들어요
+      let tg = jamoTargets(w);
+      if (EFF() <= -2) { const ez = tg.filter(x => [0, 2, 6, 9].includes(x.d.cho) && [0, 8, 13, 20].includes(x.d.jung)); if (ez.length) tg = ez; }   // ㄱㄴㅁㅅ + ㅏㅗㅜㅣ
+      const t = pick(tg); blank = t.i; ans = w[blank];
+      const d = t.d, parts = [CHO[d.cho], VOWCH[d.jung], d.jong ? JONG[d.jong] : null];
+      const SV = [0, 2, 4, 6, 8, 12, 13, 17, 18, 20], BC = [0, 2, 3, 5, 6, 7, 9, 11, 12, 18];
+      const cands = [];
+      for (const v of shuffle(SV)) if (v !== d.jung) cands.push(makeSyl(d.cho, v, d.jong));          // 같은 자음, 다른 모음
+      for (const c of shuffle(BC)) if (c !== d.cho) cands.push(makeSyl(c, d.jung, d.jong));           // 다른 자음, 같은 모음
+      if (d.jong) for (const g of [0, 4, 21, 16, 8]) if (g !== d.jong) cands.push(makeSyl(d.cho, d.jung, g));   // 받침만 다르게
+      const dis = [...new Set(cands)].filter(x => x !== ans && !w.includes(x) && COMMON.has(x)).slice(0, nC - 1);
+      choices = shuffle([ans, ...dis]);
+      return { w, e, sent: '', ans, choices, blank, blanks: [], tiles: [], jamo: { parts: parts.filter(Boolean) } };
     } else if (m === 'cons') {
       blank = L === 'easy' ? 0 : rnd(w.length);
       ans = cho(w[blank]);
@@ -793,7 +792,7 @@
     wordEl.className = 'word' + (q.w.length >= 5 && !isSentFill && !isSentOrder ? ' longword' : '') + (isSentFill || isSentOrder ? ' sentence' : '');
     let html = '', ask = '';
     state.built = [];
-    if (q.jamo) { ask = "자음과 모음을 합치면 무슨 글자일까요?"; html = `<span class="ch">${q.jamo.c}</span><span class="ch hint">+</span><span class="ch">${q.jamo.v}</span><span class="ch hint">=</span><span class="ch blank" id="ansbox">?</span>`; }
+    if (q.jamo) { ask = "빈칸 글자를 자음과 모음으로 만들어요"; html = `<span class="ch hint">${q.jamo.parts.join(" + ")}</span><span class="ch hint">→</span>` + [...q.w].map((c, i) => i === q.blank ? `<span class="ch blank" id="ansbox">?</span>` : `<span class="ch">${c}</span>`).join(""); }
     else     if (q.dict) { ask = "잘 듣고 글자를 순서대로 눌러요"; html = [...q.w].map((_, i) => `<span class="ch slot" data-i="${i}" id="slot-${i}"></span>`).join(""); }
     else if (q.mimic) { ask = "무엇을 흉내 낸 말일까요?"; html = `<span class="ch" style="font-size:.7em;min-width:auto;padding:0 .35em">${q.w}</span><span class="ch hint">→</span><span class="ch blank" id="ansbox">?</span>`; }
     else if (q.pair) { ask = `"${q.w}"의 ${q.pair}은 무엇일까요?`; html = `<span class="ch" style="font-size:.7em;min-width:auto;padding:0 .35em">${q.w}</span><span class="ch hint">${q.pair === "반대말" ? "↔" : "≈"}</span><span class="ch blank" id="ansbox">?</span>`; }
@@ -838,7 +837,7 @@
     $('feedback').textContent = ''; $('feedback').className = 'feedback';
     state.locked = false; state.missed = false;
     state.wrongTiles = 0;
-    if (m === "cons" && L !== "nine" && !q.jamo) speak(q.w);
+    if (m === "cons" && L !== "nine") speak(q.w);
     if (q.dict || q.mimic) speak(q.w);
     if (m === "word") speak(q.w);   // 낱말 찾기는 바로 읽어 줘요
     if (m === 'order' && L !== 'nine') speak(q.w);

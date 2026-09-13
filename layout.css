@@ -1,4 +1,5 @@
 /* 태블릿 가로 화면(16:9·16:10)에서 스크롤 없이 한 화면에 들어가도록 두 칸으로 배치해요 */
+html, body { overflow: hidden; height: 100dvh; }
 .cols, .colL, .colR { display: contents; }
 
 @media (orientation: landscape) and (max-height: 960px) {

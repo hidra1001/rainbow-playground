@@ -661,7 +661,7 @@
     const el = document.createElement('div');
     el.className = 'balloon';
     const color = pick(['#FF6B6B','#FFB347','#FFE66D','#7ED957','#5DADE2','#B57EDC','#FF8FBF']);
-    el.innerHTML = `<div class="b" style="background:${color}">${w[1]}</div><div class="s"></div>${state.level === 'pro' || state.level === 'nine' ? `<div class="w">${w[0]}</div>` : ''}`;
+    el.innerHTML = `<div class="b" style="background:${color}">${w[1]}</div><div class="s"></div>${(state.level === "pro" || state.level === "nine") && !/시작|첫소리/.test(rule.name) ? `<div class="w">${w[0]}</div>` : ""}`;
     $('layer').appendChild(el);
     const speed = { easy: 55, hard: 68, pro: 80, nine: 92 }[state.level] * (REDUCED ? .65 : 1) * (1 + state.spawned * .02);
     const b = { el, x, y: H + 10, vy: speed, w, match, alive: true };

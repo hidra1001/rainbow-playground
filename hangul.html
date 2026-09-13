@@ -731,9 +731,11 @@
       const p = sentenceParts(q.sent, q.w);
       html = `<span class="ch plain">${p.before}</span><span class="ch blank" id="ansbox">?</span><span class="ch plain">${p.after}</span>`;
     } else if (m === 'cons') {
-      ask = L === 'easy' ? '첫 글자의 첫소리는?' : '분홍색 글자의 첫소리는?';
+      // 글자는 숨기고 그림과 소리로만 풀어요. 몇 번째 글자인지는 빈 칸으로 표시
+      const ord = ["첫", "두", "세", "네", "다섯", "여섯"][q.blank] || "";
+      ask = q.blank === 0 ? "그림 이름의 첫소리는? (읽어 줘를 눌러 들어 봐요)" : ord + " 번째 글자의 첫소리는? (읽어 줘를 눌러 들어 봐요)";
       html = `<span class="ch blank" id="ansbox">?</span>` +
-        [...q.w].map((c, i) => `<span class="ch hint ${i === q.blank ? 'focus' : ''}">${c}</span>`).join('');
+        [...q.w].map((c, i) => `<span class="ch hint ${i === q.blank ? "focus" : ""}">${i === q.blank ? "?" : "&nbsp;"}</span>`).join("");
     } else if (isSentOrder) {
       ask = '낱말을 순서대로 눌러 문장을 만들어요';
       html = q.sent.split(' ').map((_, i) => `<span class="ch slot" data-i="${i}" id="slot-${i}">&nbsp;</span>`).join('');
@@ -770,6 +772,7 @@
     $('feedback').className = 'feedback good';
     renderStars(); sndGood(); if (!state.missed) confetti(40);
     $('emoji').textContent = q.e;
+    if (state.mode === "cons" && !q.jamo && state.level !== "nine") document.querySelectorAll("#word .hint").forEach((el, i) => el.textContent = q.w[i]);   // 맞히면 글자를 보여 줘요
     setTimeout(() => speak(q.sent && state.level === 'nine' && state.mode !== 'word' && state.mode !== 'syll' ? q.sent : q.w), 350);
     document.querySelectorAll('.choice, .tile').forEach(b => b.disabled = true);
     setTimeout(next, q.sent && state.level === 'nine' ? 2200 : 1500);

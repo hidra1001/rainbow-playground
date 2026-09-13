@@ -265,6 +265,7 @@
     <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
     <p class="sub">몇 살 놀이로 할까요?</p>
     <div class="level" role="group" aria-label="난이도">
+      <button type="button" id="level-five" data-level="five" aria-pressed="false">🍼 5살</button>
       <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
       <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
     </div>
@@ -438,12 +439,13 @@
   const VOWEL_SIM = {0:[4,1],1:[5,0],2:[6,12],4:[0,5],5:[1,4],6:[2,4],8:[13,12],12:[8,17],13:[8,17],17:[13,12],18:[13,20],20:[18,5]};
   const VOWEL_SOUND = {1:[5],5:[1],10:[11,15],11:[10,15],15:[10,11],19:[20],20:[19],16:[13]};
   const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답이에요!', '최고예요!', '멋져요!'];
-  const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  const LEVEL_NAME = { five: "5살", easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
   /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
   let DIFF = 0;
   { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
-  const TS = () => 1 - DIFF * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
-  const DIFF_TXT = () => DIFF ? (DIFF > 0 ? " +" + DIFF : " " + DIFF) : "";
+  const TS = () => 1 - EFF() * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
+  const DIFF_TXT = () => DIFF ? (EFF() > 0 ? " +" + DIFF : " " + DIFF) : "";
+  const EFF = () => level === "five" ? Math.max(-3, DIFF - 2) : DIFF;   // 5살은 6살 놀이를 두 단계 더 쉽게
   const GAME_KEY = "hangul";
   let pendingMode = null;
   const diffKey = m => "rp-diff:" + GAME_KEY + ":" + m;
@@ -456,6 +458,7 @@
     show("prestart");
   }
   const LEVEL_NOTE = {
+    five: "두 글자 낱말 · 그림 항상 보여요 · 보기 2~3개",
     easy: '보기 3개 · 짧은 낱말 · 첫 글자의 첫소리',
     hard: '보기 4개 · 긴 낱말 · 비슷한 글자로 헷갈리게',
     pro: '틀린 맞춤법 골라내기 · 글자 6개로 낱말 만들기',
@@ -467,6 +470,7 @@
     pro:  { word: ['🔍','바른 낱말 찾기','글자 하나 틀린 낱말을 골라내요'], syll: ['🐰','빠진 글자','받침·모음이 다른 글자 중에서 채워요'], cons: ['🦄','첫소리 찾기','된소리도 보기에 나와요'], order: ['🧩','낱말 만들기','글자 6개, 엉뚱한 글자 둘'] , e: ["🔊","받아쓰기","엉뚱한 글자 둘, 긴 낱말"], f: ["🔄","반대말","크다의 반대말은?"] },
     nine: { word: ['🔍','바른 낱말 찾기','소리는 같은데 틀리게 쓴 낱말을 골라내요'], syll: ['🐰','빈칸 두 개','빈칸 두 개를 순서대로 채워요'], cons: ['📝','문장 채우기','문장에 알맞은 낱말을 골라요'], order: ['🧩','문장 만들기','흩어진 낱말로 문장을 만들어요'] , e: ["🔊","받아쓰기","소리가 같은 글자가 섞여요"], f: ["🔄","반대말·비슷한말","비슷한말도 나와요"] },
   };
+  MODE_LABEL.five = MODE_LABEL.easy;
   const modeName = (m, l) => MODE_LABEL[l][m][1];
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -562,7 +566,7 @@
   function wordPoolRaw() {
     const l = state.level, m = state.mode;
     if (m === "e" || m === "f") return extraPool();
-    if (l === "easy") { const mx = DIFF >= 2 ? 4 : DIFF <= -2 ? 2 : 3; return WORDS.filter(w => m === "order" ? w[0].length >= 2 && w[0].length <= mx : w[0].length <= mx); }
+    if (l === "easy") { const mx = EFF() >= 2 ? 4 : EFF() <= -2 ? 2 : 3; return WORDS.filter(w => m === "order" ? w[0].length >= 2 && w[0].length <= mx : w[0].length <= mx); }
     if (l === 'hard') return m === 'order' ? WORDS.filter(w => w[0].length >= 3) : WORDS;
     if (l === 'pro') return m === 'order' ? WORDS.filter(w => w[0].length >= 4) : WORDS.filter(w => w[0].length >= 2);
     // 9살
@@ -649,12 +653,12 @@
     return ant.concat(SYNONYM.flatMap(([a, b]) => [['비슷한말:' + a, '🟰', b, a, '비슷한말'], ['비슷한말:' + b, '🟰', a, b, '비슷한말']]));
   }
   function makeExtraQ(entry, w, e) {
-    const L = state.level, m = state.mode, nC = Math.max(3, Math.min(5, (L === "easy" ? 3 : 4) + (DIFF >= 2 ? 1 : DIFF <= -2 ? -1 : 0)));
+    const L = state.level, m = state.mode, nC = Math.max(level === "five" ? 2 : 3, Math.min(5, (L === "easy" ? 3 : 4) + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0)));
     if (m === 'e') {
       // 받아쓰기: 듣고 글자 타일로 조립
       let tiles = shuffle([...w]);
       if (tiles.join('') === w && w.length > 1) tiles = [...tiles.slice(1), tiles[0]];
-      const decoys = Math.max(w.length, (L === "easy" ? 0 : L === "hard" ? 1 : 2) + (DIFF >= 2 ? 1 : DIFF <= -2 ? -1 : 0));   // 받아쓰기도 글자 수의 2배
+      const decoys = Math.max(w.length, (L === "easy" ? 0 : L === "hard" ? 1 : 2) + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0));   // 받아쓰기도 글자 수의 2배
       for (let k = 0; k < decoys; k++) {
         const extra = (L !== 'hard' ? variantsOf(pick([...w]), 3, L === 'nine').filter(x => !w.includes(x) && !tiles.includes(x))[0] : null)
           || similarSyllables(pick([...w]), w, 1).filter(x => !tiles.includes(x))[0] || randomSyllables(w[0], w, 1)[0];
@@ -667,7 +671,7 @@
       const ans = entry[2];
       const others = shuffle(ONOMAT.filter(o => o[1] !== ans && o[0] !== w)).slice(0, nC - 1);
       const choices = shuffle([[ans, e], ...others.map(o => [o[1], o[2]])]);
-      return { w, e, sent: ans, ans, choices: choices.map(c => c[0]), choiceEmoji: ((L === "easy" && DIFF < 2) || DIFF <= -2) ? Object.fromEntries(choices) : null, blank: -1, blanks: [], tiles: [], mimic: true };
+      return { w, e, sent: ans, ans, choices: choices.map(c => c[0]), choiceEmoji: ((L === "easy" && EFF() < 2) || EFF() <= -2) ? Object.fromEntries(choices) : null, blank: -1, blanks: [], tiles: [], mimic: true };
     }
     // 반대말 · 비슷한말
     const ans = entry[2], base = entry[3], type = entry[4];
@@ -685,7 +689,7 @@
     const others = WORDS.filter(x => x[0] !== w);
     const L = state.level, m = state.mode;
     if (m === "e" || m === "f") return makeExtraQ(entry, w, e);
-    const nC = Math.max(3, Math.min(5, (L === "easy" ? 3 : 4) + (DIFF >= 2 ? 1 : DIFF <= -2 ? -1 : 0)));
+    const nC = Math.max(level === "five" ? 2 : 3, Math.min(5, (L === "easy" ? 3 : 4) + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0)));
     let choices = [], ans = '', blank = -1, blanks = [], tiles = [];
 
     if (m === 'word') {
@@ -693,8 +697,8 @@
       let dis;
       if (L === 'nine') dis = variantsOf(w, nC - 1, true);
       else if (L === 'pro') dis = variantsOf(w, nC - 1);
-      else if (L === "hard") dis = DIFF <= -2 ? shuffle(others.map(o => o[0])).slice(0, nC - 1) : similarWords(w, others, nC - 1);
-      else dis = DIFF >= 2 ? similarWords(w, others, nC - 1) : shuffle([...new Set(others.filter(o => o[0].length === w.length).map(o => o[0]).concat(others.map(o => o[0])))]).slice(0, nC - 1);
+      else if (L === "hard") dis = EFF() <= -2 ? shuffle(others.map(o => o[0])).slice(0, nC - 1) : similarWords(w, others, nC - 1);
+      else dis = EFF() >= 2 ? similarWords(w, others, nC - 1) : shuffle([...new Set(others.filter(o => o[0].length === w.length).map(o => o[0]).concat(others.map(o => o[0])))]).slice(0, nC - 1);
       if (dis.length < nC - 1) dis = [...new Set(dis.concat(similarWords(w, others, nC - 1 - dis.length)))];
       choices = shuffle([w, ...dis]);
     } else if (m === 'syll' && L === 'nine') {
@@ -712,7 +716,7 @@
       ans = w[blank];
       let dis = [];
       if (L === 'pro') dis = variantsOf(ans, nC * 2).filter(x => !w.includes(x)).slice(0, nC - 1);
-      if (dis.length < nC - 1 && (L !== "easy" || DIFF >= 2)) dis = [...new Set(dis.concat(similarSyllables(ans, w, nC - 1 - dis.length)))];
+      if (dis.length < nC - 1 && (L !== "easy" || EFF() >= 2)) dis = [...new Set(dis.concat(similarSyllables(ans, w, nC - 1 - dis.length)))];
       if (dis.length < nC - 1) dis = dis.concat(randomSyllables(ans, w, nC - 1 - dis.length));
       choices = shuffle([ans, ...dis.slice(0, nC - 1)]);
     } else if (m === 'cons' && L === 'nine') {
@@ -722,14 +726,14 @@
       choices = shuffle([w, ...shuffle(dis).slice(0, nC - 1)]);
     } else if (m === 'cons' && L === 'easy') {
       // 6살: 자음 + 모음 = 글자
-      const CONS = DIFF <= -2 ? ["ㄱ","ㄴ","ㅁ","ㅅ"] : ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅎ"];
-      const VOW = DIFF <= -2 ? [["ㅏ",0],["ㅗ",8],["ㅜ",13],["ㅣ",20]] : [["ㅏ",0],["ㅑ",2],["ㅓ",4],["ㅕ",6],["ㅗ",8],["ㅛ",12],["ㅜ",13],["ㅠ",17],["ㅡ",18],["ㅣ",20]];
+      const CONS = EFF() <= -2 ? ["ㄱ","ㄴ","ㅁ","ㅅ"] : ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅎ"];
+      const VOW = EFF() <= -2 ? [["ㅏ",0],["ㅗ",8],["ㅜ",13],["ㅣ",20]] : [["ㅏ",0],["ㅑ",2],["ㅓ",4],["ㅕ",6],["ㅗ",8],["ㅛ",12],["ㅜ",13],["ㅠ",17],["ㅡ",18],["ㅣ",20]];
       const c = pick(CONS), [v, vi] = pick(VOW);
       const ci = CHO.indexOf(c);
       ans = makeSyl(ci, vi, 0);
       const sameC = shuffle(VOW.filter(x => x[0] !== v)).slice(0, 2).map(x => makeSyl(ci, x[1], 0));
       const sameV = shuffle(CONS.filter(x => x !== c)).slice(0, 1).map(x => makeSyl(CHO.indexOf(x), vi, 0));
-      if (DIFF >= 2 && Math.random() < .5) {
+      if (EFF() >= 2 && Math.random() < .5) {
         // 어려우면 받침 붙이기: 가 + ㅇ = 강
         const J = [["ㄴ",4],["ㅇ",21],["ㅁ",16],["ㄹ",8]];
         const [jc, ji] = pick(J);
@@ -757,7 +761,7 @@
       ans = w;
       tiles = shuffle([...w]);
       if (tiles.join('') === w && w.length > 1) tiles = [...tiles.slice(1), tiles[0]];
-      const decoys = Math.max(w.length, (L === "pro" ? 2 : L === "hard" ? 1 : 0) + (DIFF >= 2 ? 1 : DIFF <= -2 ? -1 : 0));   // 보기 타일은 최소 글자 수의 2배
+      const decoys = Math.max(w.length, (L === "pro" ? 2 : L === "hard" ? 1 : 0) + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0));   // 보기 타일은 최소 글자 수의 2배
       for (let k = 0; k < decoys; k++) {
         const extra = (L === 'pro' ? variantsOf(pick([...w]), 3).filter(x => !w.includes(x) && !tiles.includes(x))[0] : null)
           || similarSyllables(pick([...w]), w, 1).filter(x => !tiles.includes(x))[0]
@@ -779,7 +783,7 @@
     const isSentFill = m === 'cons' && L === 'nine', isSentOrder = m === 'order' && L === 'nine', isTwoBlank = m === 'syll' && L === 'nine';
     const useTiles = m === "order" || isTwoBlank || q.dict;
     $('round').textContent = (state.round + 1) + ' / ' + TOTAL;
-    $("tag").textContent = LEVEL_NAME[L] + DIFF_TXT() + ' · ' + modeName(m, L);
+    $("tag").textContent = LEVEL_NAME[state.age || L] + DIFF_TXT() + ' · ' + modeName(m, L);
     renderStars();
     const em = $('emoji');
     em.textContent = isSentFill ? "❓" : q.e;   // 받아쓰기도 그림을 보여 줘요
@@ -910,7 +914,7 @@
         document.querySelectorAll('.slot').forEach(s => { s.classList.remove('no'); void s.offsetWidth; s.classList.add('no'); });
         state.wrongTiles = (state.wrongTiles || 0) + 1;
         if (state.wrongTiles >= 3) { sndBad(); return setTimeout(revealTiles, 500); }
-        const hintNow = state.wrongTiles >= (DIFF <= -1 ? 1 : 2) && DIFF < 2;
+        const hintNow = state.wrongTiles >= (EFF() <= -1 ? 1 : 2) && EFF() < 2;
         $("feedback").textContent = hintNow ? "반짝이는 글자부터 눌러 봐요 ✨" : "순서가 달라요. 다시 놓아 볼까요? 🍀";
         sndBad();
         setTimeout(() => { resetTiles(); if (hintNow) hintTile(); }, 700);
@@ -941,7 +945,7 @@
   }
 
   function start(mode) {
-    state = { mode, level, round: 0, score: 0, q: null, locked: false, deck: [], learned: [], built: [] };
+    state = { mode, level: level === "five" ? "easy" : level, age: level, round: 0, score: 0, q: null, locked: false, deck: [], learned: [], built: [] };
     state.q = makeQ();
     show('game'); renderQ();
   }

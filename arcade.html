@@ -265,6 +265,7 @@
     <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
     <p class="sub">몇 살 놀이로 할까요?</p>
     <div class="level" role="group" aria-label="난이도">
+      <button type="button" id="level-five" data-level="five" aria-pressed="false">🍼 5살</button>
       <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
       <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
     </div>
@@ -330,12 +331,13 @@
   const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답!', '최고예요!', '멋져요!'];
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  const LEVEL_NAME = { five: "5살", easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
   /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
   let DIFF = 0;
   { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
-  const TS = () => 1 - DIFF * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
-  const DIFF_TXT = () => DIFF ? (DIFF > 0 ? " +" + DIFF : " " + DIFF) : "";
+  const TS = () => 1 - EFF() * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
+  const DIFF_TXT = () => DIFF ? (EFF() > 0 ? " +" + DIFF : " " + DIFF) : "";
+  const EFF = () => level === "five" ? Math.max(-3, DIFF - 2) : DIFF;   // 5살은 6살 놀이를 두 단계 더 쉽게
   const GAME_KEY = "arcade";
   let pendingMode = null;
   const diffKey = m => "rp-diff:" + GAME_KEY + ":" + m;
@@ -348,6 +350,7 @@
     show("prestart");
   }
   const LEVEL_NOTE = {
+    five: "아주 천천히 · 5까지 수 · 두 글자 낱말 · 하트 5개",
     easy: '10까지 계산 · 쉬운 낱말 · ㄱㄴㄷㅁㅂㅅ 첫소리 · 1~10 수',
     hard: '받아올림 20까지 · 비슷한 낱말 · 모든 첫소리 · 1~30 수',
     pro: '두 자리 계산과 구구단 · 틀린 맞춤법 · 받침·글자 수 규칙 · 구구단 두더지',
@@ -359,6 +362,7 @@
     pro:  { fall_math: ['💧','떨어지는 식','두 자리 계산과 구구단 2~5단'], fall_word: ['🍎','떨어지는 낱말','틀린 맞춤법을 피해 골라요'], balloon: ['🎈','풍선 터뜨리기','받침·글자 수·ㅏ 소리 규칙'], mole: ['🐹','두더지 잡기','3단·4단의 수, 짝수를 잡아요'] },
     nine: { fall_math: ['💧','떨어지는 식','구구단·나눗셈·세 자리 계산'], fall_word: ['🍎','떨어지는 낱말','빈칸 글자와 문장을 채워요'], balloon: ['🎈','풍선 터뜨리기','동물만! 과일만! 분류 규칙'], mole: ['🐹','두더지 잡기','7단·9단, 3으로 나누어떨어지는 수'] },
   };
+  MODE_LABEL.five = MODE_LABEL.easy;
   const modeName = (m, l) => MODE_LABEL[l][m][1];
 
   /* 낱말 재료: [낱말, 그림, 갈래] */
@@ -428,8 +432,8 @@
   function mathItem(L) {
     let a, b, op, ans, min = 0, max = 20, extra = [];
     if (L === 'easy') {
-      const cap = Math.max(5, Math.min(20, 10 + DIFF * 2));
-      op = DIFF <= -2 ? "+" : pick(["+","+","-"]);
+      const cap = Math.max(5, Math.min(20, 10 + EFF() * 2));
+      op = EFF() <= -2 ? "+" : pick(["+","+","-"]);
       if (op === "+") { a = rng(1, cap - 1); b = rng(1, cap - a); ans = a + b; } else { a = rng(2, cap); b = rng(1, a - 1); ans = a - b; }
       max = cap;
     } else if (L === 'hard') {
@@ -570,7 +574,7 @@
 
   function start(mode) {
     clearAll();
-    state = { mode, level, score: 0, lives: LIVES + (DIFF <= -2 ? 1 : 0) + (DIFF <= -3 ? 1 : 0) - (DIFF >= 3 ? 1 : 0), handled: 0, locked: true, n: 0, items: [], last: 0 };
+    state = { mode, level: level === "five" ? "easy" : level, age: level, score: 0, lives: LIVES + (EFF() <= -2 ? 1 : 0) + (EFF() <= -3 ? 1 : 0) - (EFF() >= 3 ? 1 : 0), handled: 0, locked: true, n: 0, items: [], last: 0 };
     $("tag").textContent = LEVEL_NAME[level] + DIFF_TXT() + ' · ' + modeName(mode, level);
     say(''); askRule('');
     $('answers').hidden = true; $('answers').innerHTML = '';

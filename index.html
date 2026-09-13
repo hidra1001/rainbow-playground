@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>무지개 놀이터</title>
+<title>소화 놀이터</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
   :root {
@@ -68,6 +68,8 @@
   .char.new { animation: pop .5s; }
   .char[aria-pressed="true"]:not(.locked)::after { content: "✔"; position: absolute; right: 4px; bottom: 2px; font-size: 12px; color: var(--pink-deep); }
   .char .cnt { position: absolute; left: 3px; top: 2px; font-style: normal; font-size: 11px; font-family: var(--display); background: var(--pink); color: #fff; border-radius: 10px; padding: 0 5px; z-index: 1; }
+  .t-normal:not(.locked) { border-color: #B9AEB5; background: #F4F1F3; }
+  .avatar.t-normal, .pick.t-normal { border-color: #B9AEB5; }
   .t-rare:not(.locked) { border-color: #5DADE2; box-shadow: 0 0 10px 2px rgba(93,173,226,.55); background: #EEF7FD; }
   .t-epic:not(.locked) { border-color: #B57EDC; background: linear-gradient(135deg, #F6EEFF, #E9D8FF); box-shadow: 0 0 14px 3px rgba(181,126,220,.6); animation: shimmer 2.2s infinite alternate; }
   .t-legendary:not(.locked) { border: 3px solid transparent; background: linear-gradient(#FFF8E1, #FFF8E1) padding-box, conic-gradient(from var(--ang, 0deg), #FF6B6B, #FFB347, #FFE66D, #7ED957, #5DADE2, #B57EDC, #FF6B6B) border-box; box-shadow: 0 0 18px 4px rgba(255,200,80,.7); animation: spin 3s linear infinite; }
@@ -177,7 +179,7 @@
 
   <!-- 처음 설정 -->
   <section class="card" id="setup" hidden>
-    <h2 class="center" style="justify-content:center">🌈 무지개 놀이터에 온 걸 환영해요!</h2>
+    <h2 class="center" style="justify-content:center">🌈 소화 놀이터에 온 걸 환영해요!</h2>
     <p class="center">이름을 적어 주세요</p>
     <div class="center"><input id="name-in" class="name" type="text" maxlength="10" placeholder="예: 지우" autocomplete="off" enterkeyhint="done"></div>
     <p class="center">몇 살이에요?</p>
@@ -188,7 +190,7 @@
 
   <!-- 로그인: 처음 정한 이름을 넣고 들어와요 -->
   <section class="card" id="login" hidden>
-    <h2 class="center" style="justify-content:center">🌈 무지개 놀이터</h2>
+    <h2 class="center" style="justify-content:center">🌈 소화 놀이터</h2>
     <p class="center">이름을 넣고 들어와요</p>
     <div class="center"><input id="login-in" class="name" type="text" maxlength="10" placeholder="내 이름" autocomplete="off" enterkeyhint="go"></div>
     <div class="center" style="margin-top:12px"><button class="btn" id="login-ok">들어가기 🚪</button></div>
@@ -267,7 +269,8 @@
 <script>
 (function () {
   const $ = id => document.getElementById(id);
-  const AGES = { easy: '6살', hard: '7살' };
+  const AGES = { five: "5살", easy: "6살", hard: "7살" };
+  const LB = l => l === "five" ? "easy" : l;   // 5살은 6살 놀이 이름을 써요
   const GAMES = {
     math:   { name: '산수 놀이', file: 'math.html', ico: '🔢', modes: ['a','b','c','d','e','f'], labels: {
       easy: ['더하기 빼기','몇 개일까?','10 만들기','빠진 수 찾기','문장제','돈 세기'], hard: ['20까지 더하기 빼기','가르기와 모으기','세 수 계산','뛰어 세기','문장제','돈 세기'] } },
@@ -348,7 +351,7 @@
   function greet() {
     const h = today.getHours();
     const when = h < 11 ? '좋은 아침!' : h < 17 ? '신나는 오후!' : '즐거운 저녁!';
-    $('greet').innerHTML = when + ' <b>' + (P.name || '무지개 놀이터') + '</b>' + (P.name ? '!' : '');
+    $('greet').innerHTML = when + ' <b>' + (P.name || '소화 놀이터') + '</b>' + (P.name ? '!' : '');
     setAvatar();
   }
   function setAvatar() {
@@ -359,7 +362,7 @@
     const res = todayRes(), n = playedToday();
     $('games').innerHTML = Object.entries(GAMES).map(([g, G]) => `<div class="card gcard ${g}"><h2><span><span class="ico">${G.ico}</span>${G.name}</span><small>${AGES[P.level]}</small></h2><div class="modes">${G.modes.map((m, i) => {
       const id = g + ':' + P.level + ':' + m, sc = res[id];
-      return `<a class="${sc != null ? 'played' : ''}" href="${G.file}?level=${P.level}&mode=${m}&n=${load('rp-count', 10)}"><span>${G.labels[P.level][i]}</span>${sc != null ? `<span class="sc">⭐ ${sc}</span>` : ''}</a>`;
+      return `<a class="${sc != null ? 'played' : ''}" href="${G.file}?level=${P.level}&mode=${m}&n=${load('rp-count', 10)}"><span>${G.labels[LB(P.level)][i]}</span>${sc != null ? `<span class="sc">⭐ ${sc}</span>` : ''}</a>`;
     }).join('')}</div></div>`).join('');
     const tk = P.tickets || 0, left = GAMES_PER_TICKET - (P.toward || 0);
     $('today-n').textContent = `🎟️ 뽑기권 ${tk}장 · 오늘 놀이 ${n}개 · ⭐ ${starsToday()} · 다음 뽑기권까지 ${left}판`;
@@ -434,8 +437,8 @@
     const agg = {};
     for (const day of Object.keys(R)) for (const [id, sc] of Object.entries(R[day])) { (agg[id] = agg[id] || []).push(sc); }
     const rows = Object.entries(agg).filter(([, a]) => a.length >= 2).map(([id, a]) => {
-      const [g, l, m] = id.split(':'); const G = GAMES[g]; if (!G || !G.labels[l]) return null;
-      return { label: G.labels[l][G.modes.indexOf(m)] || m, game: G.name, level: AGES[l] || l, avg: a.reduce((x, y) => x + y, 0) / a.length, n: a.length };
+      const [g, l, m] = id.split(":"); const G = GAMES[g]; if (!G || !G.labels[LB(l)]) return null;
+      return { label: G.labels[LB(l)][G.modes.indexOf(m)] || m, game: G.name, level: AGES[l] || l, avg: a.reduce((x, y) => x + y, 0) / a.length, n: a.length };
     }).filter(Boolean).sort((a, b) => a.avg - b.avg).slice(0, 3);
     $('weak').innerHTML = rows.length ? rows.map(r => `<div><span>${r.game} · ${r.label} (${r.level})</span><span>평균 ⭐ ${r.avg.toFixed(1)} · ${r.n}번</span></div>`).join('') : '<div><span>아직 자료가 부족해요. 같은 놀이를 두 번 이상 하면 나타나요.</span></div>';
     const total = Object.values(R).reduce((n, d) => n + Object.keys(d).length, 0);
@@ -502,12 +505,12 @@
     const av = e.target.closest('[data-av]'); if (av) { P.avatar = av.dataset.av; save('rp-profile', P); renderPickers('avatars2', 'ages2'); renderChars(); setAvatar(); return; }
     const ch = e.target.closest('[data-char]'); if (ch && !ch.disabled) { P.avatar = ch.dataset.char; save('rp-profile', P); renderChars(); renderPickers('avatars2', 'ages2'); setAvatar(); toast(P.avatar + ' 친구로 바꿨어요!'); return; }
     const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderMain(); } renderPickers('avatars', 'ages'); if (P.days) renderPickers('avatars2', 'ages2'); return; }
-    const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 무지개 놀이터 친구야'); return; }
+    const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 소화 놀이터 친구야'); return; }
     const cc = e.target.closest('[data-count]'); if (cc) { save('rp-count', +cc.dataset.count); renderSettings(); renderMain(); return; }
     const tab = e.target.closest('.tabs button'); if (tab) showTab(tab.dataset.tab);
   });
   $('finish').addEventListener('click', () => { wakeAudio(); openDraw(); });
-  $('voice-try').addEventListener('click', () => speak('안녕! 나는 무지개 놀이터 친구야'));
+  $('voice-try').addEventListener('click', () => speak('안녕! 나는 소화 놀이터 친구야'));
   $('name-save').addEventListener('click', () => { const v = norm($('name-edit').value); if (!v) return toast('이름을 적어 주세요'); P.name = v; save('rp-profile', P); try { sessionStorage.setItem('rp-login', v); } catch (e) {} greet(); toast('이름을 ' + v + '(으)로 바꿨어요'); });
   const norm = s => (s || '').trim().replace(/\s+/g, ' ');
   function enterApp() {

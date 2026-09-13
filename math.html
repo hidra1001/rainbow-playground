@@ -267,6 +267,7 @@
     <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
     <p class="sub">몇 살 놀이로 할까요?</p>
     <div class="level" role="group" aria-label="난이도">
+      <button type="button" id="level-five" data-level="five" aria-pressed="false">🍼 5살</button>
       <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
       <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
     </div>
@@ -336,12 +337,13 @@
   let TOTAL = 10;
   const FRUITS = ['🍓','🍎','🍊','🍇','🌸','⭐','🍬','🍪','🧁','🎈','🐣','🦋'];
   const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답이에요!', '최고예요!', '멋져요!'];
-  const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  const LEVEL_NAME = { five: "5살", easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
   /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
   let DIFF = 0;
   { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
-  const TS = () => 1 - DIFF * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
-  const DIFF_TXT = () => DIFF ? (DIFF > 0 ? " +" + DIFF : " " + DIFF) : "";
+  const TS = () => 1 - EFF() * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
+  const DIFF_TXT = () => DIFF ? (EFF() > 0 ? " +" + DIFF : " " + DIFF) : "";
+  const EFF = () => level === "five" ? Math.max(-3, DIFF - 2) : DIFF;   // 5살은 6살 놀이를 두 단계 더 쉽게
   const GAME_KEY = "math";
   let pendingMode = null;
   const diffKey = m => "rp-diff:" + GAME_KEY + ":" + m;
@@ -354,6 +356,7 @@
     show("prestart");
   }
   const LEVEL_NOTE = {
+    five: "5까지 수 · 그림 세기 · 보기 2~3개 · 아주 천천히",
     easy: '10까지 더하기·빼기 · 20까지 세기 · 10 만들기 · 빠진 수',
     hard: '받아올림 있는 20까지 · 가르기와 모으기 · 세 수 계산 · 뛰어 세기',
     pro: '두 자리 세로셈 · 세 수 섞어 계산 · 구구단 2~5단 · 시계 읽기 (숫자 직접 입력)',
@@ -365,6 +368,7 @@
     pro:  { a: ['📝','두 자리 세로셈','받아올림·받아내림 있는 두 자리 수'], b: ['🎯','세 수 섞어 계산','23 + 18 − 9 처럼 계산해요'], c: ['✖️','구구단 2~5단','묶음 그림을 보며 곱셈을 해요'], d: ['🕒','시계 읽기','몇 시, 몇 시 30분을 읽어요'] , e: ["📖","문장제","곱셈이 들어간 이야기 문제 (입력)"], f: ["🪙","돈 세기","500원까지 동전을 세어요 (입력)"] },
     nine: { a: ['📝','세 자리 세로셈','356 + 278, 503 − 247 처럼 계산해요'], b: ['✖️','구구단 2~9단','빈칸이 있는 곱셈도 나와요'], c: ['➗','나눗셈','구구단을 거꾸로! 42 ÷ 6'], d: ["🔮","규칙 찾기·시계","수의 규칙과 5분 단위 시계 읽기"] , e: ["📖","문장제","두 단계로 푸는 이야기 문제 (입력)"], f: ["🪙","돈과 거스름돈","1000원 지폐와 거스름돈 (입력)"] },
   };
+  MODE_LABEL.five = MODE_LABEL.easy;
   const modeName = (m, l) => MODE_LABEL[l][m][1];
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -458,7 +462,7 @@
   /* 문제 만들기 -------------------------------------------------- */
   function makeQ() {
     const L = state.level, m = state.mode, r = state.round;
-    const nC = Math.max(3, Math.min(5, (L === "easy" ? 3 : 4) + (DIFF >= 2 ? 1 : DIFF <= -2 ? -1 : 0)));
+    const nC = Math.max(level === "five" ? 2 : 3, Math.min(5, (L === "easy" ? 3 : 4) + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0)));
     if (m === "e") return wordProblem(L, nC);
     if (m === "f") return moneyQ(L, nC);
     if (L === "nine" && m === "d" && Math.random() < .5) return clockQ(nC);
@@ -466,8 +470,8 @@
 
     if (L === 'easy') {
       if (m === 'a') {            // 10까지 더하기·빼기 (그림)
-        const op = DIFF <= -2 ? "+" : (r < 4 && DIFF < 2) ? "+" : pick(["+", "-"]);
-        const cap = Math.max(4, Math.min(20, (r < 3 ? 6 : 10) + DIFF * 2));
+        const op = EFF() <= -2 ? "+" : (r < 4 && EFF() < 2) ? "+" : pick(["+", "-"]);
+        const cap = Math.max(4, Math.min(20, (r < 3 ? 6 : 10) + EFF() * 2));
         let a, b;
         if (op === '+') { a = rng(1, cap - 1); b = rng(1, cap - a); q.ans = a + b; }
         else { a = rng(2, cap); b = rng(1, a - 1); q.ans = a - b; }
@@ -479,7 +483,7 @@
         q.label = `${a} ${op === '+' ? '+' : '−'} ${b}`;
         q.choices = numChoices(q.ans, nC, { min: 0, max: 20 });
       } else if (m === 'b') {     // 몇 개일까? (20까지 세기)
-        const hi = Math.max(5, Math.min(30, 20 + DIFF * 3)), n = r < 3 ? rng(3, Math.min(9, hi)) : rng(Math.min(10, hi - 2), hi);
+        const hi = Math.max(5, Math.min(30, 20 + EFF() * 3)), n = r < 3 ? rng(3, Math.min(9, hi)) : rng(Math.min(10, hi - 2), hi);
         const f = pick(FRUITS);
         q.ans = n;
         q.stage = `<div class="group ${n > 10 ? 'wide' : ''}">${Array.from({length: n}, (_, i) => `<i style="animation-delay:${i * 30}ms">${f}</i>`).join('')}</div>`;
@@ -488,7 +492,7 @@
         q.label = f + ' ' + n + '개';
         q.choices = numChoices(n, nC, { min: 1, max: 30 });
       } else if (m === 'c') {     // 10 만들기
-        const T = DIFF <= -2 ? 5 : DIFF >= 2 ? 20 : 10;
+        const T = EFF() <= -2 ? 5 : EFF() >= 2 ? 20 : 10;
         const a = rng(1, T - 1); q.ans = T - a;
         q.stage = `<div class="tenframe">${Array.from({length: T}, (_, i) => `<i class="${i < a ? 'on' : 'q'}"></i>`).join('')}</div>`;
         q.ask = T + "을 만들려면 몇 개가 더 있어야 할까요?";
@@ -497,9 +501,9 @@
         q.choices = numChoices(q.ans, nC, { min: 1, max: T - 1 });
       } else {                    // 빠진 수 (1~30)
         let seq;
-        if (DIFF >= 2 && r % 2) { const s = rng(5, 30); seq = [0,1,2,3,4].map(i => s - i); }
-        else if (DIFF >= 3 && r % 3 === 0) { const s = 2 * rng(1, 8); seq = [0,1,2,3,4].map(i => s + 2 * i); }
-        else { const start = r < 4 ? rng(1, Math.max(2, 6 + DIFF * 2)) : rng(1, Math.max(6, 26 + DIFF * 4)); seq = [0,1,2,3,4].map(i => start + i); }
+        if (EFF() >= 2 && r % 2) { const s = rng(5, 30); seq = [0,1,2,3,4].map(i => s - i); }
+        else if (EFF() >= 3 && r % 3 === 0) { const s = 2 * rng(1, 8); seq = [0,1,2,3,4].map(i => s + 2 * i); }
+        else { const start = r < 4 ? rng(1, Math.max(2, 6 + EFF() * 2)) : rng(1, Math.max(6, 26 + EFF() * 4)); seq = [0,1,2,3,4].map(i => start + i); }
         const bi = rng(1, 4); q.ans = seq[bi];
         q.kind = 'seq';
         q.ask = seq[1] < seq[0] ? "거꾸로 세어요. 빈칸에 들어갈 수는?" : seq[1] - seq[0] === 2 ? "2씩 뛰어 세어요. 빈칸에 들어갈 수는?" : "순서대로 세어요. 빈칸에 들어갈 수는?";
@@ -587,7 +591,7 @@
         q.ask = b <= 6 ? `${a}개씩 ${b}묶음이면 모두 몇 개?` : `${a}단을 외워 보세요`;
         q.choices = numChoices(q.ans, nC, { min: 1, max: 50, extra: [a * (b + 1), a * (b - 1), a + b] });
       } else {                    // 시계 읽기 (정각·30분)
-        const h = rng(1, 12), mm = DIFF >= 2 ? pick([0, 15, 30, 45]) : DIFF <= -2 ? 0 : pick([0, 30, 0, 30]);
+        const h = rng(1, 12), mm = EFF() >= 2 ? pick([0, 15, 30, 45]) : EFF() <= -2 ? 0 : pick([0, 30, 0, 30]);
         q.kind = 'clock';
         q.stage = clockSVG(h, mm);
         q.ask = '시계가 가리키는 시각은?';
@@ -658,7 +662,7 @@
     let text = '', hint = '', unit = '개';
     const t = rnd(4);
     if (L === 'easy') {
-      if (t < 2 || DIFF <= -2) { const a = rng(1, 6), b = rng(1, 9 - a); q.ans = a + b; text = `${N} ${it} ${a}개를 가지고 있었어요. ${b}개를 더 받았어요. ${it}은 모두 몇 개일까요?`; hint = emojiRow(ie, a) + `<span class="opsign">+</span>` + emojiRow(ie, b); q.label = `${a} + ${b}`; }
+      if (t < 2 || EFF() <= -2) { const a = rng(1, 6), b = rng(1, 9 - a); q.ans = a + b; text = `${N} ${it} ${a}개를 가지고 있었어요. ${b}개를 더 받았어요. ${it}은 모두 몇 개일까요?`; hint = emojiRow(ie, a) + `<span class="opsign">+</span>` + emojiRow(ie, b); q.label = `${a} + ${b}`; }
       else { const a = rng(3, 10), b = rng(1, a - 1); q.ans = a - b; text = `${it} ${a}개 중에서 ${b}개를 먹었어요. 남은 ${it}은 몇 개일까요?`; hint = emojiRow(ie, a); q.label = `${a} − ${b}`; }
     } else if (L === 'hard') {
       if (t === 0) { const a = rng(5, 9), b = rng(11 - a, 9); q.ans = a + b; text = `버스에 ${a}명이 타고 있었어요. 다음 정류장에서 ${b}명이 더 탔어요. 버스에는 모두 몇 명이 있을까요?`; unit = '명'; q.label = `${a} + ${b}`; }
@@ -676,7 +680,7 @@
       else if (t === 2) { const d = rng(2, 9), k = rng(2, 9); q.ans = k; text = `${it} ${d * k}개를 ${d}명이 똑같이 나누어 가지려고 해요. 한 명이 몇 개씩 가질 수 있을까요?`; q.label = `${d * k} ÷ ${d}`; }
       else { const a = rng(20, 60), b = rng(10, 30), c = rng(5, 25); q.ans = a + b - c; text = `${N} ${it} ${a}개를 가지고 있었어요. ${b}개를 더 사고 친구에게 ${c}개를 주었어요. 지금 ${it}은 몇 개일까요?`; q.label = `${a} + ${b} − ${c}`; }
     }
-    q.stage = `<div class="story">${text}</div>` + (hint && DIFF < 2 ? `<div class="stage-hint">${hint}</div>` : "");
+    q.stage = `<div class="story">${text}</div>` + (hint && EFF() < 2 ? `<div class="stage-hint">${hint}</div>` : "");
     q.eq = `<span class="box" id="ansbox">${q.input ? '&nbsp;' : '?'}</span><span style="font-size:.6em">${unit}</span>`;
     q.unit = unit;
     if (!q.input) q.choices = numChoices(q.ans, nC, { min: 0, max: 40 });
@@ -688,7 +692,7 @@
   function moneyQ(L, nC) {
     const q = { kind: 'money', ans: 0, choices: null, input: L === 'pro' || L === 'nine', stage: '', eq: '', ask: '모두 얼마일까요?', label: '' };
     let counts;
-    if (L === "easy") counts = DIFF <= -2 ? { 100: rng(1, 5) } : DIFF >= 2 ? { 100: rng(0, 5), 50: rng(0, 1), 10: rng(0, 5) } : { 100: rng(1, 5), 10: rng(0, 5) };
+    if (L === "easy") counts = EFF() <= -2 ? { 100: rng(1, 5) } : EFF() >= 2 ? { 100: rng(0, 5), 50: rng(0, 1), 10: rng(0, 5) } : { 100: rng(1, 5), 10: rng(0, 5) };
     else if (L === 'hard') counts = { 100: rng(0, 6), 50: rng(0, 1), 10: rng(0, 4) };
     else if (L === 'pro') counts = { 500: rng(0, 2), 100: rng(0, 4), 50: rng(0, 1), 10: rng(0, 4) };
     else counts = { 1000: rng(0, 2), 500: rng(0, 1), 100: rng(0, 4), 50: rng(0, 1), 10: rng(0, 4) };
@@ -747,7 +751,7 @@
   function renderQ() {
     const q = state.q;
     $('round').textContent = (state.round + 1) + ' / ' + TOTAL;
-    $("tag").textContent = LEVEL_NAME[state.level] + DIFF_TXT() + ' · ' + modeName(state.mode, state.level);
+    $("tag").textContent = LEVEL_NAME[state.age || state.level] + DIFF_TXT() + ' · ' + modeName(state.mode, state.level);
     renderStars();
     $('ask').textContent = q.ask;
     $('stage').innerHTML = q.stage;
@@ -793,7 +797,7 @@
       const shakeEl = box || $('colans');
       if (shakeEl) { shakeEl.classList.remove('no'); void shakeEl.offsetWidth; shakeEl.classList.add('no'); }
       document.querySelectorAll('.choice').forEach(b => { if (b.dataset.v === String(v)) { b.classList.add('wrong'); b.disabled = true; } });
-      if (state.tries >= (DIFF <= -1 ? 3 : DIFF >= 2 ? 1 : 2)) {
+      if (state.tries >= (EFF() <= -1 ? 3 : EFF() >= 2 ? 1 : 2)) {
         // 두 번 틀리면 정답을 보여 주고 넘어가요
         state.locked = true;
         state.review[state.round] = false;
@@ -821,7 +825,7 @@
     state.q = makeQ(); renderQ();
   }
   function start(mode) {
-    state = { mode, level, round: 0, score: 0, q: null, locked: false, tries: 0, typed: '', startedAt: Date.now(), review: [], reviewLabels: [] };
+    state = { mode, level: level === "five" ? "easy" : level, age: level, round: 0, score: 0, q: null, locked: false, tries: 0, typed: '', startedAt: Date.now(), review: [], reviewLabels: [] };
     state.q = makeQ();
     show('game'); renderQ();
   }

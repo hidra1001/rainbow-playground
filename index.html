@@ -472,6 +472,7 @@
     for (const x of ['main','chars','settings']) $('tab-' + x).hidden = x !== t;
     document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.tab === t ? 'true' : 'false'));
     window.scrollTo(0, 0);
+    if (window.rpFit) window.rpFit();   // 탭이 바뀔 때만 한 화면 맞춤
   }
   function toast(text) {
     const el = document.createElement('div'); el.className = 'toast'; el.textContent = text; document.body.appendChild(el);

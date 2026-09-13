@@ -1,7 +1,7 @@
-/* 한 화면 맞춤: 내용이 화면보다 크면 .wrap 전체를 줄여서(zoom) 스크롤 없이 다 보이게 해요.
-   화면 크기·방향이 바뀌거나 내용이 바뀔 때마다 다시 잽니다. */
+/* 한 화면 맞춤: 처음 열 때(화면 크기·방향이 정해질 때) 내용이 화면보다 크면 .wrap 전체를 줄여요(zoom).
+   그 뒤로는 화면이 바뀔 때(탭 전환, 놀이 화면 전환)만 window.rpFit()로 다시 잽니다. */
 (function () {
-  let timer = null, busy = false;
+  let timer = null;
   function need() {   // 내용이 차지하는 높이·너비 (body 여백 포함)
     const w = document.querySelector('.wrap'), cs = getComputedStyle(document.body);
     const r = w.getBoundingClientRect();
@@ -13,7 +13,6 @@
   function fit() {
     const w = document.querySelector('.wrap');
     if (!w) return;
-    busy = true;
     w.style.zoom = '1';
     for (let i = 0; i < 4; i++) {
       const n = need();
@@ -22,14 +21,12 @@
       const cur = parseFloat(w.style.zoom) || 1;
       w.style.zoom = String(Math.max(0.4, Math.floor(cur * z * 0.985 * 1000) / 1000));
     }
-    busy = false;
   }
   const sched = () => { clearTimeout(timer); timer = setTimeout(fit, 60); };
+  window.rpFit = sched;
   addEventListener('resize', sched);
   addEventListener('orientationchange', sched);
   addEventListener('load', sched);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(sched);
-  new MutationObserver(recs => { if (busy) return; if (recs.some(r => !(r.type === 'attributes' && r.attributeName === 'style'))) sched(); })
-    .observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'class'] });
   sched();
 })();

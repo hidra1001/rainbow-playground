@@ -736,6 +736,7 @@
 
   function show(id) {
     ["home","game","result","prestart"].forEach(x => $(x).hidden = x !== id);
+    if (window.rpFit) window.rpFit();   // 화면이 바뀔 때만 한 화면 맞춤
     if (id === "home") loadBest();
     if (id === "result") reportMission();
   }

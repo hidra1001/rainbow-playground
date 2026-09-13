@@ -115,6 +115,10 @@
   .center { text-align: center; }
   .name { font-family: var(--display); font-size: 26px; text-align: center; width: min(320px, 80vw); padding: 12px 16px; border-radius: 20px; border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum); outline: none; user-select: text; -webkit-user-select: text; }
   .name:focus { border-color: var(--accent); box-shadow: 0 0 0 4px #FFD1E6; }
+  .pick.who { width: auto; border-radius: 30px; padding: 0 18px; font-family: var(--display); font-size: 20px; color: var(--plum); height: 54px; }
+  .share { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
+  .share img { border-radius: 12px; border: 3px solid #FFD6E7; background: #fff; flex: none; }
+  .share .url { font-family: var(--display); font-size: 20px; margin: 0 0 8px; color: var(--pink-deep); word-break: break-all; user-select: text; -webkit-user-select: text; }
   #login.card { max-width: 560px; margin: 8vh auto 0; }
   .note { color: var(--plum-soft); font-size: 13px; text-align: center; margin: 6px 0 0; }
   .danger { background: none; border: 2px solid #FFD6E7; border-radius: 30px; color: var(--plum-soft); font-family: var(--body); font-size: 14px; padding: 8px 16px; }
@@ -159,7 +163,7 @@
     .chars { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; }
     .char { font-size: 24px; border-radius: 12px; }
     .tier h3 { margin: 4px 0 6px; font-size: 15px; }
-    #tab-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; max-height: calc(100dvh - 84px); overflow: auto; }
+    #tab-settings { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: start; max-height: calc(100dvh - 84px); overflow: auto; }
     #tab-settings .card + .card { margin-top: 0; }
     .pickrow { margin: 6px 0 10px; gap: 8px; }
     .pick { width: 48px; height: 48px; font-size: 24px; }
@@ -188,12 +192,13 @@
     <p class="note">처음에 뽑기권 🎟️ 3장을 드려요. 캐릭터를 뽑아 내 친구로 삼고, 놀이 2판을 할 때마다 뽑기권을 한 장씩 더 받아요.</p>
   </section>
 
-  <!-- 로그인: 처음 정한 이름을 넣고 들어와요 -->
+  <!-- 로그인: 이름을 누르거나 넣고 들어와요 -->
   <section class="card" id="login" hidden>
     <h2 class="center" style="justify-content:center">🌈 소화 놀이터</h2>
-    <p class="center">이름을 넣고 들어와요</p>
+    <p class="center">누구예요? 이름을 누르거나 넣어 주세요</p>
+    <div class="pickrow" id="login-names"></div>
     <div class="center"><input id="login-in" class="name" type="text" maxlength="10" placeholder="내 이름" autocomplete="off" enterkeyhint="go"></div>
-    <div class="center" style="margin-top:12px"><button class="btn" id="login-ok">들어가기 🚪</button></div>
+    <div class="center" style="margin-top:12px"><button class="btn" id="login-ok">들어가기 🚪</button> <button class="danger" id="login-new" style="margin-left:8px">새 이름으로 시작</button></div>
     <p class="note" id="login-msg">&nbsp;</p>
   </section>
 
@@ -247,7 +252,21 @@
         </div>
         <p class="note">난이도는 놀이마다 시작 전 화면에서 따로 정해요. 놀이 2판마다 뽑기권 1장을 받고, 뽑기권으로 캐릭터를 뽑아요.</p>
         <p class="note" id="stats-line"></p>
-        <div class="center" style="margin-top:14px"><button class="danger" id="reset">처음부터 다시 시작 (기록 지우기)</button></div>
+        <div class="center" style="margin-top:14px"><button class="btn" id="logout" style="font-size:17px;padding:10px 18px">로그아웃 🚪</button> <button class="danger" id="reset" style="margin-left:8px">이 이름의 기록 지우기</button></div>
+        <p class="note">로그아웃하면 다른 이름으로 들어갈 수 있어요. 기록은 이름마다 따로, 이 기기에만 저장돼요.</p>
+      </div>
+      <div class="card">
+        <h2>앱으로 설치 · 공유</h2>
+        <div class="center"><button class="btn" id="install-btn" style="font-size:18px">📲 홈 화면에 앱으로 설치</button></div>
+        <p class="note" id="install-note">설치하면 전체 화면·가로 고정으로 열리고 인터넷 없이도 돼요. 버튼이 안 되면 브라우저 메뉴의 "홈 화면에 추가"를 눌러 주세요.</p>
+        <div class="share">
+          <img id="qr" src="qr.png" alt="소화 놀이터 QR 코드" width="150" height="150">
+          <div>
+            <p class="url" id="share-url">hidra1001.github.io/sohwa</p>
+            <button class="danger" id="copy-url">주소 복사</button>
+            <p class="note" style="text-align:left">다른 기기에서 QR을 찍거나 주소를 열면 그 기기에서 처음부터 시작해요. 기록은 서로 섞이지 않아요.</p>
+          </div>
+        </div>
       </div>
       <div class="card">
         <h2>부모님 리포트 <small>최근 7일</small></h2>
@@ -392,6 +411,7 @@
     P.tickets = Math.max(0, (P.tickets || 0) - 1);   // 뽑기권 한 장 사용
     P.draws = (P.draws || 0) + 1; P.lastChar = got;
     if (!P.avatar) P.avatar = got;
+    saveProfile();
     P.days[TODAY] = (P.days[TODAY] || 0) + 1;
     save('rp-profile', P);
     // 룰렛처럼 잠깐 돌다가 공개
@@ -512,45 +532,85 @@
   $('finish').addEventListener('click', () => { wakeAudio(); openDraw(); });
   $('voice-try').addEventListener('click', () => speak('안녕! 나는 소화 놀이터 친구야'));
   $('name-save').addEventListener('click', () => { const v = norm($('name-edit').value); if (!v) return toast('이름을 적어 주세요'); P.name = v; save('rp-profile', P); try { sessionStorage.setItem('rp-login', v); } catch (e) {} greet(); toast('이름을 ' + v + '(으)로 바꿨어요'); });
+  /* 이름별 프로필: 이 기기 안에서 여러 이름이 각자 기록을 가져요 (rp-profiles) */
   const norm = s => (s || '').trim().replace(/\s+/g, ' ');
+  const profiles = () => load('rp-profiles', {});
+  const diffKeys = () => Object.keys(localStorage).filter(k => k.startsWith('rp-diff:'));
+  function saveProfile() {   // 지금 쓰는 기록을 이 이름의 서랍에 넣어 둬요
+    if (!P || !P.name) return;
+    const diffs = {}; for (const k of diffKeys()) diffs[k] = localStorage.getItem(k);
+    const all = profiles(); all[P.name] = { profile: P, results: load('rp-results', {}), log: load('rp-log', []), diffs, at: Date.now() };
+    save('rp-profiles', all);
+  }
+  function clearActive() { ['rp-profile', 'rp-results', 'rp-log', ...diffKeys()].forEach(k => localStorage.removeItem(k)); }
+  function activate(name) {   // 서랍에서 꺼내 지금 쓰는 기록으로
+    const b = profiles()[name]; if (!b) return false;
+    clearActive();
+    P = b.profile; save('rp-profile', P); save('rp-results', b.results || {}); save('rp-log', b.log || []);
+    for (const [k, v] of Object.entries(b.diffs || {})) localStorage.setItem(k, v);
+    R = load('rp-results', {});
+    return true;
+  }
+  const findName = v => Object.keys(profiles()).find(n => n.toLowerCase() === v.toLowerCase());
   function enterApp() {
     try { sessionStorage.setItem('rp-login', P.name); } catch (e) {}
     $('setup').hidden = true; $('login').hidden = true; $('app').hidden = false; $('tabs').hidden = false;
-    renderAll(); warmAudio();
+    renderAll(); warmAudio(); saveProfile();
   }
+  function showLogin() {
+    const names = Object.keys(profiles());
+    $('login-names').innerHTML = names.map(n => `<button class="pick who" data-who="${n}">${(profiles()[n].profile?.avatar) || '🥚'} ${n}</button>`).join('');
+    $('login-msg').innerHTML = '&nbsp;'; $('login-in').value = '';
+    $('setup').hidden = true; $('app').hidden = true; $('tabs').hidden = true; $('login').hidden = false;
+  }
+  function showSetup() { $('login').hidden = true; $('setup').hidden = false; $('name-in').value = ''; renderPickers(null, 'ages'); setTimeout(() => $('name-in').focus(), 100); }
   $('setup-ok').addEventListener('click', () => {
     const name = norm($('name-in').value);
     if (!name) { toast('이름을 적어 주세요'); $('name-in').focus(); return; }
-    P.name = name;
-    P.days = {}; P.chars = []; P.counts = {}; P.draws = 0; P.tickets = 3; P.avatar = ''; P.v2 = 1; P.v3 = 1; P.v4 = 1;
-    try { localStorage.removeItem('rp-log'); } catch (e) {}
-    P.logDone = 0; P.toward = 0;
-    save('rp-profile', P);
+    if (findName(name)) { toast('이미 있는 이름이에요. 로그인해서 들어가요!'); showLogin(); return; }
+    if (P && P.name && P.days) saveProfile();   // 쓰던 사람 기록은 서랍에
+    clearActive();
+    P = { name, level: P?.level || 'hard', avatar: '', days: {}, chars: [], counts: {}, draws: 0, tickets: 3, v2: 1, v3: 1, v4: 1, logDone: 0, toward: 0 };
+    save('rp-profile', P); R = {};
     enterApp(); toast('환영해요, ' + name + '! 뽑기권 🎟️ 3장으로 첫 친구를 뽑아 봐요');
   });
   $('name-in').addEventListener('keydown', e => { if (e.key === 'Enter') $('setup-ok').click(); });
+  function loginAs(name) { if (!activate(name)) return false; enterApp(); toast('어서 와요, ' + P.name + '!'); return true; }
   $('login-ok').addEventListener('click', () => {
-    const v = norm($('login-in').value);
-    if (v && P.name && v.toLowerCase() === P.name.toLowerCase()) { enterApp(); toast('어서 와요, ' + P.name + '!'); }
-    else { $('login-msg').textContent = v ? '이름이 달라요. 처음에 정한 이름을 넣어 주세요.' : '이름을 넣어 주세요.'; $('login-in').focus(); }
+    const v = norm($('login-in').value), n = v && findName(v);
+    if (n) loginAs(n);
+    else { $('login-msg').textContent = v ? '그 이름은 없어요. 이름을 다시 넣거나 "새 이름으로 시작"을 눌러요.' : '이름을 넣어 주세요.'; $('login-in').focus(); }
   });
   $('login-in').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-ok').click(); });
+  $('login-new').addEventListener('click', showSetup);
+  $('logout').addEventListener('click', () => { saveProfile(); try { sessionStorage.removeItem('rp-login'); } catch (e) {} toast('로그아웃했어요'); showLogin(); });
+  /* 홈 화면에 앱으로 설치 */
+  let deferredInstall = null;
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+  if (matchMedia('(display-mode: standalone)').matches) { $('install-btn').hidden = true; $('install-note').textContent = '이미 앱으로 설치되어 있어요.'; }
+  $('install-btn').addEventListener('click', async () => {
+    if (!deferredInstall) return toast('브라우저 메뉴(≡ 또는 ⋮)에서 "홈 화면에 추가"를 눌러 주세요');
+    deferredInstall.prompt(); const r = await deferredInstall.userChoice; deferredInstall = null;
+    if (r && r.outcome === 'accepted') toast('홈 화면에 설치했어요! 🌈');
+  });
+  $('copy-url').addEventListener('click', async () => { try { await navigator.clipboard.writeText('https://hidra1001.github.io/sohwa/'); toast('주소를 복사했어요'); } catch (e) { toast('주소: hidra1001.github.io/sohwa'); } });
   $('reset').addEventListener('click', () => {
-    if (!confirm('정말 모든 기록을 지우고 처음부터 시작할까요?')) return;
-    Object.keys(localStorage).filter(k => k.startsWith('rp-') || k.startsWith('rainbow-')).forEach(k => localStorage.removeItem(k));
+    if (!confirm(`정말 "${P.name}"의 기록(캐릭터·뽑기권·점수)을 모두 지울까요?`)) return;
+    const all = profiles(); delete all[P.name]; save('rp-profiles', all);
+    clearActive(); try { sessionStorage.removeItem('rp-login'); } catch (e) {}
     location.reload();
   });
   // 놀이에서 돌아오면 결과를 새로 읽고, 날짜가 바뀌었으면 새로 시작해요
-  const refresh = () => { if (dayKey(new Date()) !== TODAY) return location.reload(); if (P && P.days) { R = load('rp-results', {}); grantTickets(); renderMain(); } };
+  const refresh = () => { if (dayKey(new Date()) !== TODAY) return location.reload(); if (P && P.days && !$('app').hidden) { R = load('rp-results', {}); grantTickets(); renderMain(); saveProfile(); } };
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
   addEventListener('pageshow', refresh);
 
   /* 시작 */
   applyTheme();
+  document.addEventListener('click', e => { const w = e.target.closest('[data-who]'); if (w) loginAs(w.dataset.who); });
   if (!P || !P.days) {
-    P = { avatar: '', level: 'hard', chars: [] };
-    renderPickers(null, 'ages');
-    $('setup').hidden = false;
+    if (Object.keys(profiles()).length) showLogin();   // 로그아웃 상태: 이름을 골라 들어와요
+    else { P = { avatar: '', level: 'hard', chars: [] }; renderPickers(null, 'ages'); $('setup').hidden = false; }
   } else {
     if (!P.v3) { P.v3 = 1; P.tickets = (P.tickets || 0) + 3; }   // 기존 사용자에게도 뽑기권 3장
     if (!P.v4) { P.v4 = 1; P.logDone = 0; P.toward = 0; }         // 지금까지 한 놀이도 2판마다 뽑기권으로
@@ -564,8 +624,9 @@
       if (!lg.length) { const t = Date.now() - 1000; for (const [id, sc] of Object.entries(todayRes())) lg.push({ t, id, score: sc }); save('rp-log', lg); }
     }
     save('rp-profile', P);
+    if (!profiles()[P.name]) saveProfile();   // 예전 기록을 이름 서랍으로
     let logged = false; try { logged = sessionStorage.getItem('rp-login') === P.name; } catch (e) {}
-    if (logged) enterApp(); else { $('login').hidden = false; setTimeout(() => $('login-in').focus(), 100); }
+    if (logged) enterApp(); else showLogin();
   }
 })();
 </script>

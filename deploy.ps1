@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 $stamp = Get-Date -Format "yyyyMMddHHmm"
 $swPath = Join-Path $PSScriptRoot 'sw.js'
 (Get-Content $swPath -Raw) -replace "const VERSION = '[^']*';", "const VERSION = 'rainbow-$stamp';" | Set-Content $swPath -NoNewline
-$repo = 'rainbow-playground'
+$repo = 'sohwa'
 $user = (gh api user --jq .login)
 Set-Location $PSScriptRoot
 

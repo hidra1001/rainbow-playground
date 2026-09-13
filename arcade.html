@@ -297,7 +297,7 @@
       <span id="round">0 / 10</span>
       <span class="tag" id="tag"></span>
       <span class="lives" id="lives">❤️❤️❤️</span>
-      <button id="quit" type="button">놀이터로</button>
+      <button id="quit" type="button">처음으로</button>
     </div>
     <div class="stars" id="stars" aria-label="모은 별"></div>
     <p class="ask" id="ask"></p>
@@ -835,7 +835,7 @@
   $('answers').addEventListener('click', e => { const b = e.target.closest('.btn'); if (b) tapAnswer(b); });
   $('area').addEventListener('click', e => { if (!state || state.mode !== 'mole') return; const h = e.target.closest('.hole'); if (h) tapHole(h); });
   $('again').addEventListener('click', () => start(state.mode));
-  $('home-btn').addEventListener('click', () => { clearAll(); state = null; show('home'); });
+  $("home-btn").addEventListener("click", () => { location.href = "index.html"; });
   $("quit").addEventListener("click", () => { location.href = "index.html"; });
 
   /* 놀이터(index.html) 미션 연동 */
@@ -848,8 +848,10 @@
       all[day] = all[day] || {};
       all[day][missionId] = Math.max(all[day][missionId] || 0, state.score);
       localStorage.setItem(key, JSON.stringify(all));
+      // 뽑기 에너지용 기록: 놀이를 마칠 때마다 한 줄씩
+      const lg = JSON.parse(localStorage.getItem("rp-log") || "[]"); lg.push({ t: Date.now(), id: missionId, score: Math.round(state.score * 10 / TOTAL) }); if (lg.length > 500) lg.splice(0, lg.length - 500); localStorage.setItem("rp-log", JSON.stringify(lg));
     } catch (e) {}
-    $("to-hub").hidden = false; $("home-btn").hidden = true;
+    $("to-hub").hidden = true; $("home-btn").hidden = false;
   }
   function renderDiff() {
     document.querySelectorAll("#diffrow button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === DIFF ? "true" : "false"));

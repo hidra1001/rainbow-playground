@@ -62,27 +62,34 @@
   .modes a .sc { font-size: 13px; color: #3FA85D; white-space: nowrap; }
   .modes a.played { background: #F1FBF3; border-color: #BFE9C8; }
 
-  /* 캐릭터 등급 효과: 노말(밋밋) → 레어(파란 빛) → 유니크(보라 반짝) → 레전더리(무지개 테두리 + 별빛) */
+  /* 캐릭터 등급 효과: 일반(밋밋) → 희귀(파란 빛) → 영웅(보라 반짝) → 전설(무지개 테두리 + 별빛) → 신화(금빛 후광 + 두 별빛 + 두근두근) */
   .char { aspect-ratio: 1; border-radius: 18px; background: var(--ground-2); border: 2px solid #FFD6E7; display: grid; place-items: center; font-size: 32px; cursor: pointer; position: relative; }
   .char.locked { filter: grayscale(1) opacity(.28); cursor: default; }
   .char.new { animation: pop .5s; }
   .char[aria-pressed="true"]:not(.locked)::after { content: "✔"; position: absolute; right: 4px; bottom: 2px; font-size: 12px; color: var(--pink-deep); }
+  .char .cnt { position: absolute; left: 3px; top: 2px; font-style: normal; font-size: 11px; font-family: var(--display); background: var(--pink); color: #fff; border-radius: 10px; padding: 0 5px; z-index: 1; }
   .t-rare:not(.locked) { border-color: #5DADE2; box-shadow: 0 0 10px 2px rgba(93,173,226,.55); background: #EEF7FD; }
-  .t-unique:not(.locked) { border-color: #B57EDC; background: linear-gradient(135deg, #F6EEFF, #E9D8FF); box-shadow: 0 0 14px 3px rgba(181,126,220,.6); animation: shimmer 2.2s infinite alternate; }
+  .t-epic:not(.locked) { border-color: #B57EDC; background: linear-gradient(135deg, #F6EEFF, #E9D8FF); box-shadow: 0 0 14px 3px rgba(181,126,220,.6); animation: shimmer 2.2s infinite alternate; }
   .t-legendary:not(.locked) { border: 3px solid transparent; background: linear-gradient(#FFF8E1, #FFF8E1) padding-box, conic-gradient(from var(--ang, 0deg), #FF6B6B, #FFB347, #FFE66D, #7ED957, #5DADE2, #B57EDC, #FF6B6B) border-box; box-shadow: 0 0 18px 4px rgba(255,200,80,.7); animation: spin 3s linear infinite; }
   .t-legendary:not(.locked)::before { content: "✨"; position: absolute; left: 2px; top: 0; font-size: 12px; animation: twinkle 1.2s infinite alternate; }
+  .t-mythic:not(.locked) { border: 3px solid transparent; background: linear-gradient(#FFFDF2, #FFF3C4) padding-box, conic-gradient(from var(--ang, 0deg), #FFD54F, #FFF8E1, #FFB300, #FFF8E1, #FFD54F) border-box; box-shadow: 0 0 22px 6px rgba(255,190,40,.85), 0 0 40px 10px rgba(255,220,120,.4); animation: spin 2s linear infinite, beat 1.4s ease-in-out infinite; }
+  .t-mythic:not(.locked)::before { content: "✨"; position: absolute; left: 2px; top: 0; font-size: 13px; animation: twinkle 1s infinite alternate; }
+  .t-mythic:not(.locked)::after { content: "💫"; position: absolute; right: 2px; bottom: 0; font-size: 13px; animation: twinkle 1.3s infinite alternate-reverse; }
+  .t-mythic[aria-pressed="true"]:not(.locked)::after { content: "✔"; }
   @property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
   @keyframes spin { to { --ang: 360deg; } }
+  @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
   @keyframes shimmer { from { filter: brightness(1); } to { filter: brightness(1.15); } }
   @keyframes twinkle { from { opacity: .3; transform: scale(.8); } to { opacity: 1; transform: scale(1.2); } }
   .tier { margin-bottom: 12px; }
   .tier h3 { display: flex; align-items: center; gap: 8px; margin: 6px 0 8px; }
   .tier h3 .badge { font-size: 12px; padding: 2px 10px; border-radius: 20px; color: #fff; font-family: var(--body); }
-  .badge.normal { background: #B9AEB5; } .badge.rare { background: #5DADE2; } .badge.unique { background: #B57EDC; } .badge.legendary { background: linear-gradient(90deg, #FF6B6B, #FFB347, #7ED957, #5DADE2, #B57EDC); }
+  .badge.normal { background: #B9AEB5; } .badge.rare { background: #5DADE2; } .badge.epic { background: #B57EDC; } .badge.legendary { background: linear-gradient(90deg, #FF6B6B, #FFB347, #7ED957, #5DADE2, #B57EDC); } .badge.mythic { background: linear-gradient(90deg, #FFB300, #FFD54F, #FF8F00); color: #4E3400; }
   .chars { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; }
   .avatar.t-rare { border-color: #5DADE2; box-shadow: 0 0 12px 3px rgba(93,173,226,.6); }
-  .avatar.t-unique { border-color: #B57EDC; box-shadow: 0 0 14px 4px rgba(181,126,220,.65); }
+  .avatar.t-epic { border-color: #B57EDC; box-shadow: 0 0 14px 4px rgba(181,126,220,.65); }
   .avatar.t-legendary { border-color: #FFD54F; box-shadow: 0 0 18px 5px rgba(255,200,80,.75); }
+  .avatar.t-mythic { border-color: #FFB300; box-shadow: 0 0 22px 6px rgba(255,190,40,.85); animation: beat 1.4s ease-in-out infinite; }
 
   /* 뽑기·보상 */
   .reward { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(91,42,78,.55); z-index: 25; }
@@ -91,7 +98,7 @@
   .reward .big.t-legendary { font-size: 100px; }
   .reward h2 { font-family: var(--display); font-size: 28px; margin: 8px 0 4px; color: var(--pink-deep); font-weight: normal; }
   .reward p { margin: 0 0 14px; color: var(--plum-soft); }
-  .chance { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0 14px; }
+  .chance { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0 14px; }
   .chance div { border-radius: 14px; padding: 8px 4px; font-family: var(--display); font-size: 14px; color: #fff; }
   .chance b { display: block; font-size: 20px; font-weight: normal; }
   .egg { font-size: 90px; line-height: 1; animation: wobble .8s infinite; }
@@ -126,7 +133,7 @@
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
 
   @keyframes pop { from { transform: scale(0); } 70% { transform: scale(1.2); } to { transform: scale(1); } }
-  @media (prefers-reduced-motion: reduce) { .char.new, .reward .big, .egg, .t-unique, .t-legendary, .t-legendary::before { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .char.new, .reward .big, .egg, .t-epic, .t-legendary, .t-legendary::before, .t-mythic, .t-mythic::before, .t-mythic::after, .avatar.t-mythic { animation: none; } }
   @media (min-width: 700px) { .games { grid-template-columns: 1fr 1fr; } .modes { grid-template-columns: 1fr 1fr 1fr; } }
 
   /* 태블릿 가로 화면: 스크롤 없이 한 화면에 */
@@ -173,7 +180,7 @@
     <p class="center">몇 살이에요?</p>
     <div class="pickrow" id="ages"></div>
     <div class="center"><button class="btn" id="setup-ok">시작하기 🚀</button></div>
-    <p class="note">놀이를 하고 나서 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 별을 많이 모을수록 좋은 등급이 나와요.</p>
+    <p class="note">놀이를 하고 나서 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 놀이를 많이·잘 하고 뽑을수록 좋은 등급이 나와요.</p>
   </section>
 
   <div id="app" hidden>
@@ -198,7 +205,7 @@
     <section id="tab-chars" hidden>
       <div class="card">
         <h2>캐릭터 도감 <small id="char-count"></small></h2>
-        <p class="note" style="margin:0 0 10px">하루에 한 번, 놀이를 하고 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 별을 많이 모을수록 레어·유니크·레전더리가 잘 나와요. 모은 캐릭터를 누르면 내 친구로 바꿀 수 있어요.</p>
+        <p class="note" style="margin:0 0 10px">놀이를 하고 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 뽑기 사이에 놀이를 많이·잘 할수록 희귀·영웅·전설·신화가 잘 나와요. 같은 친구를 또 만나면 숫자가 올라가요. 모은 캐릭터를 누르면 내 친구로 바꿀 수 있어요.</p>
         <div id="chars"></div>
       </div>
     </section>
@@ -222,13 +229,7 @@
           <button type="button" data-count="10">10문제</button>
           <button type="button" data-count="5">5문제 (짧게)</button>
         </div>
-        <p class="center" style="margin-top:16px">캐릭터를 뽑으려면 하루에 몇 놀이?</p>
-        <div class="seg" id="need-seg">
-          <button type="button" data-need="1">1개</button>
-          <button type="button" data-need="3">3개</button>
-          <button type="button" data-need="5">5개</button>
-        </div>
-        <p class="note">난이도는 놀이마다 시작 전 화면에서 따로 정해요.</p>
+        <p class="note">난이도는 놀이마다 시작 전 화면에서 따로 정해요. 캐릭터 뽑기는 놀이를 한 뒤 언제든 할 수 있고, 뽑기 사이에 놀이를 많이·잘 할수록 좋은 등급이 나와요.</p>
         <p class="note" id="stats-line"></p>
         <div class="center" style="margin-top:14px"><button class="danger" id="reset">처음부터 다시 시작 (기록 지우기)</button></div>
       </div>
@@ -273,14 +274,15 @@
     { n: '공룡의 날', e: '🦖', c: '#FFB347', d: '#D9902E', msg: '공룡처럼 힘차게 크앙!' },
     { n: '마법의 날', e: '🪄', c: '#F2C94C', d: '#C9A227', msg: '마법처럼 척척 풀려요!' },
   ];
-  /* 캐릭터 등급: 노말(단순) → 레어 → 유니크 → 레전더리(화려) */
+  /* 캐릭터 등급 5단계: 일반(단순) → 희귀 → 영웅 → 전설 → 신화(가장 화려) */
   const TIERS = {
-    normal:    { name: '노말', cls: 'normal', chars: ['🐶','🐱','🐭','🐹','🐰','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🐝','🐛','🐌','🐞','🐜','🐢','🐟','🐠','🐙','🦀','🐑','🐐','🐴','🦒','🦓','🐘','🦔','🦝','🐺','🦊','🐗'] },
-    rare:      { name: '레어', cls: 'rare', chars: ['🦋','🐬','🐳','🦈','🦭','🦩','🦚','🦜','🦢','🦉','🦅','🐉','🦕','🦖','🦧','🦥','🦦','🦨','🦡','🐊','🦎','🐍','🦂','🦌'] },
-    unique:    { name: '유니크', cls: 'unique', chars: ['🦄','🧚','🧜','🧞','🧙','🧝','🧛','🤖','👾','👻','👽','🎃'] },
-    legendary: { name: '레전더리', cls: 'legendary', chars: ['🐲','🔥','🌈','👑','💎','🌟'] },
+    normal:    { name: '일반', cls: 'normal', chars: ['🐶','🐱','🐭','🐹','🐰','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🐝','🐛','🐌','🐞','🐜','🐢','🐟','🐠','🐙','🦀','🐑','🐐','🐴','🦒','🦓','🐘','🦔','🦝','🐺','🦊','🐗'] },
+    rare:      { name: '희귀', cls: 'rare', chars: ['🦋','🐬','🐳','🦈','🦭','🦩','🦚','🦜','🦢','🦉','🦅','🦌','🦕','🦖','🦧','🦥','🦦','🦨','🦡','🐊','🦎','🐍','🦂','🐲'] },
+    epic:      { name: '영웅', cls: 'epic', chars: ['🧚','🧜','🧞','🧙','🧝','🧛','🦸','🦹','🤖','👾','👻','👽'] },
+    legendary: { name: '전설', cls: 'legendary', chars: ['🦄','🐉','🔥','🌈','👑','💎','🌟','🎇'] },
+    mythic:    { name: '신화', cls: 'mythic', chars: ['🌌','☄️','🪐','🔱'] },
   };
-  const TIER_ORDER = ['normal', 'rare', 'unique', 'legendary'];
+  const TIER_ORDER = ['normal', 'rare', 'epic', 'legendary', 'mythic'];
   const tierOf = c => TIER_ORDER.find(t => TIERS[t].chars.includes(c)) || 'normal';
   const ALL_CHARS = [...new Set(TIER_ORDER.flatMap(t => TIERS[t].chars))];
 
@@ -301,18 +303,24 @@
   const starsToday = () => Object.values(todayRes()).reduce((a, b) => a + b, 0);
   const need = () => load('rp-need', 3);
 
-  /* 뽑기 확률: 오늘 맞힌 비율이 높을수록, 놀이를 많이 할수록 좋은 등급이 잘 나와요 */
-  function quality() { const n = playedToday(); return n ? Math.min(1, starsToday() / (n * 10) + Math.max(0, Math.min(.15, (n - 3) * .05))) : 0; }
-  function tierChances() {
-    const q = quality();
-    if (q >= .9) return { legendary: 25, unique: 35, rare: 30, normal: 10 };
-    if (q >= .7) return { legendary: 8, unique: 27, rare: 40, normal: 25 };
-    if (q >= .5) return { legendary: 3, unique: 15, rare: 37, normal: 45 };
-    return { legendary: 1, unique: 7, rare: 27, normal: 65 };
+  /* 뽑기 에너지: 마지막 뽑기 이후에 한 놀이 수와 별. 많이·잘 할수록 좋은 등급이 잘 나와요. 뽑으면 에너지는 다시 0부터 */
+  function pending() {
+    const since = P.lastDrawAt || 0, rows = load('rp-log', []).filter(r => r.t > since);
+    return { n: rows.length, stars: rows.reduce((a, r) => a + (r.score || 0), 0) };
   }
-  function drawTier(rng) {
-    const ch = tierChances(); let r = rng() * 100;
-    for (const t of ['legendary', 'unique', 'rare', 'normal']) { if (r < ch[t]) return t; r -= ch[t]; }
+  function tierChances() {
+    const { n, stars } = pending();
+    if (!n) return { mythic: 0, legendary: 0, epic: 0, rare: 0, normal: 100 };
+    const r1 = x => Math.round(x * 10) / 10;
+    const mythic = Math.min(10, r1(stars * 0.2));          // 별 10개 → 2%, 50개 → 10%
+    const legendary = Math.min(20, r1(stars * 0.4));       // 별 10개 → 4%, 50개 → 20%
+    const epic = Math.min(30, r1(1 + stars * 0.6));         // 별 10개 → 7%, 50개 → 30%
+    const rare = Math.min(35, r1(6 + stars * 0.7));         // 별 10개 → 13%, 50개 → 35%
+    return { mythic, legendary, epic, rare, normal: r1(100 - mythic - legendary - epic - rare) };
+  }
+  function drawTier() {
+    const ch = tierChances(); let r = Math.random() * 100;
+    for (const t of ['mythic', 'legendary', 'epic', 'rare', 'normal']) { if (r < ch[t]) return t; r -= ch[t]; }
     return 'normal';
   }
 
@@ -337,33 +345,33 @@
       const id = g + ':' + P.level + ':' + m, sc = res[id];
       return `<a class="${sc != null ? 'played' : ''}" href="${G.file}?level=${P.level}&mode=${m}&n=${load('rp-count', 10)}"><span>${G.labels[P.level][i]}</span>${sc != null ? `<span class="sc">⭐ ${sc}</span>` : ''}</a>`;
     }).join('')}</div></div>`).join('');
-    const claimed = P.days[TODAY]?.char;
-    $('today-n').textContent = `오늘 한 놀이 ${n}개 · ⭐ ${starsToday()}`;
+    const pd = pending();
+    $('today-n').textContent = `뽑기 에너지 · 놀이 ${pd.n}개 · ⭐ ${pd.stars}`;
     const btn = $('finish');
-    if (claimed) { btn.textContent = '오늘 캐릭터 받음 ' + claimed; btn.classList.add('done'); }
-    else { btn.textContent = n >= need() ? '캐릭터 받기 🎁' : `놀이 ${need()}개 하면 캐릭터 🎁 (${n}/${need()})`; btn.classList.remove('done'); }
+    btn.textContent = pd.n ? '캐릭터 받기 🎁' : '놀이를 하면 뽑을 수 있어요';
+    btn.classList.toggle('done', !pd.n);
   }
   function openDraw() {
-    const n = playedToday();
-    if (P.days[TODAY]?.char) return toast('오늘 캐릭터는 이미 받았어요. 내일 또 만나요! ' + P.days[TODAY].char);
-    if (n < need()) return toast(`놀이를 ${need()}개 이상 하면 캐릭터를 받을 수 있어요 (지금 ${n}개)`);
+    const pd = pending();
+    if (!pd.n) return toast('놀이를 하나 하고 오면 캐릭터를 뽑을 수 있어요!');
     const ch = tierChances();
     const box = document.createElement('div'); box.className = 'reward'; box.id = 'draw';
-    box.innerHTML = `<div class="box"><div class="egg">🥚</div><h2>캐릭터 뽑기</h2><p>오늘 놀이 ${n}개 · ⭐ ${starsToday()}개 · 맞힌 비율 ${Math.round(quality() * 100)}%</p>
-      <div class="chance"><div class="badge normal">노말<b>${ch.normal}%</b></div><div class="badge rare">레어<b>${ch.rare}%</b></div><div class="badge unique">유니크<b>${ch.unique}%</b></div><div class="badge legendary">레전더리<b>${ch.legendary}%</b></div></div>
+    box.innerHTML = `<div class="box"><div class="egg">🥚</div><h2>캐릭터 뽑기</h2><p>놀이 ${pd.n}개 · ⭐ ${pd.stars}개로 뽑아요. 더 놀고 오면 좋은 등급이 잘 나와요!</p>
+      <div class="chance"><div class="badge normal">일반<b>${ch.normal}%</b></div><div class="badge rare">희귀<b>${ch.rare}%</b></div><div class="badge epic">영웅<b>${ch.epic}%</b></div><div class="badge legendary">전설<b>${ch.legendary}%</b></div><div class="badge mythic">신화<b>${ch.mythic}%</b></div></div>
       <button class="btn" id="draw-go">뽑기! 🎲</button> <button class="danger" id="draw-cancel" style="margin-left:8px">더 놀고 올게요</button></div>`;
     document.body.appendChild(box);
     box.querySelector('#draw-cancel').addEventListener('click', () => box.remove());
     box.querySelector('#draw-go').addEventListener('click', () => { box.remove(); doDraw(); });
   }
   function doDraw() {
-    const rng = seeded('char-' + TODAY + '-' + P.avatar + '-' + starsToday());
-    const tier = drawTier(rng);
-    const pool = TIERS[tier].chars, left = pool.filter(c => !P.chars.includes(c));
-    const got = left.length ? pickSeeded(rng, left) : pickSeeded(rng, pool);
+    const tier = drawTier();
+    const pool = TIERS[tier].chars;
+    const got = pool[Math.floor(Math.random() * pool.length)];          // 중복도 나와요
     const isNew = !P.chars.includes(got);
     if (isNew) P.chars.push(got);
-    P.days[TODAY] = { char: got, tier, played: playedToday(), stars: starsToday() };
+    P.counts = P.counts || {}; P.counts[got] = (P.counts[got] || 0) + 1;
+    P.draws = (P.draws || 0) + 1; P.lastDrawAt = Date.now(); P.lastChar = got;
+    P.days[TODAY] = (P.days[TODAY] || 0) + 1;
     save('rp-profile', P);
     // 룰렛처럼 잠깐 돌다가 공개
     const box = document.createElement('div'); box.className = 'reward'; box.id = 'reveal';
@@ -374,27 +382,26 @@
     setTimeout(() => {
       clearInterval(spin);
       reel.outerHTML = `<div class="big t-${tier} char" style="cursor:default">${got}</div>`;
-      box.querySelector('#reveal-title').textContent = `${TIERS[tier].name} ${got} ${isNew ? '새 친구를 만났어요!' : '친구를 다시 만났어요!'}`;
-      box.querySelector('#reveal-msg').textContent = tier === 'legendary' ? '와! 아주 귀한 레전더리 친구예요!' : tier === 'unique' ? '반짝반짝 유니크 친구예요!' : tier === 'rare' ? '빛나는 레어 친구예요!' : '귀여운 노말 친구예요. 별을 더 모으면 더 좋은 친구가 나와요!';
+      box.querySelector('#reveal-title').textContent = `${TIERS[tier].name} ${got} ${isNew ? '새 친구를 만났어요!' : `친구를 또 만났어요! (×${P.counts[got]})`}`;
+      box.querySelector('#reveal-msg').textContent = { mythic: '우와! 세상에 몇 없는 신화 친구예요!!', legendary: '와! 아주 귀한 전설 친구예요!', epic: '반짝반짝 영웅 친구예요!', rare: '빛나는 희귀 친구예요!', normal: '귀여운 일반 친구예요. 놀이를 더 하고 뽑으면 더 좋은 친구가 나와요!' }[tier];
       box.querySelector('#reward-ok').hidden = false;
-      confetti(tier === 'legendary' ? 260 : tier === 'unique' ? 180 : 120); sndWin();
+      confetti({ mythic: 340, legendary: 260, epic: 180, rare: 130, normal: 90 }[tier]); sndWin();
       speak(TIERS[tier].name + ' 친구를 만났어요!');
     }, 1800);
     box.querySelector('#reward-ok').addEventListener('click', () => { box.remove(); renderAll(); showTab('chars'); });
   }
   function renderChars() {
-    const newest = P.days[TODAY]?.char;
+    const newest = P.lastChar, cnt = P.counts || {};
     $('chars').innerHTML = TIER_ORDER.map(t => { const T = TIERS[t], own = T.chars.filter(c => P.chars.includes(c)).length;
-      return `<div class="tier"><h3><span class="badge ${T.cls}">${T.name}</span><small>${own} / ${T.chars.length}</small></h3><div class="chars">${T.chars.map(c => { const has = P.chars.includes(c); return `<button class="char t-${t} ${has ? '' : 'locked'} ${c === newest ? 'new' : ''}" data-char="${c}" ${has ? '' : 'disabled'} aria-pressed="${P.avatar === c}">${has ? c : '❔'}</button>`; }).join('')}</div></div>`; }).join('');
-    $('char-count').textContent = P.chars.length + ' / ' + ALL_CHARS.length;
+      return `<div class="tier"><h3><span class="badge ${T.cls}">${T.name}</span><small>${own} / ${T.chars.length}</small></h3><div class="chars">${T.chars.map(c => { const has = P.chars.includes(c); return `<button class="char t-${t} ${has ? '' : 'locked'} ${c === newest ? 'new' : ''}" data-char="${c}" ${has ? '' : 'disabled'} aria-pressed="${P.avatar === c}">${has ? c : '❔'}${cnt[c] > 1 ? `<i class="cnt">×${cnt[c]}</i>` : ''}</button>`; }).join('')}</div></div>`; }).join('');
+    $('char-count').textContent = `서로 다른 캐릭터 ${P.chars.length} / ${ALL_CHARS.length} · 뽑기 ${P.draws || 0}번`;
   }
   function renderSettings() {
-    $('stats-line').textContent = `지금까지 ${Object.keys(P.days).length}일 놀았고, 캐릭터 ${P.chars.length}개를 모았어요.`;
+    $('stats-line').textContent = `지금까지 ${Object.keys(P.days).length}일 놀았고, 캐릭터를 ${P.draws || 0}번 뽑아 서로 다른 ${P.chars.length}개를 모았어요.`;
     const v = load('rp-voice', 'clip');
     document.querySelectorAll('#voice-seg [data-voice]').forEach(b => b.setAttribute('aria-pressed', b.dataset.voice === v ? 'true' : 'false'));
     const cnt = load('rp-count', 10);
     document.querySelectorAll('#count-seg [data-count]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.count === cnt ? 'true' : 'false'));
-    document.querySelectorAll('#need-seg [data-need]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.need === need() ? 'true' : 'false'));
     renderReport();
   }
   function renderReport() {
@@ -468,13 +475,12 @@
     const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderMain(); } renderPickers('avatars', 'ages'); if (P.days) renderPickers('avatars2', 'ages2'); return; }
     const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 무지개 놀이터 친구야'); return; }
     const cc = e.target.closest('[data-count]'); if (cc) { save('rp-count', +cc.dataset.count); renderSettings(); renderMain(); return; }
-    const nd = e.target.closest('[data-need]'); if (nd) { save('rp-need', +nd.dataset.need); renderSettings(); renderMain(); return; }
     const tab = e.target.closest('.tabs button'); if (tab) showTab(tab.dataset.tab);
   });
   $('finish').addEventListener('click', openDraw);
   $('voice-try').addEventListener('click', () => speak('안녕! 나는 무지개 놀이터 친구야'));
   $('setup-ok').addEventListener('click', () => {
-    P.days = {}; P.chars = [];
+    P.days = {}; P.chars = []; P.counts = {}; P.draws = 0; P.lastDrawAt = 0;
     save('rp-profile', P);
     $('setup').hidden = true; $('app').hidden = false; $('tabs').hidden = false;
     renderAll(); toast('환영해요, ' + P.avatar + ' 친구! 하고 싶은 놀이를 골라요'); warmAudio();
@@ -497,7 +503,7 @@
     $('setup').hidden = false;
   } else {
     if (!AGES[P.level]) P.level = 'hard';
-    P.chars = P.chars || P.stickers || []; P.days = P.days || {};
+    P.chars = P.chars || P.stickers || []; P.days = P.days || {}; P.counts = P.counts || {};
     save('rp-profile', P);
     $('app').hidden = false; $('tabs').hidden = false;
     renderAll(); warmAudio();

@@ -377,7 +377,7 @@
       <button class="btn" id="draw-go">뽑기! 🎲</button> <button class="danger" id="draw-cancel" style="margin-left:8px">더 놀고 올게요</button></div>`;
     document.body.appendChild(box);
     box.querySelector('#draw-cancel').addEventListener('click', () => box.remove());
-    box.querySelector('#draw-go').addEventListener('click', () => { box.remove(); doDraw(); });
+    box.querySelector('#draw-go').addEventListener('click', () => { wakeAudio(); box.remove(); doDraw(); });
   }
   function doDraw() {
     const tier = drawTier();
@@ -396,15 +396,17 @@
     box.innerHTML = `<div class="box"><div class="reel" id="reel">❔</div><h2 id="reveal-title">두구두구…</h2><p id="reveal-msg">&nbsp;</p><button class="btn" id="reward-ok" hidden>좋아요 🎉</button></div>`;
     document.body.appendChild(box);
     const reel = box.querySelector('#reel'); let i = 0;
-    const spin = setInterval(() => { reel.textContent = ALL_CHARS[Math.floor(Math.random() * ALL_CHARS.length)]; i++; }, 90);
+    sndDrum();
+    const spin = setInterval(() => { reel.textContent = ALL_CHARS[Math.floor(Math.random() * ALL_CHARS.length)]; sndTick(i); i++; }, 90);
     setTimeout(() => {
       clearInterval(spin);
+      sndTier(tier);
       reel.outerHTML = `<div class="big t-${tier} char" style="cursor:default">${got}</div>`;
       box.querySelector('#reveal-title').textContent = `${TIERS[tier].name} ${got} ${isNew ? '새 친구를 만났어요!' : `친구를 또 만났어요! (×${P.counts[got]})`}`;
       box.querySelector('#reveal-msg').textContent = { mythic: '우와! 세상에 몇 없는 신화 친구예요!!', legendary: '와! 아주 귀한 전설 친구예요!', epic: '반짝반짝 영웅 친구예요!', rare: '빛나는 희귀 친구예요!', normal: '귀여운 일반 친구예요. 놀이를 더 하고 또 뽑아 봐요!' }[tier];
       box.querySelector('#reward-ok').hidden = false;
-      confetti({ mythic: 340, legendary: 260, epic: 180, rare: 130, normal: 90 }[tier]); sndWin();
-      speak(TIERS[tier].name + ' 친구를 만났어요!');
+      confetti({ mythic: 340, legendary: 260, epic: 180, rare: 130, normal: 90 }[tier]);
+      setTimeout(() => speak(TIERS[tier].name + ' 친구를 만났어요!'), 900);
     }, 1800);
     box.querySelector('#reward-ok').addEventListener('click', () => { box.remove(); renderAll(); showTab('chars'); });
   }
@@ -461,6 +463,14 @@
   let ac = null;
   function tone(freq, t0, dur) { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = freq; g.gain.setValueAtTime(.16, ac.currentTime + t0); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + t0 + dur); o.connect(g).connect(ac.destination); o.start(ac.currentTime + t0); o.stop(ac.currentTime + t0 + dur); } catch (e) {} }
   const sndWin = () => [523,659,784,1047,784,1047].forEach((f, i) => tone(f, i * .13, .25));
+  const sndTick = k => tone(520 + (k % 5) * 90, 0, .05);
+  const sndDrum = () => [0, .16, .32, .48].forEach(t => tone(140, t, .12));
+  function sndTier(t) {   // 등급이 높을수록 길고 화려한 팡파르
+    const seq = { normal: [523, 659, 784], rare: [523, 659, 784, 1047], epic: [523, 659, 784, 1047, 1319], legendary: [523, 659, 784, 1047, 1319, 1568, 2093], mythic: [392, 523, 659, 784, 1047, 1319, 1568, 2093, 2637, 3136] }[t];
+    seq.forEach((f, i) => { tone(f, i * .12, .3); if (t !== 'normal') tone(f * 1.5, i * .12 + .06, .2); });
+    if (t === 'mythic' || t === 'legendary') [0, .25, .5].forEach(d => tone(2093, seq.length * .12 + d, .5));
+  }
+  function wakeAudio() { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {} }
   const cv = $('confetti'), cx = cv.getContext('2d'); let bits = [], raf = null;
   const resize = () => { cv.width = innerWidth; cv.height = innerHeight; }; addEventListener('resize', resize); resize();
   function confetti(n) {
@@ -496,7 +506,7 @@
     const cc = e.target.closest('[data-count]'); if (cc) { save('rp-count', +cc.dataset.count); renderSettings(); renderMain(); return; }
     const tab = e.target.closest('.tabs button'); if (tab) showTab(tab.dataset.tab);
   });
-  $('finish').addEventListener('click', openDraw);
+  $('finish').addEventListener('click', () => { wakeAudio(); openDraw(); });
   $('voice-try').addEventListener('click', () => speak('안녕! 나는 무지개 놀이터 친구야'));
   $('name-save').addEventListener('click', () => { const v = norm($('name-edit').value); if (!v) return toast('이름을 적어 주세요'); P.name = v; save('rp-profile', P); try { sessionStorage.setItem('rp-login', v); } catch (e) {} greet(); toast('이름을 ' + v + '(으)로 바꿨어요'); });
   const norm = s => (s || '').trim().replace(/\s+/g, ' ');

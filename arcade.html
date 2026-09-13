@@ -865,6 +865,7 @@
       const lg = JSON.parse(localStorage.getItem("rp-log") || "[]"); lg.push({ t: Date.now(), id: missionId, score: Math.round(state.score * 10 / TOTAL) }); if (lg.length > 500) lg.splice(0, lg.length - 500); localStorage.setItem("rp-log", JSON.stringify(lg));
     } catch (e) {}
     $("to-hub").hidden = true; $("home-btn").hidden = false;
+    try { const av = JSON.parse(localStorage.getItem("rp-profile") || "{}").avatar; if (av) $("result-emoji").textContent = av; } catch (e) {}   // 결과 화면엔 내 친구(현재 캐릭터)
   }
   function renderDiff() {
     document.querySelectorAll("#diffrow button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === DIFF ? "true" : "false"));

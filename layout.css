@@ -7,7 +7,11 @@
   .arch, h1, .sub { display: none !important; }
   .wrap { max-width: min(1500px, 100%); gap: 6px; }
   .card { padding: 10px 22px 14px; border-radius: 22px; box-shadow: 0 6px 0 #FFC2DB; width: 100%; max-width: 1220px; margin: 0 auto; }
-  #game.card, #home.card, #result.card { min-height: calc(100dvh - 14px); display: flex; flex-direction: column; }
+  #game.card, #home.card, #result.card, #prestart.card { min-height: calc(100dvh - 14px); display: flex; flex-direction: column; }
+  #prestart .ps { flex: 1; justify-content: center; }
+  #prestart .ps-ico { font-size: 80px; }
+  #prestart .ps-title { font-size: 38px; }
+  #prestart .ps-start { font-size: 34px; padding: 18px 64px; }
   .topbar { margin-bottom: 2px; font-size: 16px; }
   .stars { margin-bottom: 4px; gap: 5px; }
   .stars span { font-size: 20px; }

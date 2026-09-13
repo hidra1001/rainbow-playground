@@ -97,6 +97,13 @@
   .diffrow span { margin-right: 4px; }
   .diffrow button { font-family: var(--display); font-size: 15px; min-width: 40px; height: 38px; padding: 0 8px; border-radius: 20px; border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft); cursor: pointer; }
   .diffrow button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 3px 0 var(--pink-deep); }
+  .ps { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 8px 0 6px; }
+  .ps-ico { font-size: 64px; line-height: 1; }
+  .ps-title { font-family: var(--display); font-size: 32px; margin: 0; font-weight: normal; }
+  .ps-desc { margin: 0; color: var(--plum-soft); font-size: 17px; }
+  .ps-level { margin: 0; font-family: var(--display); color: var(--pink-deep); font-size: 18px; }
+  .ps-note { font-size: 13px; color: var(--plum-soft); margin: 0; }
+  .ps-start { font-size: 30px; padding: 16px 52px; margin-top: 6px; }
 
   .modes { display: grid; gap: 14px; }
   .mode { display: flex; align-items: center; gap: 16px; text-align: left; padding: 14px 20px; }
@@ -262,7 +269,6 @@
       <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
     </div>
     <p class="level-note" id="level-note"></p>
-    <div class="diffrow" id="diffrow"><span>난이도</span><button type="button" data-diff="-3">−3</button><button type="button" data-diff="-2">−2</button><button type="button" data-diff="-1">−1</button><button type="button" data-diff="0">기본</button><button type="button" data-diff="1">+1</button><button type="button" data-diff="2">+2</button><button type="button" data-diff="3">+3</button></div>
     <div class="modes">
       <button class="btn mode word" id="mode-word" data-mode="word"><span class="ico" id="ico-word">🍎</span><span id="label-word"></span></button>
       <button class="btn mode syll" id="mode-syll" data-mode="syll"><span class="ico" id="ico-syll">🐰</span><span id="label-syll"></span></button>
@@ -274,11 +280,25 @@
     <p class="best" id="best"></p>
   </section>
 
+  <!-- 시작 전: 난이도 고르고 시작 -->
+  <section class="card" id="prestart" hidden>
+    <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
+    <div class="ps">
+      <div class="ps-ico" id="ps-ico"></div>
+      <h2 class="ps-title" id="ps-title"></h2>
+      <p class="ps-desc" id="ps-desc"></p>
+      <p class="ps-level" id="ps-level"></p>
+      <div class="diffrow" id="diffrow"><span>난이도</span><button type="button" data-diff="-3">−3</button><button type="button" data-diff="-2">−2</button><button type="button" data-diff="-1">−1</button><button type="button" data-diff="0">기본</button><button type="button" data-diff="1">+1</button><button type="button" data-diff="2">+2</button><button type="button" data-diff="3">+3</button></div>
+      <p class="ps-note">쉬우면 시간이 넉넉하고 보기가 적어요. 어려우면 빨라지고 비슷한 보기가 늘어요. 이 놀이에만 적용돼요.</p>
+      <button class="btn ps-start" id="ps-start">시작! ▶</button>
+    </div>
+  </section>
+
   <section class="card" id="game" hidden>
     <div class="topbar">
       <span id="round">1 / 10</span>
       <span class="tag" id="tag"></span>
-      <button id="quit" type="button">처음으로</button>
+      <button id="quit" type="button">놀이터로</button>
     </div>
     <div class="stars" id="stars" aria-label="모은 별"></div>
     <div class="pic">
@@ -421,10 +441,20 @@
   const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
   /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
   let DIFF = 0;
-  try { DIFF = Math.max(-3, Math.min(3, +(localStorage.getItem("rp-diff") || 0) || 0)); } catch (e) {}
   { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
   const TS = () => 1 - DIFF * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
   const DIFF_TXT = () => DIFF ? (DIFF > 0 ? " +" + DIFF : " " + DIFF) : "";
+  const GAME_KEY = "hangul";
+  let pendingMode = null;
+  const diffKey = m => "rp-diff:" + GAME_KEY + ":" + m;
+  function loadDiffFor(m) { try { const v = localStorage.getItem(diffKey(m)); DIFF = v === null ? 0 : Math.max(-3, Math.min(3, +v || 0)); } catch (e) { DIFF = 0; } }
+  function openPrestart(m) {
+    pendingMode = m; loadDiffFor(m); renderDiff();
+    const [ico, title, small] = MODE_LABEL[level][m];
+    $("ps-ico").textContent = ico; $("ps-title").textContent = title; $("ps-desc").textContent = small;
+    $("ps-level").textContent = LEVEL_NAME[level] + " 놀이";
+    show("prestart");
+  }
   const LEVEL_NOTE = {
     easy: '보기 3개 · 짧은 낱말 · 첫 글자의 첫소리',
     hard: '보기 4개 · 긴 낱말 · 비슷한 글자로 헷갈리게',
@@ -528,7 +558,8 @@
   }
 
   /* 낱말 풀 */
-  function wordPool() {
+  function wordPool() { return wordPoolRaw().filter(w => w[0].length >= 2); }   // 한 글자 낱말은 문제로 내지 않아요
+  function wordPoolRaw() {
     const l = state.level, m = state.mode;
     if (m === "e" || m === "f") return extraPool();
     if (l === "easy") { const mx = DIFF >= 2 ? 4 : DIFF <= -2 ? 2 : 3; return WORDS.filter(w => m === "order" ? w[0].length >= 2 && w[0].length <= mx : w[0].length <= mx); }
@@ -562,7 +593,7 @@
     while (out.size < n && tries++ < 120) {
       let v = edit(w); if (!v) continue;
       if (sound && w.length >= 3 && Math.random() < .35) v = edit(v) || v;
-      if (v !== w && !WORDS.some(x => x[0] === v)) out.add(v);
+      if (v !== w && !WORDS.some(x => x[0] === v)&& isCommon(v)) out.add(v);
     }
     return [...out];
   }
@@ -571,6 +602,16 @@
     const score = x => (x[0] === first ? 3 : cho(x[0]) === c ? 2 : 0) + (x.length === w.length ? 1 : 0) + (x[x.length - 1] === w[w.length - 1] ? 1 : 0);
     return shuffle(others).map(o => o[0]).filter(x => x !== w).sort((a, b) => score(b) - score(a)).slice(0, n);
   }
+  /* 보기에 쓸 수 있는 "보통 글자": 낱말·문장에 실제로 나오는 글자 + 기본 자음·모음 조합 */
+  const COMMON = (() => {
+    const s = new Set();
+    for (const [w] of WORDS) for (const ch of w) s.add(ch);
+    for (const [, t] of SENTS) for (const ch of t) if (/[가-힣]/.test(ch)) s.add(ch);
+    const C = ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"], V = [0,1,2,4,5,6,8,12,13,17,18,20], J = [0,1,4,8,16,17,21];
+    for (const c of C) for (const v of V) for (const j of J) s.add(makeSyl(CHO.indexOf(c), v, j));
+    return s;
+  })();
+  const isCommon = x => [...x].every(ch => COMMON.has(ch));
   function similarSyllables(target, w, n) {
     const d = decomp(target), out = new Set();
     if (d) {
@@ -578,7 +619,7 @@
       for (let j = 0; j < 21; j++) if (j !== d.jung) cands.push(makeSyl(d.cho, j, d.jong));
       for (let c = 0; c < 19; c++) if (c !== d.cho) cands.push(makeSyl(c, d.jung, d.jong));
       cands.push(makeSyl(d.cho, d.jung, d.jong ? 0 : pick([1,4,8,16,17,21])));
-      for (const x of shuffle(cands)) { if (out.size >= n) break; if (x !== target && !w.includes(x)) out.add(x); }
+      for (const x of shuffle(cands)) { if (out.size >= n) break; if (x !== target && !w.includes(x) && COMMON.has(x)) out.add(x); }
     }
     return [...out];
   }
@@ -768,9 +809,9 @@
     } else if (m === 'cons') {
       // 글자는 숨기고 그림과 소리로만 풀어요. 몇 번째 글자인지는 빈 칸으로 표시
       const ord = ["첫", "두", "세", "네", "다섯", "여섯"][q.blank] || "";
-      ask = q.blank === 0 ? "그림 이름의 첫소리는? (읽어 줘를 눌러 들어 봐요)" : ord + " 번째 글자의 첫소리는? (읽어 줘를 눌러 들어 봐요)";
+      ask = "물음표 자리 글자의 첫소리는? (그림을 보고 소리를 들어 봐요)";
       html = `<span class="ch blank" id="ansbox">?</span>` +
-        [...q.w].map((c, i) => `<span class="ch hint ${i === q.blank ? "focus" : ""}">${i === q.blank ? "?" : "&nbsp;"}</span>`).join("");
+        [...q.w].map((c, i) => `<span class="ch hint ${i === q.blank ? "focus" : ""}">${i === q.blank ? "?" : c}</span>`).join("");
     } else if (isSentOrder) {
       ask = '낱말을 순서대로 눌러 문장을 만들어요';
       html = q.sent.split(' ').map((_, i) => `<span class="ch slot" data-i="${i}" id="slot-${i}">&nbsp;</span>`).join('');
@@ -919,7 +960,7 @@
   }
 
   function show(id) {
-    ['home','game','result'].forEach(x => $(x).hidden = x !== id);
+    ["home","game","result","prestart"].forEach(x => $(x).hidden = x !== id);
     if (id === "home") loadBest();
     if (id === "result") reportMission();
   }
@@ -937,7 +978,7 @@
   }
 
   document.querySelectorAll('.level button').forEach(b => b.addEventListener('click', () => setLevel(b.dataset.level)));
-  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => start(b.dataset.mode)));
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => openPrestart(b.dataset.mode)));
   $('choices').addEventListener('click', e => { const b = e.target.closest('.choice'); if (b) answer(b); });
   $('tiles').addEventListener('click', e => { const b = e.target.closest('.tile'); if (b) tapTile(b); });
   $('word').addEventListener('click', e => { const s = e.target.closest('.slot'); if (s) tapSlot(s); });
@@ -949,13 +990,13 @@
   });
   $('again').addEventListener('click', () => start(state.mode));
   $('home-btn').addEventListener('click', () => show('home'));
-  $('quit').addEventListener('click', () => show('home'));
+  $("quit").addEventListener("click", () => { location.href = "index.html"; });
   if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
 
   /* 놀이터(index.html) 미션 연동 */
   let missionId = null;
   function reportMission() {
-    if (!missionId) return;
+    const missionId = GAME_KEY + ":" + state.level + ":" + state.mode;   // 오늘 한 놀이로 기록
     try {
       const key = "rp-results", all = JSON.parse(localStorage.getItem(key) || "{}");
       const d = new Date(), day = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
@@ -969,14 +1010,15 @@
     const p = new URLSearchParams(location.search);
     const l = p.get("level"), m = p.get("mode");
     if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
-    missionId = p.get("mission");
+    missionId = GAME_KEY + ":" + l + ":" + m;
     const n = +p.get("n"); if (n === 5 || n === 10) TOTAL = n;
-    setLevel(l); start(m); return true;
+    setLevel(l); openPrestart(m); return true;
   }
   function renderDiff() {
     document.querySelectorAll("#diffrow button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === DIFF ? "true" : "false"));
   }
-  document.querySelectorAll("#diffrow button").forEach(b => b.addEventListener("click", () => { DIFF = +b.dataset.diff; try { localStorage.setItem("rp-diff", DIFF); } catch (e) {} renderDiff(); }));
+  document.querySelectorAll("#diffrow button").forEach(b => b.addEventListener("click", () => { DIFF = +b.dataset.diff; try { localStorage.setItem(diffKey(pendingMode || (state && state.mode) || "x"), DIFF); } catch (e) {} renderDiff(); }));
+  $("ps-start").addEventListener("click", () => { if (pendingMode) start(pendingMode); });
   function boot(data) {
     let saved = 'hard';
     try { saved = localStorage.getItem('rainbow-hangul-level') || 'hard'; } catch (e) {}

@@ -25,7 +25,7 @@
   body {
     margin: 0; background: var(--ground); color: var(--plum); font-family: var(--body); font-size: 15px;
     user-select: none; -webkit-user-select: none;
-    padding-inline: 16px; padding-block: 16px 96px; min-height: 100vh;
+    padding-inline: 16px; padding-block: 14px 92px; min-height: 100vh;
     background-image:
       radial-gradient(circle at 15% 20%, #FFD1E6 0 60px, transparent 61px),
       radial-gradient(circle at 85% 30%, #FFD9EA 0 80px, transparent 81px),
@@ -33,151 +33,128 @@
       radial-gradient(circle at 20% 80%, #FFDDEC 0 70px, transparent 71px);
   }
   [hidden] { display: none !important; }
-  .wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+  .wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
 
-  .hero { display: flex; align-items: center; gap: 14px; padding: 6px 4px 0; }
-  .hero .avatar { width: 72px; height: 72px; border-radius: 50%; background: #fff; border: 4px solid var(--accent); display: grid; place-items: center; font-size: 40px; box-shadow: 0 6px 0 #FFC2DB; flex: none; }
-  .hero h1 { font-family: var(--display); font-size: clamp(26px, 6vw, 34px); margin: 0; line-height: 1.15; color: var(--plum); }
+  .hero { display: flex; align-items: center; gap: 14px; padding: 4px 4px 0; flex-wrap: wrap; }
+  .hero .avatar { width: 68px; height: 68px; border-radius: 50%; background: #fff; border: 4px solid var(--accent); display: grid; place-items: center; font-size: 38px; box-shadow: 0 6px 0 #FFC2DB; flex: none; position: relative; }
+  .hero h1 { font-family: var(--display); font-size: clamp(24px, 6vw, 32px); margin: 0; line-height: 1.15; color: var(--plum); }
   .hero h1 b { background: linear-gradient(90deg, var(--r1), var(--r2), #F2C94C, var(--r4), var(--r5), var(--r6)); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: normal; }
-  .hero p { margin: 4px 0 0; color: var(--plum-soft); font-size: 15px; }
-
-  .card { background: var(--card); border-radius: 28px; padding: 20px 20px 22px; box-shadow: 0 8px 0 #FFC2DB, 0 14px 26px rgba(232, 64, 138, .12); border: 4px solid #FFD6E7; }
-  .card + .card { margin-top: 16px; }
-  .card h2 { font-family: var(--display); font-size: 22px; margin: 0 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .card h2 small { font-family: var(--body); font-size: 14px; color: var(--plum-soft); font-weight: normal; }
-  .card h3 { font-family: var(--display); font-size: 18px; margin: 18px 0 8px; font-weight: normal; }
-
-  .btn { font-family: var(--display); font-size: 22px; border: 0; border-radius: 22px; padding: 14px 18px; cursor: pointer; color: #fff; background: var(--accent); box-shadow: 0 6px 0 var(--accent-deep); transition: transform .08s, box-shadow .08s; line-height: 1.1; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .hero p { margin: 3px 0 0; color: var(--plum-soft); font-size: 14px; }
+  .hero .today { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .hero .today .n { font-family: var(--display); font-size: 16px; color: var(--plum-soft); background: #fff; border: 3px solid #FFD6E7; border-radius: 30px; padding: 8px 14px; }
+  .btn { font-family: var(--display); font-size: 20px; border: 0; border-radius: 22px; padding: 12px 18px; cursor: pointer; color: #fff; background: var(--accent); box-shadow: 0 6px 0 var(--accent-deep); transition: transform .08s, box-shadow .08s; line-height: 1.1; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
   .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--accent-deep); }
+  .btn.done { background: var(--good); box-shadow: 0 6px 0 #4DB369; }
 
-  /* 오늘의 미션 */
-  .today { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .stat { background: var(--ground-2); border: 3px solid #FFD6E7; border-radius: 20px; padding: 10px 14px; }
-  .stat b { display: block; font-family: var(--display); font-size: 26px; color: var(--accent-deep); font-weight: normal; line-height: 1.1; }
-  .stat span { font-size: 13px; color: var(--plum-soft); }
-  .missions { display: grid; gap: 12px; }
-  .mission { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 22px; border: 3px solid #FFD6E7; background: #fff; text-decoration: none; color: var(--plum); box-shadow: 0 5px 0 #FFE0EC; position: relative; }
-  .mission:active { transform: translateY(3px); box-shadow: 0 2px 0 #FFE0EC; }
-  .mission .ico { width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center; font-size: 30px; flex: none; color: #fff; }
-  .mission.math .ico { background: var(--r4); } .mission.hangul .ico { background: var(--r2); } .mission.brain .ico { background: var(--r6); } .mission.arcade .ico { background: var(--r5); }
-  .mission .t { flex: 1; min-width: 0; }
-  .mission .t b { font-family: var(--display); font-size: 20px; font-weight: normal; display: block; }
-  .mission .t span { font-size: 13px; color: var(--plum-soft); }
-  .mission .st { font-size: 15px; white-space: nowrap; font-family: var(--display); color: var(--plum-soft); }
-  .mission.done { background: #F1FBF3; border-color: #BFE9C8; }
-  .mission.done .st { color: #3FA85D; }
-  .mission.challenge { border-color: #E8CF4A; background: #FFFBEA; }
-  .mission .crown { position: absolute; top: -12px; right: 12px; background: var(--r3); border-radius: 20px; padding: 2px 10px; font-size: 12px; font-family: var(--display); color: #7A5A00; }
-  .mission.arcade .crown { background: #CFE9F8; color: #1F4E79; }
-  .allclear { margin-top: 14px; text-align: center; font-family: var(--display); font-size: 20px; color: #3FA85D; }
+  .card { background: var(--card); border-radius: 26px; padding: 16px 18px 18px; box-shadow: 0 8px 0 #FFC2DB, 0 14px 26px rgba(232, 64, 138, .12); border: 4px solid #FFD6E7; }
+  .card h2 { font-family: var(--display); font-size: 21px; margin: 0 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: normal; }
+  .card h2 small { font-family: var(--body); font-size: 13px; color: var(--plum-soft); }
+  .card h3 { font-family: var(--display); font-size: 17px; margin: 16px 0 8px; font-weight: normal; }
 
-  .wordday { display: flex; align-items: center; gap: 14px; cursor: pointer; }
-  .wordday .e { font-size: 54px; line-height: 1; }
-  .wordday b { font-family: var(--display); font-size: 30px; font-weight: normal; display: block; }
-  .wordday span { color: var(--plum-soft); font-size: 14px; }
-  .wordday .spk { margin-left: auto; font-size: 30px; }
+  /* 메인: 놀이 카드 4장 */
+  .games { display: grid; gap: 12px; }
+  .gcard h2 .ico { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; font-size: 20px; color: #fff; margin-right: 6px; }
+  .gcard.math h2 .ico { background: var(--r4); } .gcard.hangul h2 .ico { background: var(--r2); } .gcard.brain h2 .ico { background: var(--r6); } .gcard.arcade h2 .ico { background: var(--r5); }
+  .gcard h2 span:first-child { display: flex; align-items: center; }
+  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .modes a { display: flex; align-items: center; justify-content: space-between; gap: 6px; text-decoration: none; color: var(--plum); font-family: var(--display); font-size: 17px; padding: 10px 12px; border-radius: 16px; background: var(--ground-2); border: 3px solid #FFD6E7; box-shadow: 0 4px 0 #FFE0EC; min-height: 50px; }
+  .modes a:active { transform: translateY(3px); box-shadow: 0 1px 0 #FFE0EC; }
+  .modes a .sc { font-size: 13px; color: #3FA85D; white-space: nowrap; }
+  .modes a.played { background: #F1FBF3; border-color: #BFE9C8; }
 
-  /* 스티커북 */
-  .stickers { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; }
-  .sticker { aspect-ratio: 1; border-radius: 16px; background: var(--ground-2); border: 2px solid #FFD6E7; display: grid; place-items: center; font-size: 30px; }
-  .sticker.locked { filter: grayscale(1) opacity(.28); }
-  .sticker.new { animation: pop .5s; border-color: var(--r3); background: #FFFBEA; }
-  .sticker.gold { border-color: #E8CF4A; background: #FFF6CC; box-shadow: 0 0 0 3px #FFE66D inset; }
+  /* 캐릭터 등급 효과: 노말(밋밋) → 레어(파란 빛) → 유니크(보라 반짝) → 레전더리(무지개 테두리 + 별빛) */
+  .char { aspect-ratio: 1; border-radius: 18px; background: var(--ground-2); border: 2px solid #FFD6E7; display: grid; place-items: center; font-size: 32px; cursor: pointer; position: relative; }
+  .char.locked { filter: grayscale(1) opacity(.28); cursor: default; }
+  .char.new { animation: pop .5s; }
+  .char[aria-pressed="true"]:not(.locked)::after { content: "✔"; position: absolute; right: 4px; bottom: 2px; font-size: 12px; color: var(--pink-deep); }
+  .t-rare:not(.locked) { border-color: #5DADE2; box-shadow: 0 0 10px 2px rgba(93,173,226,.55); background: #EEF7FD; }
+  .t-unique:not(.locked) { border-color: #B57EDC; background: linear-gradient(135deg, #F6EEFF, #E9D8FF); box-shadow: 0 0 14px 3px rgba(181,126,220,.6); animation: shimmer 2.2s infinite alternate; }
+  .t-legendary:not(.locked) { border: 3px solid transparent; background: linear-gradient(#FFF8E1, #FFF8E1) padding-box, conic-gradient(from var(--ang, 0deg), #FF6B6B, #FFB347, #FFE66D, #7ED957, #5DADE2, #B57EDC, #FF6B6B) border-box; box-shadow: 0 0 18px 4px rgba(255,200,80,.7); animation: spin 3s linear infinite; }
+  .t-legendary:not(.locked)::before { content: "✨"; position: absolute; left: 2px; top: 0; font-size: 12px; animation: twinkle 1.2s infinite alternate; }
+  @property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  @keyframes spin { to { --ang: 360deg; } }
+  @keyframes shimmer { from { filter: brightness(1); } to { filter: brightness(1.15); } }
+  @keyframes twinkle { from { opacity: .3; transform: scale(.8); } to { opacity: 1; transform: scale(1.2); } }
+  .tier { margin-bottom: 12px; }
+  .tier h3 { display: flex; align-items: center; gap: 8px; margin: 6px 0 8px; }
+  .tier h3 .badge { font-size: 12px; padding: 2px 10px; border-radius: 20px; color: #fff; font-family: var(--body); }
+  .badge.normal { background: #B9AEB5; } .badge.rare { background: #5DADE2; } .badge.unique { background: #B57EDC; } .badge.legendary { background: linear-gradient(90deg, #FF6B6B, #FFB347, #7ED957, #5DADE2, #B57EDC); }
+  .chars { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; }
+  .avatar.t-rare { border-color: #5DADE2; box-shadow: 0 0 12px 3px rgba(93,173,226,.6); }
+  .avatar.t-unique { border-color: #B57EDC; box-shadow: 0 0 14px 4px rgba(181,126,220,.65); }
+  .avatar.t-legendary { border-color: #FFD54F; box-shadow: 0 0 18px 5px rgba(255,200,80,.75); }
 
-  /* 무지개 길 */
-  .road { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-  .stop { aspect-ratio: 1; border-radius: 50%; background: var(--ground-2); border: 3px solid #FFD6E7; display: grid; place-items: center; font-size: 22px; position: relative; }
-  .stop.past { background: #F1FBF3; border-color: #BFE9C8; }
-  .stop.here { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px #FFD1E6; font-size: 30px; animation: bob 1.2s infinite alternate; }
-  .stop.goal { background: #FFF6CC; border-color: #E8CF4A; }
-  .stop i { position: absolute; bottom: -6px; right: -4px; font-style: normal; font-size: 11px; background: #fff; border-radius: 10px; padding: 0 5px; border: 1px solid #FFD6E7; }
-  .roadmsg { margin: 12px 0 0; color: var(--plum-soft); font-size: 14px; text-align: center; }
+  /* 뽑기·보상 */
+  .reward { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(91,42,78,.55); z-index: 25; }
+  .reward .box { background: #fff; border-radius: 30px; padding: 24px 30px; text-align: center; border: 4px solid #FFD6E7; box-shadow: 0 10px 0 #FFC2DB; max-width: 92vw; width: 460px; }
+  .reward .big { font-size: 96px; line-height: 1; animation: pop .6s; width: 150px; height: 150px; margin: 0 auto; display: grid; place-items: center; border-radius: 40px; }
+  .reward .big.t-legendary { font-size: 100px; }
+  .reward h2 { font-family: var(--display); font-size: 28px; margin: 8px 0 4px; color: var(--pink-deep); font-weight: normal; }
+  .reward p { margin: 0 0 14px; color: var(--plum-soft); }
+  .chance { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0 14px; }
+  .chance div { border-radius: 14px; padding: 8px 4px; font-family: var(--display); font-size: 14px; color: #fff; }
+  .chance b { display: block; font-size: 20px; font-weight: normal; }
+  .egg { font-size: 90px; line-height: 1; animation: wobble .8s infinite; }
+  @keyframes wobble { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+  .reel { font-size: 64px; line-height: 1; height: 80px; display: grid; place-items: center; }
 
-  /* 자유 놀이 */
-  .free { display: grid; gap: 12px; }
-  .free a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 22px; color: #fff; text-decoration: none; font-family: var(--display); font-size: 22px; }
-  .free a small { display: block; font-family: var(--body); font-size: 13px; opacity: .92; }
-  .free .m { background: var(--r4); box-shadow: 0 6px 0 #5FB25A; } .free .h { background: var(--r2); box-shadow: 0 6px 0 #D9902E; } .free .b { background: var(--r6); box-shadow: 0 6px 0 #9560C0; } .free .a { background: var(--r5); box-shadow: 0 6px 0 #3F8FC2; }
-  .free a:active { transform: translateY(4px); box-shadow: none; }
-  .free .ico { font-size: 34px; }
-
-  /* 설정·첫 화면 */
-  .pickrow { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 8px 0 16px; }
-  .pick { width: 64px; height: 64px; border-radius: 50%; border: 3px solid #FFD6E7; background: var(--ground-2); font-size: 34px; display: grid; place-items: center; cursor: pointer; position: relative; }
+  /* 설정 */
+  .pickrow { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 8px 0 14px; }
+  .pick { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #FFD6E7; background: var(--ground-2); font-size: 32px; display: grid; place-items: center; cursor: pointer; }
   .pick.age { width: auto; border-radius: 30px; padding: 0 18px; font-family: var(--display); font-size: 20px; color: var(--plum-soft); }
   .pick[aria-pressed="true"] { border-color: var(--accent-deep); background: var(--accent); color: #fff; box-shadow: 0 4px 0 var(--accent-deep); }
-  .pick.locked { filter: grayscale(1) opacity(.45); }
-  .pick.locked::after { content: '🔒'; position: absolute; right: -4px; bottom: -4px; font-size: 16px; filter: none; }
-  .unlocks { display: grid; gap: 6px; font-size: 13px; color: var(--plum-soft); }
-  .unlocks div { display: flex; align-items: center; gap: 8px; }
-  .unlocks div b { font-size: 22px; font-weight: normal; }
   .center { text-align: center; }
   .note { color: var(--plum-soft); font-size: 13px; text-align: center; margin: 6px 0 0; }
   .danger { background: none; border: 2px solid #FFD6E7; border-radius: 30px; color: var(--plum-soft); font-family: var(--body); font-size: 14px; padding: 8px 16px; }
   .seg { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-  .seg button { font-family: var(--display); font-size: 17px; padding: 8px 16px; border-radius: 30px; border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft); }
+  .seg button { font-family: var(--display); font-size: 16px; padding: 8px 14px; border-radius: 30px; border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft); }
   .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent-deep); color: #fff; }
-
-  /* 부모 리포트 */
   .bars { display: grid; gap: 6px; }
   .bar { display: grid; grid-template-columns: 52px 1fr 44px; align-items: center; gap: 8px; font-size: 13px; color: var(--plum-soft); }
-  .bar i { display: block; height: 16px; border-radius: 8px; background: linear-gradient(90deg, var(--r2), var(--pink)); min-width: 4px; }
+  .bar i { display: block; height: 14px; border-radius: 8px; background: linear-gradient(90deg, var(--r2), var(--pink)); min-width: 4px; }
   .bar.today { color: var(--accent-deep); font-family: var(--display); }
   .weak { display: grid; gap: 6px; font-size: 14px; }
   .weak div { display: flex; justify-content: space-between; background: var(--ground-2); border-radius: 14px; padding: 8px 12px; }
 
   /* 탭 바 */
   .tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; gap: 6px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-top: 3px solid #FFD6E7; z-index: 10; }
-  .tabs button { flex: 1; max-width: 130px; border: 0; background: none; font-family: var(--display); font-size: 14px; color: var(--plum-soft); padding: 6px 4px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tabs button { flex: 1; max-width: 160px; border: 0; background: none; font-family: var(--display); font-size: 15px; color: var(--plum-soft); padding: 6px 4px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .tabs button i { font-style: normal; font-size: 24px; }
   .tabs button[aria-pressed="true"] { background: var(--ground); color: var(--accent-deep); }
 
-  .toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--plum); color: #fff; padding: 12px 20px; border-radius: 30px; font-family: var(--display); font-size: 18px; z-index: 20; box-shadow: 0 8px 20px rgba(0,0,0,.2); max-width: 90vw; text-align: center; }
+  .toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); background: var(--plum); color: #fff; padding: 12px 20px; border-radius: 30px; font-family: var(--display); font-size: 18px; z-index: 20; box-shadow: 0 8px 20px rgba(0,0,0,.2); max-width: 90vw; text-align: center; }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
 
   @keyframes pop { from { transform: scale(0); } 70% { transform: scale(1.2); } to { transform: scale(1); } }
-  @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-6px); } }
-  @media (prefers-reduced-motion: reduce) { .stop.here, .sticker.new { animation: none; } }
-  @media (min-width: 700px) { .missions { grid-template-columns: 1fr 1fr; } .road { grid-template-columns: repeat(10, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .char.new, .reward .big, .egg, .t-unique, .t-legendary, .t-legendary::before { animation: none; } }
+  @media (min-width: 700px) { .games { grid-template-columns: 1fr 1fr; } .modes { grid-template-columns: 1fr 1fr 1fr; } }
+
   /* 태블릿 가로 화면: 스크롤 없이 한 화면에 */
   @media (orientation: landscape) and (max-height: 960px) {
     html, body { height: 100dvh; overflow: hidden; }
-    body { padding-block: 6px 70px; }
+    body { padding-block: 6px 66px; }
     .wrap { max-width: min(1500px, 100vw); gap: 8px; }
     .hero { padding: 0 4px; gap: 10px; }
-    .hero .avatar { width: 50px; height: 50px; font-size: 26px; }
+    .hero .avatar { width: 48px; height: 48px; font-size: 26px; }
     .hero h1 { font-size: 22px; }
-    .hero p { font-size: 13px; margin-top: 2px; }
-    .card { padding: 12px 16px 14px; border-radius: 22px; }
-    .card h2 { font-size: 19px; margin-bottom: 8px; }
-    #tab-today { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: start; }
-    #tab-today .card + .card { margin-top: 0; }
-    .today { margin-bottom: 8px; }
-    .stat { padding: 6px 12px; }
-    .stat b { font-size: 20px; }
-    .missions { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .mission { padding: 7px 12px; gap: 10px; }
-    .mission .ico { width: 42px; height: 42px; font-size: 22px; border-radius: 14px; }
-    .mission .t b { font-size: 16px; }
-    .mission .t span { font-size: 12px; }
-    .allclear { margin-top: 8px; font-size: 17px; }
-    .wordday .e { font-size: 44px; }
-    .wordday b { font-size: 24px; }
-    .stickers { grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
-    .sticker { font-size: 22px; border-radius: 10px; }
-    .road { grid-template-columns: repeat(10, 1fr); gap: 6px; }
-    .stop { font-size: 17px; }
-    .stop.here { font-size: 24px; }
-    .free { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .free a { padding: 10px 14px; font-size: 19px; }
-    #tab-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; max-height: calc(100dvh - 88px); overflow: auto; }
+    .hero p { font-size: 12px; margin-top: 1px; }
+    .card { padding: 10px 14px 12px; border-radius: 20px; }
+    .card h2 { font-size: 18px; margin-bottom: 8px; }
+    .games { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .modes { grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+    .modes a { font-size: 15px; padding: 7px 10px; min-height: 44px; border-radius: 14px; }
+    #tab-chars .card { max-height: calc(100dvh - 140px); overflow: auto; }
+    .chars { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; }
+    .char { font-size: 24px; border-radius: 12px; }
+    .tier h3 { margin: 4px 0 6px; font-size: 15px; }
+    #tab-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; max-height: calc(100dvh - 84px); overflow: auto; }
     #tab-settings .card + .card { margin-top: 0; }
     .pickrow { margin: 6px 0 10px; gap: 8px; }
-    .pick { width: 50px; height: 50px; font-size: 26px; }
+    .pick { width: 48px; height: 48px; font-size: 24px; }
     .tabs { padding: 4px 12px calc(4px + env(safe-area-inset-bottom)); }
     .tabs button { font-size: 12px; padding: 3px 4px; }
     .tabs button i { font-size: 20px; }
-    .toast { bottom: 70px; }
+    .toast { bottom: 66px; }
     #setup { max-width: 760px; margin: 0 auto; }
   }
 </style>
@@ -196,7 +173,7 @@
     <p class="center">몇 살이에요?</p>
     <div class="pickrow" id="ages"></div>
     <div class="center"><button class="btn" id="setup-ok">시작하기 🚀</button></div>
-    <p class="note">나이에 맞춰 매일 다른 미션 5개가 나와요. 설정에서 언제든 바꿀 수 있어요.</p>
+    <p class="note">놀이를 하고 나서 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 별을 많이 모을수록 좋은 등급이 나와요.</p>
   </section>
 
   <div id="app" hidden>
@@ -206,54 +183,23 @@
         <h1 id="greet"></h1>
         <p id="theme-line"></p>
       </div>
+      <div class="today">
+        <span class="n" id="today-n"></span>
+        <button class="btn" id="finish">캐릭터 받기 🎁</button>
+      </div>
     </header>
 
-    <!-- 오늘 -->
-    <section id="tab-today">
-      <div class="card">
-        <h2>오늘의 미션 <small id="date-line"></small></h2>
-        <div class="today">
-          <div class="stat"><b id="stat-stars">0</b><span>오늘 모은 별 (50개 중)</span></div>
-          <div class="stat"><b id="stat-streak">0일</b><span>연속 출석 🔥</span></div>
-        </div>
-        <div class="missions" id="missions"></div>
-        <div id="allclear" class="allclear" hidden></div>
-        <p class="note" id="level-tip" hidden></p>
-      </div>
-      <div class="card">
-        <h2>오늘의 낱말 <small>누르면 읽어 줘요</small></h2>
-        <div class="wordday" id="wordday"><div class="e" id="wd-emoji"></div><div><b id="wd-word"></b><span id="wd-hint"></span></div><div class="spk">🔊</div></div>
-      </div>
+    <!-- 메인: 모든 놀이 -->
+    <section id="tab-main">
+      <div class="games" id="games"></div>
     </section>
 
-    <!-- 스티커북 -->
-    <section id="tab-stickers" hidden>
+    <!-- 캐릭터 도감 -->
+    <section id="tab-chars" hidden>
       <div class="card">
-        <h2>스티커북 <small id="sticker-count"></small></h2>
-        <p class="note" style="margin:0 0 12px">미션 5개를 다 하면 스티커를 하나 받아요. 별을 45개 넘게 모으면 반짝 스티커도!</p>
-        <div class="stickers" id="stickers"></div>
-      </div>
-    </section>
-
-    <!-- 무지개 길 -->
-    <section id="tab-road" hidden>
-      <div class="card">
-        <h2>무지개 길 <small id="road-round"></small></h2>
-        <div class="road" id="road"></div>
-        <p class="roadmsg" id="road-msg"></p>
-      </div>
-    </section>
-
-    <!-- 자유 놀이 -->
-    <section id="tab-free" hidden>
-      <div class="card">
-        <h2>자유 놀이 <small>하고 싶은 걸 골라요</small></h2>
-        <div class="free">
-          <a class="a" href="arcade.html"><span class="ico">🕹️</span><span>무지개 아케이드<small>떨어지는 식·낱말, 풍선 터뜨리기, 두더지 잡기</small></span></a>
-          <a class="m" href="math.html"><span class="ico">🔢</span><span>산수 놀이<small>더하기 빼기, 구구단, 시계, 문장제, 돈 세기</small></span></a>
-          <a class="h" href="hangul.html"><span class="ico">🍎</span><span>한글 놀이<small>낱말, 받아쓰기, 문장 만들기, 반대말</small></span></a>
-          <a class="b" href="brain.html"><span class="ico">🧠</span><span>두뇌 놀이<small>짝 맞추기, 규칙, 순서 기억, 다른 그림</small></span></a>
-        </div>
+        <h2>캐릭터 도감 <small id="char-count"></small></h2>
+        <p class="note" style="margin:0 0 10px">하루에 한 번, 놀이를 하고 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 별을 많이 모을수록 레어·유니크·레전더리가 잘 나와요. 모은 캐릭터를 누르면 내 친구로 바꿀 수 있어요.</p>
+        <div id="chars"></div>
       </div>
     </section>
 
@@ -261,10 +207,9 @@
     <section id="tab-settings" hidden>
       <div class="card">
         <h2>설정</h2>
-        <p class="center">친구 바꾸기</p>
+        <p class="center">내 친구 바꾸기</p>
         <div class="pickrow" id="avatars2"></div>
-        <div class="unlocks" id="unlocks"></div>
-        <p class="center" style="margin-top:16px">나이 바꾸기</p>
+        <p class="center">나이</p>
         <div class="pickrow" id="ages2"></div>
         <p class="center">읽어 주는 목소리</p>
         <div class="seg" id="voice-seg">
@@ -272,15 +217,18 @@
           <button type="button" data-voice="tts">📱 기기 목소리</button>
           <button type="button" id="voice-try">▶ 들어 보기</button>
         </div>
-        <p class="center" style="margin-top:16px">난이도 조정 (모든 놀이) <small style="display:block;color:var(--plum-soft);font-family:var(--body);font-size:12px">쉬우면 시간이 넉넉하고 보기가 적어요. 어려우면 빨라지고 비슷한 보기가 늘어요.</small></p>
-        <div class="seg" id="diff-seg">
-          <button type="button" data-diff="-3">−3</button><button type="button" data-diff="-2">−2</button><button type="button" data-diff="-1">−1</button><button type="button" data-diff="0">기본</button><button type="button" data-diff="1">+1</button><button type="button" data-diff="2">+2</button><button type="button" data-diff="3">+3</button>
-        </div>
         <p class="center" style="margin-top:16px">한 놀이의 문제 수</p>
         <div class="seg" id="count-seg">
           <button type="button" data-count="10">10문제</button>
           <button type="button" data-count="5">5문제 (짧게)</button>
         </div>
+        <p class="center" style="margin-top:16px">캐릭터를 뽑으려면 하루에 몇 놀이?</p>
+        <div class="seg" id="need-seg">
+          <button type="button" data-need="1">1개</button>
+          <button type="button" data-need="3">3개</button>
+          <button type="button" data-need="5">5개</button>
+        </div>
+        <p class="note">난이도는 놀이마다 시작 전 화면에서 따로 정해요.</p>
         <p class="note" id="stats-line"></p>
         <div class="center" style="margin-top:14px"><button class="danger" id="reset">처음부터 다시 시작 (기록 지우기)</button></div>
       </div>
@@ -296,10 +244,8 @@
 </div>
 
 <nav class="tabs" id="tabs" hidden>
-  <button data-tab="today" aria-pressed="true"><i>🌟</i>오늘</button>
-  <button data-tab="stickers"><i>📒</i>스티커</button>
-  <button data-tab="road"><i>🛤️</i>무지개 길</button>
-  <button data-tab="free"><i>🎮</i>자유 놀이</button>
+  <button data-tab="main" aria-pressed="true"><i>🌈</i>놀이터</button>
+  <button data-tab="chars"><i>📒</i>캐릭터 도감</button>
   <button data-tab="settings"><i>⚙️</i>설정</button>
 </nav>
 
@@ -307,29 +253,16 @@
 (function () {
   const $ = id => document.getElementById(id);
   const AVATARS = ['🦄','🐰','🐻','🐱','🦊','🐼','🐥','🐸'];
-  const UNLOCKS = [
-    { a: '🐉', cond: '3일 연속 출석', test: p => (p.bestStreak || 0) >= 3 },
-    { a: '🦋', cond: '6일 연속 출석', test: p => (p.bestStreak || 0) >= 6 },
-    { a: '🧚', cond: '10일 연속 출석', test: p => (p.bestStreak || 0) >= 10 },
-    { a: '🐬', cond: '스티커 20개', test: p => p.stickers.length >= 20 },
-    { a: '🦁', cond: '스티커 40개', test: p => p.stickers.length >= 40 },
-    { a: '👑', cond: '무지개 성 도착', test: p => (p.roadRound || 1) >= 2 },
-  ];
-  const AGES = { easy: "6살", hard: "7살" };   // 8살·9살은 숨김 (코드는 남아 있음)
-  const NEXT = { easy: "hard", hard: "hard", pro: "pro", nine: "nine" };
+  const AGES = { easy: '6살', hard: '7살' };
   const GAMES = {
-    math:   { name: '산수', file: 'math.html', ico: '🔢', modes: ['a','b','c','d','e','f'], labels: {
-      easy: ['더하기 빼기','몇 개일까?','10 만들기','빠진 수 찾기','문장제','돈 세기'], hard: ['20까지 더하기 빼기','가르기와 모으기','세 수 계산','뛰어 세기','문장제','돈 세기'],
-      pro: ['두 자리 세로셈','세 수 섞어 계산','구구단 2~5단','시계 읽기','문장제','돈 세기'], nine: ['세 자리 세로셈','구구단 2~9단',"나눗셈","규칙 찾기·시계","문장제","돈과 거스름돈"] } },
-    hangul: { name: '한글', file: 'hangul.html', ico: '🍎', modes: ['word','syll','cons','order','e','f'], labels: {
-      easy: ["낱말 찾기","빠진 글자","글자 만들기","낱말 만들기","받아쓰기","흉내 내는 말"], hard: ['낱말 찾기','빠진 글자','첫소리 찾기','낱말 만들기','받아쓰기','흉내 내는 말'],
-      pro: ['바른 낱말 찾기','빠진 글자','첫소리 찾기','낱말 만들기','받아쓰기','반대말'], nine: ['바른 낱말 찾기','빈칸 두 개','문장 채우기','문장 만들기','받아쓰기','반대말·비슷한말'] } },
-    brain:  { name: '두뇌', file: 'brain.html', ico: '🧠', modes: ["memory","pattern","simon","odd","tap"], labels: {
-      easy: ["짝 맞추기","규칙 찾기","순서 기억","다른 그림 찾기","순서대로 누르기"], hard: ["짝 맞추기","규칙 찾기","순서 기억","다른 그림 찾기","순서대로 누르기"],
-      pro: ["짝 맞추기","규칙 찾기","순서 기억","다른 그림 찾기","순서대로 누르기"], nine: ["닮은 짝 맞추기","규칙 찾기","순서 기억","다른 그림 찾기","순서대로 누르기"] } },
+    math:   { name: '산수 놀이', file: 'math.html', ico: '🔢', modes: ['a','b','c','d','e','f'], labels: {
+      easy: ['더하기 빼기','몇 개일까?','10 만들기','빠진 수 찾기','문장제','돈 세기'], hard: ['20까지 더하기 빼기','가르기와 모으기','세 수 계산','뛰어 세기','문장제','돈 세기'] } },
+    hangul: { name: '한글 놀이', file: 'hangul.html', ico: '🍎', modes: ['word','syll','cons','order','e','f'], labels: {
+      easy: ['낱말 찾기','빠진 글자','글자 만들기','낱말 만들기','받아쓰기','흉내 내는 말'], hard: ['낱말 찾기','빠진 글자','첫소리 찾기','낱말 만들기','받아쓰기','흉내 내는 말'] } },
+    brain:  { name: '두뇌 놀이', file: 'brain.html', ico: '🧠', modes: ['memory','pattern','simon','odd','tap'], labels: {
+      easy: ['짝 맞추기','규칙 찾기','순서 기억','다른 그림 찾기','순서대로 누르기'], hard: ['짝 맞추기','규칙 찾기','순서 기억','다른 그림 찾기','순서대로 누르기'] } },
     arcade: { name: '아케이드', file: 'arcade.html', ico: '🕹️', modes: ['fall_math','fall_word','balloon','mole'], labels: {
-      easy: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'], hard: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'],
-      pro: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'], nine: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'] } },
+      easy: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'], hard: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'] } },
   };
   const THEMES = [ // 요일마다 다른 분위기 (일~토)
     { n: '무지개의 날', e: '🌈', c: '#FF5FA2', d: '#E8408A', msg: '일곱 빛깔처럼 신나게 놀아요!' },
@@ -340,58 +273,47 @@
     { n: '공룡의 날', e: '🦖', c: '#FFB347', d: '#D9902E', msg: '공룡처럼 힘차게 크앙!' },
     { n: '마법의 날', e: '🪄', c: '#F2C94C', d: '#C9A227', msg: '마법처럼 척척 풀려요!' },
   ];
-  const STICKERS = ['🦄','🐰','🐻','🐱','🦊','🐼','🐥','🐸','🐶','🐯','🦁','🐨','🐷','🐮','🐵','🦒','🦓','🦘','🐘','🦏',
-    '🍎','🍓','🍇','🍉','🍌','🍑','🍒','🍍','🥝','🍋','🍩','🧁','🍭','🍪','🍦','🎂','🍕','🍔','🌮','🥞',
-    '🌈','⭐','🌙','☀️','☁️','🌸','🌻','🌷','🍀','🌵','🌊','🔥','❄️','🌋','🪐','🌍','🌠','⚡','🍁','🎈',
-    '🚗','🚀','✈️','🚂','⛵','🚁','🚲','🎡','🎢','🏰','🎁','🎀','🎨','🎸','🎹','🥁','🎯','🧩','🪁','🏆'];
-  const GOLD = ['👑','💎','🏅','🌟','💫','🦋','🧚','🐉','🔮','🎇'];
-  const ROAD = ['🏠','🌳','🌷','🍄','🐿️','🌉','🏞️','⛺','🦌','🌲','🏔️','❄️','⛄','🛷','🌋','🐉','🏜️','🐪','🌵','🏝️','🐬','🐚','⛵','🐳','🌊','🎡','🎢','🎪','🎠','🏰'];
-  const WORDS = [['사과','🍎','빨간 사과'],['무지개','🌈','비 온 뒤 하늘에'],['코끼리','🐘','코가 긴 동물'],['해바라기','🌻','해를 따라 도는 꽃'],['자전거','🚲','바퀴 두 개'],['펭귄','🐧','남극에 살아요'],['우주선','🚀','별나라로 출발'],['달팽이','🐌','집을 지고 다녀요'],['소방차','🚒','불을 꺼요'],['눈사람','⛄','겨울에 만들어요'],['나비','🦋','꽃밭에서 팔랑팔랑'],['기린','🦒','목이 길어요'],['수박','🍉','여름 과일'],['비행기','✈️','하늘을 날아요'],['거북이','🐢','느리지만 끝까지'],['도서관','📖','조용히 책을 읽어요'],['망원경','🔭','멀리 있는 별을 봐요'],['돌고래','🐬','바다에서 폴짝'],['판다','🐼','대나무를 좋아해요'],['신호등','🚦','초록불에 건너요'],['피아노','🎹','띵동 연주해요'],['보름달','🌕','둥근 달'],['악어','🐊','이가 많아요'],['횡단보도','🚸','손 들고 건너요'],['크리스마스','🎄','12월 25일'],['공룡','🦖','옛날 옛적에 살았어요'],['부엉이','🦉','밤에 깨어 있어요'],['헬리콥터','🚁','빙글빙글 날개'],['무당벌레','🐞','빨간 등에 점'],['토마토','🍅','빨갛게 익어요']];
+  /* 캐릭터 등급: 노말(단순) → 레어 → 유니크 → 레전더리(화려) */
+  const TIERS = {
+    normal:    { name: '노말', cls: 'normal', chars: ['🐶','🐱','🐭','🐹','🐰','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🐝','🐛','🐌','🐞','🐜','🐢','🐟','🐠','🐙','🦀','🐑','🐐','🐴','🦒','🦓','🐘','🦔','🦝','🐺','🦊','🐗'] },
+    rare:      { name: '레어', cls: 'rare', chars: ['🦋','🐬','🐳','🦈','🦭','🦩','🦚','🦜','🦢','🦉','🦅','🐉','🦕','🦖','🦧','🦥','🦦','🦨','🦡','🐊','🦎','🐍','🦂','🦌'] },
+    unique:    { name: '유니크', cls: 'unique', chars: ['🦄','🧚','🧜','🧞','🧙','🧝','🧛','🤖','👾','👻','👽','🎃'] },
+    legendary: { name: '레전더리', cls: 'legendary', chars: ['🐲','🔥','🌈','👑','💎','🌟'] },
+  };
+  const TIER_ORDER = ['normal', 'rare', 'unique', 'legendary'];
+  const tierOf = c => TIER_ORDER.find(t => TIERS[t].chars.includes(c)) || 'normal';
+  const ALL_CHARS = [...new Set(TIER_ORDER.flatMap(t => TIERS[t].chars))];
 
   /* 날짜·시드 */
   const pad = n => String(n).padStart(2, '0');
   const dayKey = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   const today = new Date(), TODAY = dayKey(today);
-  const yesterdayKey = dayKey(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
-  const dayIndex = Math.floor((today - new Date(2026, 0, 1)) / 86400000);
   function seeded(str) { let h = 1779033703 ^ str.length; for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; } return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
   const pickSeeded = (rng, arr) => arr[Math.floor(rng() * arr.length)];
 
   /* 저장 */
   const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  let P = load('rp-profile', null);       // { avatar, level, days:{date:{done, stars, sticker, gold}}, stickers:[], gold:[], streak, bestStreak, lastDay, road, roadRound, unlocked:[] }
-  let R = load('rp-results', {});          // { date: { missionId: score } }
+  let P = load('rp-profile', null);       // { avatar, level, chars:[], days:{date:{char, tier, played, stars}} }
+  let R = load('rp-results', {});          // { date: { game:level:mode: score } }
+  const todayRes = () => R[TODAY] || {};
+  const playedToday = () => Object.keys(todayRes()).length;
+  const starsToday = () => Object.values(todayRes()).reduce((a, b) => a + b, 0);
+  const need = () => load('rp-need', 3);
 
-  /* 오늘의 미션 5개: 학습 2 (산수·한글) + 게임 2 (아케이드) + 두뇌 또는 👑 도전. 어제와 같은 놀이는 피해요 */
-  function missionsFor(dateKey, level) {
-    const rng = seeded('mission-' + dateKey + '-' + level);
-    const yv = load('rp-yesterday-modes', null);
-    const prev = (yv && yv.date && yv.date < dateKey) ? yv.modes : {};
-    const pickMode = (key, modes) => pickSeeded(rng, modes.filter(m => m !== prev[key]));
-    const list = [
-      { game: 'math', level, mode: pickMode('math', GAMES.math.modes) },
-      { game: 'hangul', level, mode: pickMode('hangul', GAMES.hangul.modes) },
-      { game: 'arcade', level, mode: pickMode('arcadeM', ['fall_math', 'mole']), arcade: true },
-      { game: 'arcade', level, mode: pickMode('arcadeW', ['fall_word', 'balloon']), arcade: true },
-    ];
-    if (dayIndex % 2 === 0 || NEXT[level] === level) list.push({ game: 'brain', level, mode: pickMode('brain', GAMES.brain.modes) });
-    else {
-      const g = ['math', 'hangul', 'brain'][Math.floor(dayIndex / 2) % 3], nl = NEXT[level];
-      const used = list.find(x => x.game === g)?.mode;
-      list.push({ game: g, level: nl, mode: pickSeeded(rng, GAMES[g].modes.filter(m => m !== used)), challenge: true });
-    }
-    for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
-    return list.map(x => ({ ...x, id: x.game + ':' + x.level + ':' + x.mode }));
+  /* 뽑기 확률: 오늘 맞힌 비율이 높을수록, 놀이를 많이 할수록 좋은 등급이 잘 나와요 */
+  function quality() { const n = playedToday(); return n ? Math.min(1, starsToday() / (n * 10) + Math.max(0, Math.min(.15, (n - 3) * .05))) : 0; }
+  function tierChances() {
+    const q = quality();
+    if (q >= .9) return { legendary: 25, unique: 35, rare: 30, normal: 10 };
+    if (q >= .7) return { legendary: 8, unique: 27, rare: 40, normal: 25 };
+    if (q >= .5) return { legendary: 3, unique: 15, rare: 37, normal: 45 };
+    return { legendary: 1, unique: 7, rare: 27, normal: 65 };
   }
-  function rememberModes() {
-    const modes = {};
-    for (const m of missionsFor(TODAY, P.level)) {
-      if (m.challenge) continue;
-      if (m.game === 'arcade') modes[['fall_math', 'mole'].includes(m.mode) ? 'arcadeM' : 'arcadeW'] = m.mode;
-      else modes[m.game] = m.mode;
-    }
-    save('rp-yesterday-modes', { date: TODAY, modes });
+  function drawTier(rng) {
+    const ch = tierChances(); let r = rng() * 100;
+    for (const t of ['legendary', 'unique', 'rare', 'normal']) { if (r < ch[t]) return t; r -= ch[t]; }
+    return 'normal';
   }
 
   /* 화면 */
@@ -406,96 +328,73 @@
     const h = today.getHours();
     const when = h < 11 ? '좋은 아침!' : h < 17 ? '신나는 오후!' : '즐거운 저녁!';
     $('greet').innerHTML = when + ' <b>무지개 놀이터</b>';
-    $('avatar').textContent = P.avatar;
-    $('date-line').textContent = (today.getMonth() + 1) + '월 ' + today.getDate() + '일 ' + ['일','월','화','수','목','금','토'][today.getDay()] + '요일';
+    setAvatar();
   }
-  function renderToday() {
-    const ms = missionsFor(TODAY, P.level);
-    const res = R[TODAY] || {};
-    let stars = 0, done = 0;
-    $('missions').innerHTML = ms.map(m => {
-      const g = GAMES[m.game], label = g.labels[m.level][g.modes.indexOf(m.mode)];
-      const sc = res[m.id]; const isDone = sc != null;
-      if (isDone) { stars += sc; done++; }
-      const tagHtml = m.challenge ? '<span class="crown">👑 도전 미션</span>' : m.arcade ? '<span class="crown">🕹️ 게임</span>' : '';
-      return `<a class="mission ${m.game} ${isDone ? 'done' : ''} ${m.challenge ? 'challenge' : ''}" href="${g.file}?level=${m.level}&mode=${m.mode}&mission=${encodeURIComponent(m.id)}&n=${load("rp-count", 10)}&diff=${load("rp-diff", 0)}">
-        ${tagHtml}<span class="ico">${g.ico}</span>
-        <span class="t"><b>${label}</b><span>${g.name} 놀이 · ${AGES[m.level]}${load("rp-diff", 0) ? " (" + (load("rp-diff", 0) > 0 ? "+" : "") + load("rp-diff", 0) + ")" : ""}</span></span>
-        <span class="st">${isDone ? '⭐ ' + sc + '/10' : '시작 ▶'}</span></a>`;
-    }).join('');
-    $('stat-stars').textContent = stars;
-    $('stat-streak').textContent = (P.streak || 0) + '일';
-    const all = done === ms.length;
-    $('allclear').hidden = !all;
-    if (all) $('allclear').textContent = '🎉 오늘 미션을 다 했어요! ' + (P.days[TODAY]?.gold ? '반짝 스티커까지 받았어요 ✨' : '스티커를 받았어요 🎁');
-    if (all && !P.days[TODAY]?.done) completeDay(stars);
-    const tip = $("level-tip");
-    if (NEXT[P.level] !== P.level) {
-      let perfect = 0;
-      const since = dayKey(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6));
-      for (const day of Object.keys(R)) if (day >= since) for (const [id, sc] of Object.entries(R[day])) { const [g, l] = id.split(":"); if ((g === "math" || g === "hangul") && l === P.level && sc >= 10) perfect++; }
-      tip.hidden = perfect < 6;
-      tip.textContent = "요즘 별을 다 모으고 있어요! 설정에서 " + AGES[NEXT[P.level]] + " 놀이로 올려 볼까요? 👑";
-    } else tip.hidden = true;
-    const rng = seeded('word-' + TODAY);
-    const w = pickSeeded(rng, WORDS);
-    $('wd-emoji').textContent = w[1]; $('wd-word').textContent = w[0]; $('wd-hint').textContent = w[2];
+  function setAvatar() { const a = $('avatar'); a.textContent = P.avatar; a.className = 'avatar t-' + tierOf(P.avatar); }
+  function renderMain() {
+    const res = todayRes(), n = playedToday();
+    $('games').innerHTML = Object.entries(GAMES).map(([g, G]) => `<div class="card gcard ${g}"><h2><span><span class="ico">${G.ico}</span>${G.name}</span><small>${AGES[P.level]}</small></h2><div class="modes">${G.modes.map((m, i) => {
+      const id = g + ':' + P.level + ':' + m, sc = res[id];
+      return `<a class="${sc != null ? 'played' : ''}" href="${G.file}?level=${P.level}&mode=${m}&n=${load('rp-count', 10)}"><span>${G.labels[P.level][i]}</span>${sc != null ? `<span class="sc">⭐ ${sc}</span>` : ''}</a>`;
+    }).join('')}</div></div>`).join('');
+    const claimed = P.days[TODAY]?.char;
+    $('today-n').textContent = `오늘 한 놀이 ${n}개 · ⭐ ${starsToday()}`;
+    const btn = $('finish');
+    if (claimed) { btn.textContent = '오늘 캐릭터 받음 ' + claimed; btn.classList.add('done'); }
+    else { btn.textContent = n >= need() ? '캐릭터 받기 🎁' : `놀이 ${need()}개 하면 캐릭터 🎁 (${n}/${need()})`; btn.classList.remove('done'); }
   }
-  function completeDay(stars) {
-    const rng = seeded('reward-' + TODAY + '-' + P.avatar);
-    const left = STICKERS.filter(s => !P.stickers.includes(s));
-    const got = left.length ? pickSeeded(rng, left) : pickSeeded(rng, STICKERS);
-    if (!P.stickers.includes(got)) P.stickers.push(got);
-    let gold = null;
-    if (stars >= 45) { const gl = GOLD.filter(s => !P.gold.includes(s)); if (gl.length) { gold = pickSeeded(rng, gl); P.gold.push(gold); } }
-    P.streak = (P.lastDay === yesterdayKey) ? (P.streak || 0) + 1 : 1;
-    P.bestStreak = Math.max(P.bestStreak || 0, P.streak);
-    P.lastDay = TODAY;
-    P.road = (P.road || 0) + 1;
-    if (P.road >= ROAD.length) { P.road = 0; P.roadRound = (P.roadRound || 1) + 1; }
-    P.days[TODAY] = { done: true, stars, sticker: got, gold };
+  function openDraw() {
+    const n = playedToday();
+    if (P.days[TODAY]?.char) return toast('오늘 캐릭터는 이미 받았어요. 내일 또 만나요! ' + P.days[TODAY].char);
+    if (n < need()) return toast(`놀이를 ${need()}개 이상 하면 캐릭터를 받을 수 있어요 (지금 ${n}개)`);
+    const ch = tierChances();
+    const box = document.createElement('div'); box.className = 'reward'; box.id = 'draw';
+    box.innerHTML = `<div class="box"><div class="egg">🥚</div><h2>캐릭터 뽑기</h2><p>오늘 놀이 ${n}개 · ⭐ ${starsToday()}개 · 맞힌 비율 ${Math.round(quality() * 100)}%</p>
+      <div class="chance"><div class="badge normal">노말<b>${ch.normal}%</b></div><div class="badge rare">레어<b>${ch.rare}%</b></div><div class="badge unique">유니크<b>${ch.unique}%</b></div><div class="badge legendary">레전더리<b>${ch.legendary}%</b></div></div>
+      <button class="btn" id="draw-go">뽑기! 🎲</button> <button class="danger" id="draw-cancel" style="margin-left:8px">더 놀고 올게요</button></div>`;
+    document.body.appendChild(box);
+    box.querySelector('#draw-cancel').addEventListener('click', () => box.remove());
+    box.querySelector('#draw-go').addEventListener('click', () => { box.remove(); doDraw(); });
+  }
+  function doDraw() {
+    const rng = seeded('char-' + TODAY + '-' + P.avatar + '-' + starsToday());
+    const tier = drawTier(rng);
+    const pool = TIERS[tier].chars, left = pool.filter(c => !P.chars.includes(c));
+    const got = left.length ? pickSeeded(rng, left) : pickSeeded(rng, pool);
+    const isNew = !P.chars.includes(got);
+    if (isNew) P.chars.push(got);
+    P.days[TODAY] = { char: got, tier, played: playedToday(), stars: starsToday() };
     save('rp-profile', P);
-    rememberModes();
-    confetti(160); sndWin();
-    toast('🎁 스티커 ' + got + ' 획득!' + (gold ? ' ✨ 반짝 스티커 ' + gold + '도!' : ''));
-    $('stat-streak').textContent = P.streak + '일';
-    $('allclear').textContent = '🎉 오늘 미션을 다 했어요! ' + (gold ? '반짝 스티커까지 받았어요 ✨' : '스티커를 받았어요 🎁');
-    setTimeout(checkUnlocks, 1500);
-    renderStickers(); renderRoad(); renderSettings();
+    // 룰렛처럼 잠깐 돌다가 공개
+    const box = document.createElement('div'); box.className = 'reward'; box.id = 'reveal';
+    box.innerHTML = `<div class="box"><div class="reel" id="reel">❔</div><h2 id="reveal-title">두구두구…</h2><p id="reveal-msg">&nbsp;</p><button class="btn" id="reward-ok" hidden>좋아요 🎉</button></div>`;
+    document.body.appendChild(box);
+    const reel = box.querySelector('#reel'); let i = 0;
+    const spin = setInterval(() => { reel.textContent = ALL_CHARS[Math.floor(Math.random() * ALL_CHARS.length)]; i++; }, 90);
+    setTimeout(() => {
+      clearInterval(spin);
+      reel.outerHTML = `<div class="big t-${tier} char" style="cursor:default">${got}</div>`;
+      box.querySelector('#reveal-title').textContent = `${TIERS[tier].name} ${got} ${isNew ? '새 친구를 만났어요!' : '친구를 다시 만났어요!'}`;
+      box.querySelector('#reveal-msg').textContent = tier === 'legendary' ? '와! 아주 귀한 레전더리 친구예요!' : tier === 'unique' ? '반짝반짝 유니크 친구예요!' : tier === 'rare' ? '빛나는 레어 친구예요!' : '귀여운 노말 친구예요. 별을 더 모으면 더 좋은 친구가 나와요!';
+      box.querySelector('#reward-ok').hidden = false;
+      confetti(tier === 'legendary' ? 260 : tier === 'unique' ? 180 : 120); sndWin();
+      speak(TIERS[tier].name + ' 친구를 만났어요!');
+    }, 1800);
+    box.querySelector('#reward-ok').addEventListener('click', () => { box.remove(); renderAll(); showTab('chars'); });
   }
-  function checkUnlocks() {
-    P.unlocked = P.unlocked || [];
-    const fresh = UNLOCKS.filter(u => !P.unlocked.includes(u.a) && u.test(P));
-    if (!fresh.length) return;
-    fresh.forEach(u => P.unlocked.push(u.a));
-    save('rp-profile', P);
-    confetti(120);
-    toast('🎊 새 친구 ' + fresh.map(u => u.a).join(' ') + ' 을(를) 만났어요! 설정에서 바꿀 수 있어요');
-    renderPickers('avatars2', 'ages2');
-  }
-  const allAvatars = () => AVATARS.concat(UNLOCKS.map(u => u.a));
-  function renderStickers() {
-    const newest = P.days[TODAY]?.sticker;
-    $('stickers').innerHTML = STICKERS.map(s => `<div class="sticker ${P.stickers.includes(s) ? '' : 'locked'} ${s === newest ? 'new' : ''}">${P.stickers.includes(s) ? s : '❔'}</div>`).join('')
-      + GOLD.map(s => `<div class="sticker gold ${P.gold.includes(s) ? '' : 'locked'}">${P.gold.includes(s) ? s : '✨'}</div>`).join('');
-    $('sticker-count').textContent = P.stickers.length + ' / ' + STICKERS.length + (P.gold.length ? ' · 반짝 ' + P.gold.length : '');
-  }
-  function renderRoad() {
-    const pos = P.road || 0;
-    $('road-round').textContent = (P.roadRound || 1) + '번째 여행';
-    $('road').innerHTML = ROAD.map((e, i) => `<div class="stop ${i < pos ? 'past' : ''} ${i === pos ? 'here' : ''} ${i === ROAD.length - 1 ? 'goal' : ''}">${i === pos ? P.avatar : e}${i === pos ? '' : `<i>${i + 1}</i>`}</div>`).join('');
-    const leftN = ROAD.length - 1 - pos;
-    $('road-msg').textContent = leftN > 0 ? `무지개 성까지 ${leftN}밤 남았어요. 미션을 다 하면 한 칸 앞으로!` : '🏰 무지개 성에 도착했어요! 내일부터 새 여행이 시작돼요.';
+  function renderChars() {
+    const newest = P.days[TODAY]?.char;
+    $('chars').innerHTML = TIER_ORDER.map(t => { const T = TIERS[t], own = T.chars.filter(c => P.chars.includes(c)).length;
+      return `<div class="tier"><h3><span class="badge ${T.cls}">${T.name}</span><small>${own} / ${T.chars.length}</small></h3><div class="chars">${T.chars.map(c => { const has = P.chars.includes(c); return `<button class="char t-${t} ${has ? '' : 'locked'} ${c === newest ? 'new' : ''}" data-char="${c}" ${has ? '' : 'disabled'} aria-pressed="${P.avatar === c}">${has ? c : '❔'}</button>`; }).join('')}</div></div>`; }).join('');
+    $('char-count').textContent = P.chars.length + ' / ' + ALL_CHARS.length;
   }
   function renderSettings() {
-    $('stats-line').textContent = `지금까지 ${Object.keys(P.days).length}일 놀았고, 스티커 ${P.stickers.length}개를 모았어요. 최고 연속 출석 ${P.bestStreak || 0}일.`;
+    $('stats-line').textContent = `지금까지 ${Object.keys(P.days).length}일 놀았고, 캐릭터 ${P.chars.length}개를 모았어요.`;
     const v = load('rp-voice', 'clip');
-    const cnt = load("rp-count", 10);
-    const df = load("rp-diff", 0);
-    document.querySelectorAll("#diff-seg [data-diff]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === df ? "true" : "false"));
-    document.querySelectorAll("#count-seg [data-count]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.count === cnt ? "true" : "false"));
     document.querySelectorAll('#voice-seg [data-voice]').forEach(b => b.setAttribute('aria-pressed', b.dataset.voice === v ? 'true' : 'false'));
-    $('unlocks').innerHTML = UNLOCKS.map(u => `<div><b>${u.a}</b>${(P.unlocked || []).includes(u.a) ? '✅ ' : '🔒 '}${u.cond}</div>`).join('');
+    const cnt = load('rp-count', 10);
+    document.querySelectorAll('#count-seg [data-count]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.count === cnt ? 'true' : 'false'));
+    document.querySelectorAll('#need-seg [data-need]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.need === need() ? 'true' : 'false'));
     renderReport();
   }
   function renderReport() {
@@ -507,22 +406,22 @@
     const agg = {};
     for (const day of Object.keys(R)) for (const [id, sc] of Object.entries(R[day])) { (agg[id] = agg[id] || []).push(sc); }
     const rows = Object.entries(agg).filter(([, a]) => a.length >= 2).map(([id, a]) => {
-      const [g, l, m] = id.split(':'); const G = GAMES[g]; if (!G) return null;
-      return { label: (G.labels[l] || [])[G.modes.indexOf(m)] || m, game: G.name, level: AGES[l], avg: a.reduce((x, y) => x + y, 0) / a.length, n: a.length };
+      const [g, l, m] = id.split(':'); const G = GAMES[g]; if (!G || !G.labels[l]) return null;
+      return { label: G.labels[l][G.modes.indexOf(m)] || m, game: G.name, level: AGES[l] || l, avg: a.reduce((x, y) => x + y, 0) / a.length, n: a.length };
     }).filter(Boolean).sort((a, b) => a.avg - b.avg).slice(0, 3);
     $('weak').innerHTML = rows.length ? rows.map(r => `<div><span>${r.game} · ${r.label} (${r.level})</span><span>평균 ⭐ ${r.avg.toFixed(1)} · ${r.n}번</span></div>`).join('') : '<div><span>아직 자료가 부족해요. 같은 놀이를 두 번 이상 하면 나타나요.</span></div>';
     const total = Object.values(R).reduce((n, d) => n + Object.keys(d).length, 0);
-    $('report-note').textContent = `지금까지 미션 ${total}개를 했어요. 별은 한 번에 맞힌 문제에만 주니, 평균이 낮은 놀이를 함께 해 보세요.`;
+    $('report-note').textContent = `지금까지 놀이 ${total}번을 했어요. 별은 한 번에 맞힌 문제에만 주니, 평균이 낮은 놀이를 함께 해 보세요.`;
   }
   function renderPickers(avId, ageId) {
-    const un = P.unlocked || [];
-    $(avId).innerHTML = allAvatars().map(a => { const locked = !AVATARS.includes(a) && !un.includes(a); return `<button class="pick ${locked ? 'locked' : ''}" data-av="${a}" ${locked ? 'disabled' : ''} aria-pressed="${P.avatar === a}">${a}</button>`; }).join('');
+    const all = [...new Set(AVATARS.concat(P.chars || []))];
+    $(avId).innerHTML = all.map(a => `<button class="pick t-${tierOf(a)}" data-av="${a}" aria-pressed="${P.avatar === a}">${a}</button>`).join('');
     $(ageId).innerHTML = Object.keys(AGES).map(l => `<button class="pick age" data-lv="${l}" aria-pressed="${P.level === l}">${AGES[l]}</button>`).join('');
   }
-  function renderAll() { greet(); renderToday(); renderStickers(); renderRoad(); renderSettings(); renderPickers('avatars2', 'ages2'); }
+  function renderAll() { greet(); renderMain(); renderChars(); renderSettings(); renderPickers('avatars2', 'ages2'); }
 
   function showTab(t) {
-    for (const x of ['today','stickers','road','free','settings']) $('tab-' + x).hidden = x !== t;
+    for (const x of ['main','chars','settings']) $('tab-' + x).hidden = x !== t;
     document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.tab === t ? 'true' : 'false'));
     window.scrollTo(0, 0);
   }
@@ -564,28 +463,29 @@
 
   /* 이벤트 */
   document.addEventListener('click', e => {
-    const av = e.target.closest('[data-av]'); if (av && !av.disabled) { P.avatar = av.dataset.av; if (P.days) save('rp-profile', P); renderPickers('avatars', 'ages'); renderPickers('avatars2', 'ages2'); $('avatar').textContent = P.avatar; if (P.days) renderRoad(); return; }
-    const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderToday(); } renderPickers('avatars', 'ages'); renderPickers('avatars2', 'ages2'); return; }
-    const dc = e.target.closest("[data-diff]"); if (dc) { save("rp-diff", +dc.dataset.diff); renderSettings(); renderToday(); return; }
-    const cc = e.target.closest("[data-count]"); if (cc) { save("rp-count", +cc.dataset.count); renderSettings(); renderToday(); return; }
+    const av = e.target.closest('[data-av]'); if (av) { P.avatar = av.dataset.av; if (P.days) save('rp-profile', P); renderPickers('avatars', 'ages'); if (P.days) { renderPickers('avatars2', 'ages2'); renderChars(); } setAvatar(); return; }
+    const ch = e.target.closest('[data-char]'); if (ch && !ch.disabled) { P.avatar = ch.dataset.char; save('rp-profile', P); renderChars(); renderPickers('avatars2', 'ages2'); setAvatar(); toast(P.avatar + ' 친구로 바꿨어요!'); return; }
+    const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderMain(); } renderPickers('avatars', 'ages'); if (P.days) renderPickers('avatars2', 'ages2'); return; }
     const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 무지개 놀이터 친구야'); return; }
+    const cc = e.target.closest('[data-count]'); if (cc) { save('rp-count', +cc.dataset.count); renderSettings(); renderMain(); return; }
+    const nd = e.target.closest('[data-need]'); if (nd) { save('rp-need', +nd.dataset.need); renderSettings(); renderMain(); return; }
     const tab = e.target.closest('.tabs button'); if (tab) showTab(tab.dataset.tab);
   });
+  $('finish').addEventListener('click', openDraw);
   $('voice-try').addEventListener('click', () => speak('안녕! 나는 무지개 놀이터 친구야'));
-  $('wordday').addEventListener('click', () => speak($('wd-word').textContent));
   $('setup-ok').addEventListener('click', () => {
-    P.days = {}; P.stickers = []; P.gold = []; P.streak = 0; P.bestStreak = 0; P.road = 0; P.roadRound = 1; P.unlocked = [];
+    P.days = {}; P.chars = [];
     save('rp-profile', P);
     $('setup').hidden = true; $('app').hidden = false; $('tabs').hidden = false;
-    renderAll(); toast('환영해요, ' + P.avatar + ' 친구! 오늘 미션을 시작해 봐요'); warmAudio();
+    renderAll(); toast('환영해요, ' + P.avatar + ' 친구! 하고 싶은 놀이를 골라요'); warmAudio();
   });
   $('reset').addEventListener('click', () => {
     if (!confirm('정말 모든 기록을 지우고 처음부터 시작할까요?')) return;
-    ['rp-profile','rp-results','rp-yesterday-modes'].forEach(k => localStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k.startsWith('rp-') || k.startsWith('rainbow-')).forEach(k => localStorage.removeItem(k));
     location.reload();
   });
   // 놀이에서 돌아오면 결과를 새로 읽고, 날짜가 바뀌었으면 새로 시작해요
-  const refresh = () => { if (dayKey(new Date()) !== TODAY) return location.reload(); if (P && P.days) { R = load('rp-results', {}); renderToday(); } };
+  const refresh = () => { if (dayKey(new Date()) !== TODAY) return location.reload(); if (P && P.days) { R = load('rp-results', {}); renderMain(); } };
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
   addEventListener('pageshow', refresh);
 
@@ -596,10 +496,11 @@
     renderPickers('avatars', 'ages');
     $('setup').hidden = false;
   } else {
-    if (P.lastDay && P.lastDay !== TODAY && P.lastDay !== yesterdayKey) { P.streak = 0; save('rp-profile', P); }
-    if (!AGES[P.level]) { P.level = "hard"; save("rp-profile", P); }
+    if (!AGES[P.level]) P.level = 'hard';
+    P.chars = P.chars || P.stickers || []; P.days = P.days || {};
+    save('rp-profile', P);
     $('app').hidden = false; $('tabs').hidden = false;
-    renderAll(); checkUnlocks(); warmAudio();
+    renderAll(); warmAudio();
   }
 })();
 </script>

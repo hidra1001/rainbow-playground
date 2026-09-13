@@ -504,6 +504,11 @@
   } else {
     if (!AGES[P.level]) P.level = 'hard';
     P.chars = P.chars || P.stickers || []; P.days = P.days || {}; P.counts = P.counts || {};
+    if (!P.v2) {   // 새 뽑기 방식으로 한 번 옮기기: 뽑은 횟수 0, 오늘 한 놀이를 뽑기 에너지로 인정
+      P.v2 = 1; P.draws = 0; P.lastDrawAt = 0; P.counts = {};
+      const lg = load('rp-log', []);
+      if (!lg.length) { const t = Date.now() - 1000; for (const [id, sc] of Object.entries(todayRes())) lg.push({ t, id, score: sc }); save('rp-log', lg); }
+    }
     save('rp-profile', P);
     $('app').hidden = false; $('tabs').hidden = false;
     renderAll(); warmAudio();

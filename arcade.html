@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#FF5FA2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="voice.js"></script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
+<title>무지개 아케이드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+  :root {
+    --ground: #FFE4F0;
+    --ground-2: #FFF3F8;
+    --card: #FFFFFF;
+    --pink: #FF5FA2;
+    --pink-deep: #E8408A;
+    --plum: #5B2A4E;
+    --plum-soft: #9A6A8C;
+    --r1: #FF6B6B; --r2: #FFB347; --r3: #FFE66D; --r4: #7ED957; --r5: #5DADE2; --r6: #B57EDC;
+    --good: #5FC97A;
+    --oops: #FF8A80;
+    --display: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --body: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    background-image:
+      radial-gradient(circle at 15% 20%, #FFD1E6 0 60px, transparent 61px),
+      radial-gradient(circle at 85% 30%, #FFD9EA 0 80px, transparent 81px),
+      radial-gradient(circle at 70% 85%, #FFCCE2 0 50px, transparent 51px),
+      radial-gradient(circle at 20% 80%, #FFDDEC 0 70px, transparent 71px);
+    color: var(--plum);
+    font-family: var(--body);
+    padding-inline: 16px;
+    padding-block: 20px 40px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  .arch { position: relative; height: 120px; overflow: hidden; margin-bottom: -20px; }
+  .arch svg { width: 100%; height: 100%; display: block; }
+  .cloud { position: absolute; bottom: 4px; width: 88px; height: 34px; background: #fff; border-radius: 40px; box-shadow: 0 6px 0 #FFD1E6; }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+  .cloud::before { width: 42px; height: 42px; left: 10px; top: -20px; }
+  .cloud::after { width: 32px; height: 32px; right: 12px; top: -12px; }
+  .cloud.l { left: 2%; } .cloud.r { right: 2%; }
+  .letters { position: absolute; inset: 0; pointer-events: none; font-size: 26px; }
+  .letters span { position: absolute; }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(34px, 9vw, 46px);
+    text-align: center; margin: 0; line-height: 1.1; text-wrap: balance;
+    background: linear-gradient(90deg, var(--r1), var(--r2), #F2C94C, var(--r4), var(--r5), var(--r6));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 0 #fff);
+  }
+  .sub { text-align: center; margin: 0; font-size: 17px; color: var(--plum-soft); }
+
+  .card {
+    background: var(--card); border-radius: 32px; padding: 24px 22px 26px;
+    box-shadow: 0 10px 0 #FFC2DB, 0 16px 30px rgba(232, 64, 138, .15);
+    border: 4px solid #FFD6E7;
+  }
+  [hidden] { display: none !important; }
+
+  .btn {
+    font-family: var(--display); font-size: 26px; border: 0; border-radius: 24px;
+    padding: 16px 20px; cursor: pointer; color: #fff; background: var(--pink);
+    box-shadow: 0 7px 0 var(--pink-deep);
+    transition: transform .08s ease, box-shadow .08s ease; touch-action: manipulation; line-height: 1.1;
+  }
+  .btn:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--pink-deep); }
+  .btn:focus-visible { outline: 4px solid var(--r5); outline-offset: 3px; }
+
+  /* 난이도 */
+  .level { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 12px 0 16px; }
+  .level button {
+    font-family: var(--display); font-size: 20px; padding: 10px 16px; border-radius: 30px; cursor: pointer;
+    border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft);
+  }
+  .level button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 4px 0 var(--pink-deep); }
+  .level button:focus-visible { outline: 4px solid var(--r5); outline-offset: 2px; }
+  .level-note { text-align: center; font-size: 14px; color: var(--plum-soft); margin: -6px 0 10px; }
+
+  .modes { display: grid; gap: 14px; }
+  .mode { display: flex; align-items: center; gap: 16px; text-align: left; padding: 14px 20px; }
+  .mode .ico { font-size: 38px; line-height: 1; }
+  .mode small { display: block; font-family: var(--body); font-size: 15px; opacity: .9; margin-top: 4px; }
+  .mode.fall_math { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .mode.fall_math:active { box-shadow: 0 2px 0 #3F8FC2; }
+  .mode.fall_word { background: var(--r2); box-shadow: 0 7px 0 #D9902E; }
+  .mode.fall_word:active { box-shadow: 0 2px 0 #D9902E; }
+  .mode.balloon { background: var(--r1); box-shadow: 0 7px 0 #D94E4E; }
+  .mode.balloon:active { box-shadow: 0 2px 0 #D94E4E; }
+  .mode.mole { background: var(--r4); box-shadow: 0 7px 0 #5FB25A; }
+  .mode.mole:active { box-shadow: 0 2px 0 #5FB25A; }
+  .best { text-align: center; font-size: 15px; color: var(--plum-soft); margin: 14px 0 0; line-height: 1.6; }
+
+  .stars { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .stars span { font-size: 24px; filter: grayscale(1) opacity(.35); transition: transform .3s, filter .3s; }
+  .stars span.on { filter: none; transform: scale(1.15); }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 15px; color: var(--plum-soft); gap: 6px; }
+  .topbar button { background: none; border: 0; font-family: var(--body); font-size: 15px; color: var(--plum-soft); cursor: pointer; text-decoration: underline; padding: 6px; }
+  .topbar button:focus-visible { outline: 3px solid var(--r5); border-radius: 8px; }
+  .tag { background: var(--ground-2); border: 2px solid #FFD6E7; border-radius: 20px; padding: 3px 10px; font-family: var(--display); }
+  .lives { font-size: 18px; letter-spacing: 2px; }
+  .ask { text-align: center; font-family: var(--display); font-size: 22px; color: var(--plum); margin: 0 0 10px; min-height: 28px; }
+  .ask.flash { animation: pop .5s; color: var(--pink-deep); }
+  .feedback { min-height: 30px; text-align: center; font-family: var(--display); font-size: 22px; margin-top: 10px; color: var(--pink-deep); }
+  .feedback.good { color: #3FA85D; }
+
+  /* 놀이 무대 */
+  #area {
+    position: relative; width: 100%; height: min(62vh, 560px); min-height: 300px;
+    border-radius: 24px; overflow: hidden; border: 4px solid #FFD6E7;
+    background: linear-gradient(180deg, #DDF3FF 0%, #F1F9FF 70%, #FFE4F0 100%);
+  }
+  .water { position: absolute; left: 0; right: 0; bottom: 0; height: 14%; background: linear-gradient(180deg, #FFB7D5, #FF8FBF); border-top: 4px solid #FFD6E7; }
+  .water::before { content: "〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰"; position: absolute; top: -14px; left: 0; right: 0; color: #FFB7D5; font-size: 18px; letter-spacing: -2px; overflow: hidden; white-space: nowrap; }
+  .sun { position: absolute; top: 14px; right: 18px; font-size: 34px; opacity: .8; }
+  .layer { position: absolute; inset: 0; }
+  .overlay { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: clamp(40px, 12vw, 64px); color: var(--pink-deep); text-shadow: 0 4px 0 #fff; pointer-events: none; z-index: 3; }
+  .banner { position: absolute; left: 8%; right: 8%; top: 38%; background: rgba(255,255,255,.95); border: 4px solid var(--pink); border-radius: 24px; padding: 14px; text-align: center; font-family: var(--display); font-size: clamp(22px, 6vw, 30px); color: var(--plum); z-index: 3; animation: pop .4s; pointer-events: none; }
+
+  /* 떨어지는 것들 */
+  .bubble {
+    position: absolute; left: 0; top: 0; will-change: transform;
+    min-width: 110px; padding: 12px 18px; border-radius: 40px; background: #fff; border: 4px solid var(--r5);
+    font-family: var(--display); font-size: 34px; color: var(--plum); text-align: center; line-height: 1;
+    box-shadow: 0 6px 0 #BFE0F5; white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .bubble.big { font-size: 28px; }
+  .bubble.emoji { font-size: 60px; padding: 10px 22px; border-color: var(--r2); box-shadow: 0 6px 0 #FFD9A8; }
+  .bubble.word { font-size: 30px; border-color: var(--r2); box-shadow: 0 6px 0 #FFD9A8; }
+  .bubble.sent { font-size: 20px; white-space: normal; max-width: 86%; line-height: 1.3; }
+  .bubble.no { animation: shake .4s; }
+  .bubble.pop { animation: popout .35s forwards; }
+  .bubble.sink { animation: sink .7s forwards; }
+  .answers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+  .answers .btn { font-size: 30px; padding: 12px 4px; }
+  .answers .btn.long { font-size: 22px; }
+  .answers .btn:nth-child(1) { background: var(--r1); box-shadow: 0 7px 0 #D94E4E; }
+  .answers .btn:nth-child(2) { background: var(--r2); box-shadow: 0 7px 0 #D9902E; }
+  .answers .btn:nth-child(3) { background: var(--r6); box-shadow: 0 7px 0 #9560C0; }
+  .answers .btn:nth-child(4) { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .answers .btn:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+  .answers .btn.right { background: var(--good) !important; box-shadow: 0 7px 0 #4DB369 !important; }
+  .answers .btn.wrong { background: #E9C8D6 !important; box-shadow: 0 7px 0 #C9A6B8 !important; }
+  .answers .btn:disabled { cursor: default; }
+
+  /* 풍선 */
+  .balloon {
+    position: absolute; left: 0; top: 0; width: 92px; text-align: center; will-change: transform; cursor: pointer;
+  }
+  .balloon .b {
+    width: 84px; height: 96px; margin: 0 auto; border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+    display: grid; place-items: center; font-size: 44px; line-height: 1; border: 4px solid rgba(255,255,255,.7);
+    box-shadow: inset -8px -10px 0 rgba(0,0,0,.08), 0 6px 0 rgba(0,0,0,.08);
+  }
+  .balloon .s { width: 3px; height: 34px; background: #B0A0A8; margin: -2px auto 0; }
+  .balloon .w { font-family: var(--display); font-size: 17px; color: var(--plum); background: rgba(255,255,255,.9); border-radius: 12px; padding: 2px 6px; margin-top: 2px; }
+  .balloon.pop { animation: popout .3s forwards; }
+  .balloon.bad .b { background: #C9A6B8 !important; animation: shake .4s; }
+
+  /* 두더지 */
+  .holes { position: absolute; inset: 8% 6% 12%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; }
+  .hole { position: relative; border-radius: 50% / 40%; background: radial-gradient(ellipse at 50% 70%, #8D6E63 0 46%, transparent 47%); overflow: hidden; cursor: pointer; }
+  .hole::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: 8%; height: 26%; border-radius: 50%; background: #5D4037; }
+  .mole {
+    position: absolute; left: 50%; bottom: 22%; transform: translate(-50%, 130%); width: 62%; max-width: 92px; aspect-ratio: 1 / 1.1;
+    background: #A1887F; border-radius: 45% 45% 40% 40%; border: 3px solid #8D6E63;
+    display: grid; place-items: center; transition: transform .18s ease-out; z-index: 1;
+  }
+  .mole::before { content: "•ᴥ•"; position: absolute; top: 8%; font-size: 14px; color: #4E342E; }
+  .mole .num { font-family: var(--display); font-size: clamp(22px, 5vw, 30px); color: #3E2723; background: #FFF3E0; border-radius: 12px; padding: 2px 10px; margin-top: 30%; border: 2px solid #D7CCC8; }
+  .hole.up .mole { transform: translate(-50%, 0); }
+  .hole.hit .mole { background: var(--good); border-color: #4DB369; }
+  .hole.hit .mole .num { background: #EAF9EE; }
+  .hole.bad .mole { background: #E57373; animation: shake .4s; }
+  .hole.miss .mole { background: #E9C8D6; }
+
+  .result { text-align: center; }
+  .result .big { font-size: 80px; line-height: 1; margin: 6px 0 10px; animation: bounce 1s infinite alternate; }
+  .result h2 { font-family: var(--display); font-size: 34px; margin: 0 0 6px; color: var(--pink-deep); }
+  .result p { margin: 0 0 20px; font-size: 18px; }
+  .result .score { font-family: var(--display); font-size: 30px; color: var(--plum); }
+  .result .actions { display: grid; gap: 12px; }
+  .result .again { background: var(--r4); box-shadow: 0 7px 0 #5FB25A; }
+  .result .home { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .result .hub { display: block; text-decoration: none; text-align: center; background: var(--pink); box-shadow: 0 7px 0 var(--pink-deep); }
+  .hublink { display: inline-block; font-family: var(--body); font-size: 15px; color: var(--plum-soft); text-decoration: none; border: 2px solid #FFD6E7; border-radius: 30px; padding: 6px 14px; margin-bottom: 10px; }
+
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+
+  @keyframes pop { from { transform: scale(.6); } 70% { transform: scale(1.12); } to { transform: scale(1); } }
+  @keyframes popout { to { transform: scale(1.6); opacity: 0; } }
+  @keyframes sink { to { transform: translateY(40px) scale(.7); opacity: 0; } }
+  @keyframes shake { 0%,100% { transform: translateX(0);} 25% { transform: translateX(-8px);} 75% { transform: translateX(8px);} }
+  @keyframes bounce { from { transform: translateY(0);} to { transform: translateY(-14px);} }
+  @media (prefers-reduced-motion: reduce) {
+    .result .big { animation: none; }
+    .btn, .stars span { transition: none; }
+  }
+  @media (max-width: 400px) {
+    .card { padding: 20px 14px 22px; }
+    .answers .btn { font-size: 26px; } .answers .btn.long { font-size: 19px; }
+    .bubble { font-size: 28px; min-width: 90px; } .bubble.emoji { font-size: 50px; }
+    .balloon { width: 76px; } .balloon .b { width: 70px; height: 80px; font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <div class="arch" aria-hidden="true">
+    <svg viewBox="0 0 520 130" preserveAspectRatio="xMidYMax meet">
+      <path d="M20 130 A240 240 0 0 1 500 130" fill="none" stroke="#FF6B6B" stroke-width="16"/>
+      <path d="M36 130 A224 224 0 0 1 484 130" fill="none" stroke="#FFB347" stroke-width="16"/>
+      <path d="M52 130 A208 208 0 0 1 468 130" fill="none" stroke="#FFE66D" stroke-width="16"/>
+      <path d="M68 130 A192 192 0 0 1 452 130" fill="none" stroke="#7ED957" stroke-width="16"/>
+      <path d="M84 130 A176 176 0 0 1 436 130" fill="none" stroke="#5DADE2" stroke-width="16"/>
+      <path d="M100 130 A160 160 0 0 1 420 130" fill="none" stroke="#B57EDC" stroke-width="16"/>
+    </svg>
+    <div class="letters">
+      <span style="left:26%;top:40%">🎈</span><span style="left:44%;top:14%">🕹️</span>
+      <span style="left:60%;top:20%">💧</span><span style="left:72%;top:44%">🐹</span>
+    </div>
+    <div class="cloud l"></div>
+    <div class="cloud r"></div>
+  </div>
+
+  <h1>무지개 아케이드</h1>
+  <p class="sub">떨어지기 전에, 날아가기 전에 빨리 눌러요 🌈</p>
+
+  <section class="card" id="home">
+    <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
+    <p class="sub">몇 살 놀이로 할까요?</p>
+    <div class="level" role="group" aria-label="난이도">
+      <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
+      <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
+      <button type="button" id="level-pro" data-level="pro" aria-pressed="false">🌈 8살</button>
+      <button type="button" id="level-nine" data-level="nine" aria-pressed="false">👑 9살</button>
+    </div>
+    <p class="level-note" id="level-note"></p>
+    <div class="modes">
+      <button class="btn mode fall_math" id="mode-fall_math" data-mode="fall_math"><span class="ico" id="ico-fall_math">💧</span><span id="label-fall_math"></span></button>
+      <button class="btn mode fall_word" id="mode-fall_word" data-mode="fall_word"><span class="ico" id="ico-fall_word">🍎</span><span id="label-fall_word"></span></button>
+      <button class="btn mode balloon" id="mode-balloon" data-mode="balloon"><span class="ico" id="ico-balloon">🎈</span><span id="label-balloon"></span></button>
+      <button class="btn mode mole" id="mode-mole" data-mode="mole"><span class="ico" id="ico-mole">🐹</span><span id="label-mole"></span></button>
+    </div>
+    <p class="best" id="best"></p>
+  </section>
+
+  <section class="card" id="game" hidden>
+    <div class="topbar">
+      <span id="round">0 / 10</span>
+      <span class="tag" id="tag"></span>
+      <span class="lives" id="lives">❤️❤️❤️</span>
+      <button id="quit" type="button">처음으로</button>
+    </div>
+    <div class="stars" id="stars" aria-label="모은 별"></div>
+    <p class="ask" id="ask"></p>
+    <div id="area"></div>
+    <div class="answers" id="answers" hidden></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+  </section>
+
+  <section class="card result" id="result" hidden>
+    <div class="big" id="result-emoji">🎉</div>
+    <h2 id="result-title">참 잘했어요!</h2>
+    <p class="score" id="result-score"></p>
+    <p id="result-msg"></p>
+    <div class="actions">
+      <button class="btn again" id="again">한 번 더! 🌟</button>
+      <button class="btn home" id="home-btn">처음으로 🏠</button>
+      <a class="btn hub" id="to-hub" href="index.html" hidden>🏠 놀이터로 돌아가기</a>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const TOTAL = 10, LIVES = 3;
+  const $ = id => document.getElementById(id);
+  const rnd = n => Math.floor(Math.random() * n);
+  const rng = (a, b) => a + rnd(b - a + 1);
+  const pick = a => a[rnd(a.length)];
+  const shuffle = a => a.slice().sort(() => Math.random() - .5);
+  const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답!', '최고예요!', '멋져요!'];
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  const LEVEL_NOTE = {
+    easy: '10까지 계산 · 쉬운 낱말 · ㄱㄴㄷㅁㅂㅅ 첫소리 · 1~10 수',
+    hard: '받아올림 20까지 · 비슷한 낱말 · 모든 첫소리 · 1~30 수',
+    pro: '두 자리 계산과 구구단 · 틀린 맞춤법 · 받침·글자 수 규칙 · 구구단 두더지',
+    nine: '구구단·나눗셈·세 자리 · 빈칸 글자와 문장 · 동물·과일 분류 · 7단·9단 두더지'
+  };
+  const MODE_LABEL = {
+    easy: { fall_math: ['💧','떨어지는 식','10까지 더하기 빼기가 떨어져요'], fall_word: ['🍎','떨어지는 낱말','그림에 맞는 낱말을 빨리 눌러요'], balloon: ['🎈','풍선 터뜨리기','ㄱ으로 시작하는 풍선만 터뜨려요'], mole: ['🐹','두더지 잡기','5보다 큰 수, 짝수 두더지를 잡아요'] },
+    hard: { fall_math: ['💧','떨어지는 식','받아올림 있는 20까지 계산'], fall_word: ['🍎','떨어지는 낱말','비슷한 낱말 중에서 골라요'], balloon: ['🎈','풍선 터뜨리기','첫소리가 같은 풍선만 터뜨려요'], mole: ['🐹','두더지 잡기','홀수, 10보다 큰 수, 5씩 뛴 수'] },
+    pro:  { fall_math: ['💧','떨어지는 식','두 자리 계산과 구구단 2~5단'], fall_word: ['🍎','떨어지는 낱말','틀린 맞춤법을 피해 골라요'], balloon: ['🎈','풍선 터뜨리기','받침·글자 수·ㅏ 소리 규칙'], mole: ['🐹','두더지 잡기','3단·4단의 수, 짝수를 잡아요'] },
+    nine: { fall_math: ['💧','떨어지는 식','구구단·나눗셈·세 자리 계산'], fall_word: ['🍎','떨어지는 낱말','빈칸 글자와 문장을 채워요'], balloon: ['🎈','풍선 터뜨리기','동물만! 과일만! 분류 규칙'], mole: ['🐹','두더지 잡기','7단·9단, 3으로 나누어떨어지는 수'] },
+  };
+  const modeName = (m, l) => MODE_LABEL[l][m][1];
+
+  /* 낱말 재료: [낱말, 그림, 갈래] */
+  const WORDS = [
+    ['강아지','🐶','동물'],['고양이','🐱','동물'],['토끼','🐰','동물'],['사자','🦁','동물'],['코끼리','🐘','동물'],['나비','🦋','동물'],['곰','🐻','동물'],['호랑이','🐯','동물'],['돼지','🐷','동물'],['오리','🦆','동물'],
+    ['병아리','🐤','동물'],['개구리','🐸','동물'],['물고기','🐟','동물'],['거북이','🐢','동물'],['원숭이','🐵','동물'],['펭귄','🐧','동물'],['말','🐴','동물'],['소','🐮','동물'],['벌','🐝','동물'],['새','🐦','동물'],
+    ['기린','🦒','동물'],['얼룩말','🦓','동물'],['다람쥐','🐿️','동물'],['공룡','🦖','동물'],['악어','🐊','동물'],['여우','🦊','동물'],['늑대','🐺','동물'],['판다','🐼','동물'],['하마','🦛','동물'],['독수리','🦅','동물'],
+    ['부엉이','🦉','동물'],['달팽이','🐌','동물'],['문어','🐙','동물'],['상어','🦈','동물'],['고래','🐳','동물'],['낙타','🐪','동물'],['사슴','🦌','동물'],['닭','🐔','동물'],['쥐','🐭','동물'],['뱀','🐍','동물'],
+    ['사과','🍎','과일'],['바나나','🍌','과일'],['딸기','🍓','과일'],['포도','🍇','과일'],['수박','🍉','과일'],['복숭아','🍑','과일'],['체리','🍒','과일'],['키위','🥝','과일'],['레몬','🍋','과일'],['파인애플','🍍','과일'],['멜론','🍈','과일'],['귤','🍊','과일'],
+    ['자동차','🚗','탈것'],['버스','🚌','탈것'],['비행기','✈️','탈것'],['기차','🚂','탈것'],['자전거','🚲','탈것'],['트럭','🚚','탈것'],['택시','🚕','탈것'],['소방차','🚒','탈것'],['구급차','🚑','탈것'],['헬리콥터','🚁','탈것'],['우주선','🚀','탈것'],['오토바이','🏍️','탈것'],['요트','⛵','탈것'],
+    ['모자','🎩','물건'],['신발','👟','물건'],['가방','🎒','물건'],['책','📚','물건'],['우산','☂️','물건'],['시계','⏰','물건'],['연필','✏️','물건'],['안경','👓','물건'],['열쇠','🔑','물건'],['풍선','🎈','물건'],
+    ['선물','🎁','물건'],['로봇','🤖','물건'],['거울','🪞','물건'],['의자','🪑','물건'],['침대','🛏️','물건'],['가위','✂️','물건'],['컴퓨터','💻','물건'],['카메라','📷','물건'],['종','🔔','물건'],['망치','🔨','물건'],
+    ['꽃','🌸','자연'],['나무','🌳','자연'],['별','⭐','자연'],['달','🌙','자연'],['해','☀️','자연'],['비','🌧️','자연'],['구름','☁️','자연'],['무지개','🌈','자연'],['산','⛰️','자연'],['바다','🌊','자연'],['눈사람','⛄','자연'],['번개','⚡','자연'],['불','🔥','자연'],['숲','🌲','자연'],['화산','🌋','자연'],
+    ['빵','🍞','음식'],['우유','🥛','음식'],['피자','🍕','음식'],['케이크','🎂','음식'],['김밥','🍙','음식'],['라면','🍜','음식'],['만두','🥟','음식'],['사탕','🍬','음식'],['초콜릿','🍫','음식'],['아이스크림','🍦','음식'],['도넛','🍩','음식'],['햄버거','🍔','음식'],
+  ];
+  const SENTS = [
+    ['사과','빨간 ___를 한 입 먹었어요.'],['우산','비가 와서 ___을 펼쳤어요.'],['기차','___가 칙칙폭폭 달려요.'],['펭귄','___은 추운 남극에 살아요.'],
+    ['무지개','비가 그치고 하늘에 ___가 떴어요.'],['눈사람','겨울에 친구와 ___을 만들었어요.'],['연필','___로 이름을 또박또박 썼어요.'],['개구리','비가 오면 ___가 개굴개굴 울어요.'],
+    ['코끼리','___는 코가 아주 길어요.'],['자전거','공원에서 ___를 신나게 탔어요.'],['소방차','불이 나자 ___가 달려왔어요.'],['달팽이','___는 등에 집을 지고 다녀요.'],
+    ['김밥','소풍 가는 날 ___을 쌌어요.'],['시계','벽에 걸린 ___가 세 시를 가리켜요.'],['풍선','빨간 ___이 하늘로 날아갔어요.'],['바다','여름 방학에 ___로 놀러 갔어요.'],
+  ];
+  const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const decomp = ch => { const c = ch.codePointAt(0) - 0xAC00; return c >= 0 && c < 11172 ? { cho: Math.floor(c / 588), jung: Math.floor(c % 588 / 28), jong: c % 28 } : null; };
+  const cho = ch => { const d = decomp(ch); return d ? CHO[d.cho] : ''; };
+  const makeSyl = (c, j, g) => String.fromCodePoint(0xAC00 + c * 588 + j * 28 + g);
+  const hasJong = w => [...w].some(ch => { const d = decomp(ch); return d && d.jong > 0; });
+  const hasA = w => [...w].some(ch => { const d = decomp(ch); return d && d.jung === 0; });
+  const CHO_FAM = [['ㄱ','ㄲ','ㅋ'],['ㄷ','ㄸ','ㅌ'],['ㄴ','ㄹ'],['ㅂ','ㅃ','ㅍ','ㅁ'],['ㅅ','ㅆ'],['ㅈ','ㅉ','ㅊ'],['ㅇ','ㅎ']];
+  const VOWEL_SIM = {0:[4,1],1:[5,0],2:[6,12],4:[0,5],5:[1,4],6:[2,4],8:[13,12],12:[8,17],13:[8,17],17:[13,12],18:[13,20],20:[18,5]};
+  const JONG_COMMON = [0, 1, 4, 8, 16, 17, 21];
+  const allWords = new Set(WORDS.map(w => w[0]));
+  // 글자 하나만 살짝 바꾼 낱말 (틀린 맞춤법)
+  function variantsOf(w, n) {
+    const out = new Set(); let tries = 0;
+    while (out.size < n && tries++ < 80) {
+      const i = rnd(w.length), d = decomp(w[i]); if (!d) continue;
+      let { cho: c, jung: j, jong: g } = d;
+      const t = rnd(3);
+      if (t === 0) g = pick(JONG_COMMON.filter(x => x !== g));
+      else if (t === 1) j = pick((VOWEL_SIM[j] || [0,4,8,13,18,20]).filter(x => x !== j));
+      else { const fam = CHO_FAM.find(f => f.includes(CHO[c])) || []; const alt = fam.filter(x => x !== CHO[c]); if (!alt.length) continue; c = CHO.indexOf(pick(alt)); }
+      const v = w.slice(0, i) + makeSyl(c, j, g) + w.slice(i + 1);
+      if (v !== w && !allWords.has(v)) out.add(v);
+    }
+    return [...out];
+  }
+  function syllableVariants(ch, w, n) {
+    const d = decomp(ch), out = new Set();
+    if (d) {
+      const cands = [];
+      for (const j of (VOWEL_SIM[d.jung] || [0,4,8,13,18,20])) if (j !== d.jung) cands.push(makeSyl(d.cho, j, d.jong));
+      for (let c = 0; c < 19; c++) if (c !== d.cho) cands.push(makeSyl(c, d.jung, d.jong));
+      cands.push(makeSyl(d.cho, d.jung, d.jong ? 0 : 1));
+      for (const x of shuffle(cands)) { if (out.size >= n) break; if (x !== ch && !w.includes(x)) out.add(x); }
+    }
+    return [...out];
+  }
+  function numChoices(ans, n, min, max, extra = []) {
+    const set = new Set([ans]);
+    const cands = shuffle(extra).concat(shuffle([ans + 1, ans - 1, ans + 2, ans - 2, ans + 10, ans - 10, ans + 3, ans - 3]));
+    for (const c of cands) { if (set.size >= n) break; if (Number.isInteger(c) && c >= min && c <= max && c !== ans) set.add(c); }
+    let g = 0; while (set.size < n && g++ < 60) { const c = ans + rng(-12, 12); if (c >= min && c <= max) set.add(c); }
+    return shuffle([...set]);
+  }
+
+  /* ───────── 문제 재료 ───────── */
+  function mathItem(L) {
+    let a, b, op, ans, min = 0, max = 20, extra = [];
+    if (L === 'easy') {
+      op = pick(['+','+','-']);
+      if (op === '+') { a = rng(1, 9); b = rng(1, 10 - a); ans = a + b; } else { a = rng(2, 10); b = rng(1, a - 1); ans = a - b; }
+      max = 10;
+    } else if (L === 'hard') {
+      op = pick(['+','+','-']);
+      if (op === '+') { a = rng(5, 9); b = rng(11 - a, 9); ans = a + b; extra = [ans - 10]; }
+      else { a = rng(11, 18); b = rng(a - 9, 9); ans = a - b; extra = [ans + 10]; }
+    } else if (L === 'pro') {
+      const t = rnd(3);
+      if (t === 2) { a = pick([2,3,4,5]); b = rng(2, 9); op = '×'; ans = a * b; extra = [a * (b + 1), a * (b - 1), a + b]; max = 50; }
+      else { op = t === 0 ? '+' : '-'; if (op === '+') { a = rng(12, 78); b = rng(11, 99 - a); ans = a + b; } else { a = rng(30, 99); b = rng(11, a - 1); ans = a - b; } extra = [ans + 10, ans - 10]; max = 199; }
+    } else {
+      const t = rnd(4);
+      if (t === 0) { a = rng(2, 9); b = rng(2, 9); op = '×'; ans = a * b; extra = [a * (b + 1), a * (b - 1), (a + 1) * b]; max = 81; }
+      else if (t === 1) { const d = rng(2, 9), q = rng(2, 9); a = d * q; b = d; op = '÷'; ans = q; extra = [q + 1, q - 1, d]; max = 9; min = 1; }
+      else { op = t === 2 ? '+' : '-'; if (op === '+') { a = rng(125, 780); b = rng(115, 999 - a); ans = a + b; } else { a = rng(300, 999); b = rng(105, a - 1); ans = a - b; } extra = [ans + 100, ans - 100, ans + 10]; max = 1999; }
+    }
+    return { text: `${a} ${op === '-' ? '−' : op} ${b}`, ans, choices: numChoices(ans, 4, min, max, extra), big: L === 'nine' && op !== '×' && op !== '÷' };
+  }
+  function wordItem(L, n) {
+    if (L === 'nine' && n % 3 === 2) {
+      const [w, s] = pick(SENTS);
+      const dis = shuffle(WORDS.map(x => x[0]).filter(x => x !== w && Math.abs(x.length - w.length) <= 1)).slice(0, 3);
+      return { kind: 'sent', text: s, ans: w, choices: shuffle([w, ...dis]), say: s.replace('___', '땡') };
+    }
+    const pool = L === 'easy' ? WORDS.filter(x => x[0].length >= 2 && x[0].length <= 3) : WORDS.filter(x => x[0].length >= 2);
+    const [w, e] = pick(pool);
+    if (L === 'nine') {
+      const bi = rnd(w.length), ans = w[bi];
+      let dis = syllableVariants(ans, w, 3);
+      if (dis.length < 3) dis = dis.concat(shuffle([...new Set(WORDS.flatMap(x => [...x[0]]))].filter(c => c !== ans && !w.includes(c) && !dis.includes(c))).slice(0, 3 - dis.length));
+      return { kind: 'word', text: w.slice(0, bi) + '_' + w.slice(bi + 1), emoji: e, ans, choices: shuffle([ans, ...dis]), say: w };
+    }
+    let dis;
+    if (L === 'easy') dis = shuffle(WORDS.filter(x => x[0] !== w).map(x => x[0])).slice(0, 3);
+    else if (L === 'hard') {
+      const score = x => (x[0] === w[0] ? 3 : cho(x[0]) === cho(w[0]) ? 2 : 0) + (x.length === w.length ? 1 : 0);
+      dis = shuffle(WORDS.map(x => x[0]).filter(x => x !== w)).sort((p, q) => score(q) - score(p)).slice(0, 3);
+    } else {
+      dis = variantsOf(w, 3);
+      if (dis.length < 3) dis = dis.concat(shuffle(WORDS.map(x => x[0]).filter(x => x !== w && !dis.includes(x))).slice(0, 3 - dis.length));
+    }
+    return { kind: 'emoji', text: e, ans: w, choices: shuffle([w, ...dis]), say: w };
+  }
+  // 풍선 규칙
+  function consonantRules(set) {
+    return set.filter(c => WORDS.filter(x => cho(x[0][0]) === c).length >= 3).map(c => ({ name: `${c}으로 시작하는 것!`, fn: w => cho(w[0][0]) === c }));
+  }
+  const RULES_B = {
+    easy: () => consonantRules(['ㄱ','ㄴ','ㄷ','ㅁ','ㅂ','ㅅ']),
+    hard: () => consonantRules(['ㄱ','ㄴ','ㄷ','ㅁ','ㅂ','ㅅ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ','ㅇ']),
+    pro: () => [{ name: '받침이 있는 낱말!', fn: w => hasJong(w[0]) }, { name: '3글자 낱말!', fn: w => w[0].length === 3 }, { name: 'ㅏ 소리가 들어간 낱말!', fn: w => hasA(w[0]) }, ...consonantRules(['ㄱ','ㅂ','ㅅ','ㅈ','ㅎ'])],
+    nine: () => [...['동물','과일','탈것','음식','물건'].map(c => ({ name: `${c}만!`, fn: w => w[2] === c })), { name: '받침이 있는 낱말!', fn: w => hasJong(w[0]) }, { name: '4글자 낱말!', fn: w => w[0].length === 4 }, ...consonantRules(['ㄱ','ㄷ','ㅁ','ㅅ','ㅊ','ㅎ'])],
+  };
+  // 두더지 규칙: { name, fn, min, max }
+  const RULES_M = {
+    easy: [{ name: '5보다 큰 수!', fn: n => n > 5, min: 1, max: 10 }, { name: '짝수!', fn: n => n % 2 === 0, min: 1, max: 10 }, { name: '5보다 작은 수!', fn: n => n < 5, min: 1, max: 10 }],
+    hard: [{ name: '10보다 큰 수!', fn: n => n > 10, min: 1, max: 30 }, { name: '홀수!', fn: n => n % 2 === 1, min: 1, max: 30 }, { name: '5씩 뛰어 센 수! (5, 10, 15…)', fn: n => n % 5 === 0, min: 1, max: 30 }, { name: '짝수!', fn: n => n % 2 === 0, min: 1, max: 30 }],
+    pro: [{ name: '3단의 수!', fn: n => n % 3 === 0 && n <= 27, min: 1, max: 30 }, { name: '4단의 수!', fn: n => n % 4 === 0 && n <= 36, min: 1, max: 40 }, { name: '짝수!', fn: n => n % 2 === 0, min: 1, max: 50 }, { name: '5단의 수!', fn: n => n % 5 === 0 && n <= 45, min: 1, max: 50 }],
+    nine: [{ name: '7단의 수!', fn: n => n % 7 === 0 && n <= 63, min: 1, max: 70 }, { name: '9단의 수!', fn: n => n % 9 === 0 && n <= 81, min: 1, max: 90 }, { name: '3으로 나누어떨어지는 수!', fn: n => n % 3 === 0, min: 1, max: 99 }, { name: '십의 자리가 일의 자리보다 큰 수!', fn: n => Math.floor(n / 10) > n % 10, min: 10, max: 99 }, { name: '6단의 수!', fn: n => n % 6 === 0 && n <= 54, min: 1, max: 60 }],
+  };
+
+  /* ───────── 상태·소리·색종이 ───────── */
+  let level = 'hard';
+  let state = null;
+  let timers = [], rafId = null;
+  const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
+  function clearAll() { timers.forEach(clearTimeout); timers = []; if (rafId) cancelAnimationFrame(rafId); rafId = null; }
+
+  let ac = null;
+  function tone(freq, t0, dur, type = 'sine', vol = .18) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ac.currentTime + t0);
+      g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + t0 + dur);
+      o.connect(g).connect(ac.destination);
+      o.start(ac.currentTime + t0); o.stop(ac.currentTime + t0 + dur);
+    } catch (e) {}
+  }
+  const sndGood = () => { tone(523, 0, .12); tone(784, .1, .2); };
+  const sndBad = () => { tone(220, 0, .25, 'triangle', .12); };
+  const sndPop = () => { tone(1046, 0, .08, 'square', .06); };
+  const sndSplash = () => { tone(330, 0, .18, 'sawtooth', .07); tone(196, .12, .3, 'triangle', .1); };
+  const sndWin = () => { [523,659,784,1047,784,1047].forEach((f,i)=>tone(f, i*.13, .25)); };
+  function speak(text) {
+    if (window.rpSpeak) return window.rpSpeak(text);
+    try { if (!("speechSynthesis" in window)) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = "ko-KR"; u.rate = .9; u.pitch = 1.3; speechSynthesis.speak(u); } catch (e) {}
+  }
+
+  const cv = $('confetti'), cx = cv.getContext('2d');
+  let bits = [], raf = null;
+  function resize() { cv.width = innerWidth; cv.height = innerHeight; }
+  addEventListener('resize', resize); resize();
+  function confetti(n) {
+    if (REDUCED) return;
+    const colors = ['#FF6B6B','#FFB347','#FFE66D','#7ED957','#5DADE2','#B57EDC','#FF5FA2'];
+    for (let i = 0; i < n; i++) bits.push({ x: cv.width / 2 + (Math.random() - .5) * 200, y: cv.height * .45, vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 4, r: 4 + Math.random() * 6, c: colors[i % colors.length], a: Math.random() * 6, s: (Math.random() - .5) * .3 });
+    if (!raf) loop();
+  }
+  function loop() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    bits = bits.filter(b => b.y < cv.height + 20);
+    for (const b of bits) { b.vy += .35; b.x += b.vx; b.y += b.vy; b.a += b.s; b.vx *= .99; cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.fillStyle = b.c; cx.fillRect(-b.r, -b.r / 2, b.r * 2, b.r); cx.restore(); }
+    raf = bits.length ? requestAnimationFrame(loop) : (cx.clearRect(0,0,cv.width,cv.height), null);
+  }
+
+  /* 최고 기록 */
+  const bestKey = (l, m) => 'rainbow-arcade-best-' + l + '-' + m;
+  function loadBest() {
+    try {
+      const lines = Object.keys(LEVEL_NAME).map(l => {
+        const parts = Object.keys(MODE_LABEL[l]).map(m => { const v = localStorage.getItem(bestKey(l, m)); return v ? modeName(m, l) + ' ' + v + '점' : null; }).filter(Boolean);
+        return parts.length ? '🏆 ' + LEVEL_NAME[l] + ' · ' + parts.join(' · ') : null;
+      }).filter(Boolean);
+      $('best').innerHTML = lines.join('<br>');
+    } catch (e) { $('best').textContent = ''; }
+  }
+  function saveBest() {
+    try { const k = bestKey(state.level, state.mode), prev = +(localStorage.getItem(k) || 0); if (state.score > prev) localStorage.setItem(k, state.score); } catch (e) {}
+  }
+
+  /* ───────── 공통 화면 ───────── */
+  function renderStars() { $('stars').innerHTML = Array.from({length: TOTAL}, (_, i) => `<span class="${i < state.score ? 'on' : ''}">⭐</span>`).join(''); }
+  function renderHud() {
+    $('round').textContent = Math.min(state.handled, TOTAL) + ' / ' + TOTAL;
+    $('lives').textContent = '❤️'.repeat(state.lives) + '🤍'.repeat(Math.max(0, LIVES - state.lives));
+    renderStars();
+  }
+  function say(text, good) { $('feedback').textContent = text; $('feedback').className = 'feedback' + (good ? ' good' : ''); }
+  function askRule(text, flash) { const a = $('ask'); a.textContent = text; a.classList.remove('flash'); if (flash) { void a.offsetWidth; a.classList.add('flash'); } }
+  function areaSize() { const r = $('area').getBoundingClientRect(); return { W: r.width, H: r.height }; }
+  function stageHTML(extra = '') { return `<div class="sun">☀️</div><div class="water"></div><div class="layer" id="layer">${extra}</div><div class="overlay" id="overlay"></div>`; }
+  function banner(text, ms) {
+    const el = document.createElement('div'); el.className = 'banner'; el.textContent = text; $('area').appendChild(el);
+    later(() => el.remove(), ms);
+  }
+
+  function start(mode) {
+    clearAll();
+    state = { mode, level, score: 0, lives: LIVES, handled: 0, locked: true, n: 0, items: [], last: 0 };
+    $('tag').textContent = LEVEL_NAME[level] + ' · ' + modeName(mode, level);
+    say(''); askRule('');
+    $('answers').hidden = true; $('answers').innerHTML = '';
+    show('game');
+    renderHud();
+    $('area').innerHTML = stageHTML(mode === 'mole' ? holesHTML() : '');
+    countdown(() => { state.locked = false; ({ fall_math: beginFall, fall_word: beginFall, balloon: beginBalloon, mole: beginMole })[mode](); });
+  }
+  function countdown(done) {
+    const ov = $('overlay'); const steps = ['준비…', '3', '2', '1', '시작!'];
+    let i = 0;
+    const step = () => { ov.textContent = steps[i]; tone(i === 4 ? 880 : 440, 0, .12, 'sine', .1); i++; if (i < steps.length) later(step, i === 1 ? 700 : 550); else later(() => { ov.textContent = ''; done(); }, 450); };
+    step();
+  }
+  function loseLife(reason) {
+    state.lives--; renderHud(); sndBad();
+    say(reason || '앗! 하트 하나가 사라졌어요 💔');
+  }
+  function gainPoint(msg) {
+    state.score = Math.min(TOTAL, state.score + 1); renderHud(); sndGood();
+    say((msg || pick(PRAISE)) + ' 🌟', true);
+  }
+  function checkEnd(nextFn, delay) {
+    if (state.lives <= 0 || state.handled >= TOTAL) { state.locked = true; later(finish, 700); return true; }
+    if (nextFn) later(nextFn, delay); return false;
+  }
+
+  /* ───────── 떨어지는 식·낱말 ───────── */
+  function fallTime() {
+    const base = { easy: 7.5, hard: 6.5, pro: 6, nine: 5.5 }[state.level] * (REDUCED ? 1.5 : 1);
+    return base * Math.max(.55, 1 - state.n * .045);
+  }
+  function beginFall() { $('answers').hidden = false; spawnFall(); }
+  function spawnFall() {
+    if (state.locked) return;
+    const item = state.mode === 'fall_math' ? mathItem(state.level) : wordItem(state.level, state.n);
+    state.n++;
+    const { W, H } = areaSize();
+    const el = document.createElement('div');
+    el.className = 'bubble' + (state.mode === 'fall_math' ? (item.big ? ' big' : '') : item.kind === 'emoji' ? ' emoji' : item.kind === 'sent' ? ' sent' : ' word');
+    el.textContent = item.text;
+    $('layer').appendChild(el);
+    const bw = el.offsetWidth || 120;
+    const x = item.kind === 'sent' ? (W - bw) / 2 : rng(12, Math.max(12, W - bw - 12));
+    const cur = { el, x, y: -110, vy: (H * .86 + 110) / fallTime(), item, alive: true };
+    state.cur = cur;
+    el.style.transform = `translate(${x}px, ${cur.y}px)`;
+    $('answers').innerHTML = item.choices.map(c => `<button class="btn ${String(c).length >= 4 ? 'long' : ''}" data-v="${c}">${c}</button>`).join('');
+    if (state.mode === 'fall_word' && item.say && state.level === 'easy') speak(item.say);   // 6살만 소리 힌트
+    state.last = performance.now();
+    if (!rafId) rafId = requestAnimationFrame(tickFall);
+  }
+  function tickFall(now) {
+    rafId = null;
+    if (!state || state.locked && !state.cur) return;
+    const dt = Math.min(.2, (now - state.last) / 1000); state.last = now;
+    const c = state.cur;
+    if (c && c.alive) {
+      c.y += c.vy * dt;
+      c.el.style.transform = `translate(${c.x}px, ${c.y}px)`;
+      const { H } = areaSize();
+      if (c.y + c.el.offsetHeight * .6 > H * .86) { splash(c); return; }
+    }
+    if (c && c.alive) rafId = requestAnimationFrame(tickFall);
+  }
+  function splash(c) {
+    c.alive = false; c.el.classList.add('sink'); sndSplash();
+    state.handled++;
+    loseLife('풍덩! 정답은 ' + c.item.ans + ' 이었어요 💔');
+    document.querySelectorAll('#answers .btn').forEach(b => { b.disabled = true; if (b.dataset.v === String(c.item.ans)) b.classList.add('right'); });
+    later(() => c.el.remove(), 700);
+    checkEnd(spawnFall, 1100);
+  }
+  function tapAnswer(btn) {
+    if (state.locked || !state.cur || !state.cur.alive || btn.disabled) return;
+    const c = state.cur, v = btn.dataset.v;
+    if (v === String(c.item.ans)) {
+      c.alive = false; c.el.classList.add('pop'); sndPop();
+      btn.classList.add('right');
+      document.querySelectorAll('#answers .btn').forEach(b => b.disabled = true);
+      state.handled++; gainPoint();
+      if (state.mode === 'fall_word') later(() => speak(c.item.kind === 'sent' ? c.item.text.replace('___', c.item.ans) : c.item.say || c.item.ans), 200);
+      later(() => c.el.remove(), 400);
+      checkEnd(spawnFall, 700);
+    } else {
+      btn.classList.add('wrong'); btn.disabled = true; sndBad();
+      c.el.classList.remove('no'); void c.el.offsetWidth; c.el.classList.add('no');
+      say('아니에요, 다시! 🍀');
+    }
+  }
+
+  /* ───────── 풍선 터뜨리기 ───────── */
+  function beginBalloon() {
+    state.rules = RULES_B[state.level]();
+    state.rule = null; state.ruleLeft = 0; state.waitRule = true; state.spawned = 0;
+    state.last = performance.now();
+    balloonSpawner();
+    rafId = requestAnimationFrame(tickBalloon);
+  }
+  function newRule() {
+    const cands = state.rules.filter(r => r !== state.rule);
+    state.rule = pick(cands); state.ruleLeft = 4; state.waitRule = false;
+    askRule(state.rule.name, true); banner('🎈 ' + state.rule.name, 1100);
+  }
+  function balloonSpawner() {
+    if (!state || state.locked || state.mode !== 'balloon') return;
+    if (state.waitRule) {
+      if (state.items.length === 0) { newRule(); later(balloonSpawner, 1200); } else later(balloonSpawner, 300);
+      return;
+    }
+    if (state.ruleLeft <= 0) { state.waitRule = true; later(balloonSpawner, 300); return; }
+    spawnBalloon();
+    const gap = { easy: 1900, hard: 1600, pro: 1400, nine: 1250 }[state.level] * (REDUCED ? 1.4 : 1) * Math.max(.6, 1 - state.spawned * .025);
+    later(balloonSpawner, gap);
+  }
+  function spawnBalloon() {
+    const rule = state.rule;
+    const matchPool = WORDS.filter(rule.fn), otherPool = WORDS.filter(w => !rule.fn(w));
+    // 규칙마다 최소 한 개는 맞는 풍선이 나오게 해요
+    const wantMatch = state.ruleLeft === 1 && !state.items.some(b => b.match) ? true : Math.random() < .5;
+    const w = pick(wantMatch && matchPool.length ? matchPool : otherPool.length ? otherPool : matchPool);
+    const match = rule.fn(w);
+    state.ruleLeft--; state.spawned++;
+    const { W, H } = areaSize();
+    const cols = [.12, .38, .64].map(f => f * W + rnd(Math.max(1, W * .1)));
+    const usedX = state.items.map(b => b.x);
+    const x = pick(cols.filter(c => !usedX.some(u => Math.abs(u - c) < 70))) ?? pick(cols);
+    const el = document.createElement('div');
+    el.className = 'balloon';
+    const color = pick(['#FF6B6B','#FFB347','#FFE66D','#7ED957','#5DADE2','#B57EDC','#FF8FBF']);
+    el.innerHTML = `<div class="b" style="background:${color}">${w[1]}</div><div class="s"></div>${state.level === 'pro' || state.level === 'nine' ? `<div class="w">${w[0]}</div>` : ''}`;
+    $('layer').appendChild(el);
+    const speed = { easy: 55, hard: 68, pro: 80, nine: 92 }[state.level] * (REDUCED ? .65 : 1) * (1 + state.spawned * .02);
+    const b = { el, x, y: H + 10, vy: speed, w, match, alive: true };
+    el.style.transform = `translate(${x}px, ${b.y}px)`;
+    el.addEventListener('click', () => tapBalloon(b));
+    state.items.push(b);
+  }
+  function tickBalloon(now) {
+    rafId = null;
+    if (!state || state.mode !== 'balloon') return;
+    const dt = Math.min(.2, (now - state.last) / 1000); state.last = now;
+    for (const b of state.items) {
+      if (!b.alive) continue;
+      b.y -= b.vy * dt;
+      b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
+      if (b.y < -150) {
+        b.alive = false; b.el.remove();
+        if (b.match && !state.locked) { state.handled++; loseLife('놓쳤어요! ' + b.w[0] + ' 풍선이 날아갔어요 💔'); if (checkEnd()) { state.items.forEach(o => o.el.remove()); state.items = []; return; } }
+      }
+    }
+    state.items = state.items.filter(b => b.alive);
+    if (!state.locked || state.items.length) rafId = requestAnimationFrame(tickBalloon);
+  }
+  function tapBalloon(b) {
+    if (state.locked || !b.alive) return;
+    b.alive = false;
+    if (b.match) {
+      b.el.classList.add('pop'); sndPop(); later(() => b.el.remove(), 300);
+      state.handled++; gainPoint(b.w[0] + ' 펑!');
+    } else {
+      b.el.classList.add('bad'); later(() => b.el.remove(), 400);
+      loseLife(b.w[0] + '은(는) 아니에요 💔');
+    }
+    if (checkEnd()) { state.items.forEach(o => { if (o !== b) o.el.remove(); }); state.items = []; }
+  }
+
+  /* ───────── 두더지 잡기 ───────── */
+  function holesHTML() { return `<div class="holes">${Array.from({length: 9}, (_, i) => `<div class="hole" data-i="${i}"><div class="mole"><span class="num"></span></div></div>`).join('')}</div>`; }
+  function beginMole() {
+    state.rules = RULES_M[state.level]; state.rule = null; state.spawned = 0; state.active = null;
+    moleRule(); later(spawnMole, 1200);
+  }
+  function moleRule() {
+    state.rule = pick(state.rules.filter(r => r !== state.rule)); state.ruleLeft = 5;
+    askRule(state.rule.name, true); banner('🐹 ' + state.rule.name, 1000);
+  }
+  function spawnMole() {
+    if (!state || state.locked || state.mode !== 'mole') return;
+    if (state.ruleLeft <= 0) { moleRule(); later(spawnMole, 1200); return; }
+    const r = state.rule;
+    const all = []; for (let n = r.min; n <= r.max; n++) all.push(n);
+    const yes = all.filter(r.fn), no = all.filter(n => !r.fn(n));
+    const wantMatch = state.ruleLeft === 1 && !state.matchInRule ? true : Math.random() < .5;
+    const num = pick(wantMatch && yes.length ? yes : no.length ? no : yes);
+    const match = r.fn(num);
+    if (state.ruleLeft === 5) state.matchInRule = false;
+    if (match) state.matchInRule = true;
+    state.ruleLeft--; state.spawned++;
+    const holes = [...document.querySelectorAll('.hole')];
+    const hole = pick(holes.filter(h => h !== state.lastHole)) || holes[0];
+    state.lastHole = hole;
+    hole.querySelector('.num').textContent = num;
+    hole.className = 'hole up';
+    const showMs = { easy: 1500, hard: 1300, pro: 1150, nine: 1000 }[state.level] * (REDUCED ? 1.4 : 1) * Math.max(.65, 1 - state.spawned * .03);
+    const m = { hole, num, match, alive: true };
+    state.active = m;
+    m.timer = later(() => {
+      if (!m.alive) return;
+      m.alive = false; state.active = null;
+      if (match) { hole.classList.add('miss'); state.handled++; loseLife(num + '을(를) 놓쳤어요 💔'); }
+      later(() => hole.className = 'hole', 350);
+      checkEnd(spawnMole, match ? 900 : 500);
+    }, showMs);
+  }
+  function tapHole(hole) {
+    if (state.locked) return;
+    const m = state.active;
+    if (!m || !m.alive || m.hole !== hole) return;
+    m.alive = false; state.active = null; clearTimeout(m.timer);
+    if (m.match) { hole.classList.add('hit'); sndPop(); state.handled++; gainPoint(m.num + ' 잡았다!'); }
+    else { hole.classList.add('bad'); loseLife(m.num + '은(는) 아니에요 💔'); }
+    later(() => hole.className = 'hole', 350);
+    checkEnd(spawnMole, 700);
+  }
+
+  /* ───────── 결과 ───────── */
+  function finish() {
+    clearAll();
+    $('area').querySelectorAll('.bubble, .balloon').forEach(e => e.remove());
+    state.score = Math.max(0, Math.min(TOTAL, Math.round(state.score)));
+    saveBest();
+    const s = state.score, L = state.level;
+    $('result-score').textContent = '⭐ ' + s + ' / ' + TOTAL;
+    const outOfLives = state.lives <= 0;
+    if (s === TOTAL) {
+      $('result-emoji').textContent = '🦄'; $('result-title').textContent = '완벽해요! 아케이드 챔피언!';
+      $('result-msg').textContent = L === 'easy' ? '이제 7살 놀이에 도전해 볼까요?' : L === 'hard' ? '이제 8살 놀이에 도전해 볼까요?' : L === 'pro' ? '이제 9살 놀이에 도전해 볼까요?' : '하트를 하나도 잃지 않았어요!';
+    } else if (s >= 7) { $('result-emoji').textContent = '🌈'; $('result-title').textContent = '정말 잘했어요!'; $('result-msg').textContent = outOfLives ? '하트가 다 떨어졌지만 별을 많이 모았어요.' : '조금만 더 빨리 누르면 별을 다 모을 수 있어요.'; }
+    else { $('result-emoji').textContent = '🌸'; $('result-title').textContent = '열심히 했어요!'; $('result-msg').textContent = outOfLives ? '하트가 다 떨어졌어요. 천천히 잘 보고 눌러 봐요.' : '한 번 더 하면 더 잘할 수 있어요.'; }
+    show('result'); sndWin(); confetti(s >= 7 ? 120 : 50);
+  }
+
+  function show(id) {
+    ['home','game','result'].forEach(x => $(x).hidden = x !== id);
+    if (id === "home") loadBest();
+    if (id === "result") reportMission();
+  }
+  function setLevel(l) {
+    level = l;
+    document.querySelectorAll('.level button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === l ? 'true' : 'false'));
+    $('level-note').textContent = LEVEL_NOTE[l];
+    for (const m of ['fall_math','fall_word','balloon','mole']) {
+      const [ico, title, small] = MODE_LABEL[l][m];
+      $('ico-' + m).textContent = ico;
+      $('label-' + m).innerHTML = title + '<small>' + small + '</small>';
+    }
+    try { localStorage.setItem('rainbow-arcade-level', l); } catch (e) {}
+  }
+
+  /* 이벤트 */
+  document.querySelectorAll('.level button').forEach(b => b.addEventListener('click', () => setLevel(b.dataset.level)));
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => start(b.dataset.mode)));
+  $('answers').addEventListener('click', e => { const b = e.target.closest('.btn'); if (b) tapAnswer(b); });
+  $('area').addEventListener('click', e => { if (!state || state.mode !== 'mole') return; const h = e.target.closest('.hole'); if (h) tapHole(h); });
+  $('again').addEventListener('click', () => start(state.mode));
+  $('home-btn').addEventListener('click', () => { clearAll(); state = null; show('home'); });
+  $('quit').addEventListener('click', () => { clearAll(); state = null; show('home'); });
+
+  /* 놀이터(index.html) 미션 연동 */
+  let missionId = null;
+  function reportMission() {
+    if (!missionId) return;
+    try {
+      const key = "rp-results", all = JSON.parse(localStorage.getItem(key) || "{}");
+      const d = new Date(), day = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      all[day] = all[day] || {};
+      all[day][missionId] = Math.max(all[day][missionId] || 0, state.score);
+      localStorage.setItem(key, JSON.stringify(all));
+    } catch (e) {}
+    $("to-hub").hidden = false; $("home-btn").hidden = true;
+  }
+  function launchFromUrl() {
+    const p = new URLSearchParams(location.search);
+    const l = p.get("level"), m = p.get("mode");
+    if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
+    missionId = p.get("mission");
+    setLevel(l); start(m); return true;
+  }
+  function boot() {
+    let saved = 'hard';
+    try { saved = localStorage.getItem('rainbow-arcade-level') || 'hard'; } catch (e) {}
+    if (!LEVEL_NAME[saved]) saved = 'hard';
+    setLevel(saved);
+    if (launchFromUrl()) return;
+    show('home');
+  }
+  boot();
+})();
+</script>
+</body>
+</html>

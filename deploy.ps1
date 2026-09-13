@@ -1,6 +1,10 @@
 # 무지개 놀이터를 GitHub Pages에 올립니다. (gh CLI 로그인 필요)
 # 사용법: PowerShell에서  .\deploy.ps1
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = "Stop"
+# 서비스 워커 캐시 버전을 배포 시각으로 바꿔 태블릿이 새 버전을 받게 해요
+$stamp = Get-Date -Format "yyyyMMddHHmm"
+$swPath = Join-Path $PSScriptRoot 'sw.js'
+(Get-Content $swPath -Raw) -replace "const VERSION = '[^']*';", "const VERSION = 'rainbow-$stamp';" | Set-Content $swPath -NoNewline
 $repo = 'rainbow-playground'
 $user = (gh api user --jq .login)
 Set-Location $PSScriptRoot

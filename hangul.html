@@ -10,6 +10,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="voice.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
 <title>무지개 한글 놀이</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -104,6 +105,9 @@
   .mode.cons:active { box-shadow: 0 2px 0 #9560C0; }
   .mode.order { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
   .mode.order:active { box-shadow: 0 2px 0 #3F8FC2; }
+  .mode.e { background: var(--r4); box-shadow: 0 7px 0 #5FB25A; } .mode.e:active { box-shadow: 0 2px 0 #5FB25A; }
+  .mode.f { background: #F2C94C; box-shadow: 0 7px 0 #C9A227; } .mode.f:active { box-shadow: 0 2px 0 #C9A227; }
+  @media (min-width: 600px) { .modes { grid-template-columns: 1fr 1fr; } }
   .best { text-align: center; font-size: 15px; color: var(--plum-soft); margin: 14px 0 0; line-height: 1.6; }
 
   .stars { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -142,6 +146,9 @@
   .word .ch.hint { font-size: .55em; color: var(--plum-soft); }
   .word .ch.slot { cursor: pointer; }
   .word .ch.slot.filled { background: var(--r3); border-color: #E8CF4A; color: var(--plum); }
+  .word .ch.slot.reveal { background: var(--r2); border-color: #D9902E; color: #fff; }
+  .tile.hint { outline: 5px solid var(--r3); outline-offset: 3px; animation: hintpulse .8s infinite alternate; }
+  @keyframes hintpulse { from { transform: scale(1); } to { transform: scale(1.08); } }
   .word.longword { font-size: clamp(30px, 9vw, 46px); gap: 6px; }
   .word.longword .ch { border-radius: 14px; border-width: 3px; }
   /* 문장 칸 */
@@ -255,6 +262,8 @@
       <button class="btn mode syll" id="mode-syll" data-mode="syll"><span class="ico" id="ico-syll">🐰</span><span id="label-syll"></span></button>
       <button class="btn mode cons" id="mode-cons" data-mode="cons"><span class="ico" id="ico-cons">🦄</span><span id="label-cons"></span></button>
       <button class="btn mode order" id="mode-order" data-mode="order"><span class="ico" id="ico-order">🧩</span><span id="label-order"></span></button>
+      <button class="btn mode e" id="mode-e" data-mode="e"><span class="ico" id="ico-e"></span><span id="label-e"></span></button>
+      <button class="btn mode f" id="mode-f" data-mode="f"><span class="ico" id="ico-f"></span><span id="label-f"></span></button>
     </div>
     <p class="best" id="best"></p>
   </section>
@@ -294,7 +303,7 @@
 
 <script>
 (function () {
-  const TOTAL = 10;
+  let TOTAL = 10;
   const WORDS = [
     // 짧은 낱말 (6살·7살 공통)
     ['사과','🍎'],['바나나','🍌'],['딸기','🍓'],['포도','🍇'],['수박','🍉'],['당근','🥕'],['빵','🍞'],['우유','🥛'],['피자','🍕'],['케이크','🎂'],
@@ -396,10 +405,10 @@
     nine: '소리가 같은 맞춤법 · 빈칸 두 개 · 문장 채우기 · 문장 만들기'
   };
   const MODE_LABEL = {
-    easy: { word: ['🍎','낱말 찾기','그림에 맞는 낱말을 골라요'], syll: ['🐰','빠진 글자','비어 있는 글자를 채워요'], cons: ['🦄','첫소리 찾기','ㄱㄴㄷ… 첫 글자의 첫 자음을 찾아요'], order: ['🧩','낱말 만들기','흩어진 글자를 순서대로 모아요'] },
-    hard: { word: ['🍎','낱말 찾기','비슷한 낱말 중에서 골라요'], syll: ['🐰','빠진 글자','비슷한 글자 중에서 채워요'], cons: ['🦄','첫소리 찾기','분홍색 글자의 첫 자음을 찾아요'], order: ['🧩','낱말 만들기','엉뚱한 글자 하나가 섞여 있어요'] },
-    pro:  { word: ['🔍','바른 낱말 찾기','글자 하나 틀린 낱말을 골라내요'], syll: ['🐰','빠진 글자','받침·모음이 다른 글자 중에서 채워요'], cons: ['🦄','첫소리 찾기','된소리도 보기에 나와요'], order: ['🧩','낱말 만들기','글자 6개, 엉뚱한 글자 둘'] },
-    nine: { word: ['🔍','바른 낱말 찾기','소리는 같은데 틀리게 쓴 낱말을 골라내요'], syll: ['🐰','빈칸 두 개','빈칸 두 개를 순서대로 채워요'], cons: ['📝','문장 채우기','문장에 알맞은 낱말을 골라요'], order: ['🧩','문장 만들기','흩어진 낱말로 문장을 만들어요'] },
+    easy: { word: ['🍎','낱말 찾기','그림에 맞는 낱말을 골라요'], syll: ['🐰','빠진 글자','비어 있는 글자를 채워요'], cons: ["🔤","글자 만들기","ㄱ + ㅏ = 가! 자음과 모음을 합쳐요"], order: ['🧩','낱말 만들기','흩어진 글자를 순서대로 모아요'] , e: ["🔊","받아쓰기","듣고 글자를 순서대로 눌러요"], f: ["🐸","흉내 내는 말","개굴개굴은 누구일까요?"] },
+    hard: { word: ['🍎','낱말 찾기','비슷한 낱말 중에서 골라요'], syll: ['🐰','빠진 글자','비슷한 글자 중에서 채워요'], cons: ['🦄','첫소리 찾기','분홍색 글자의 첫 자음을 찾아요'], order: ['🧩','낱말 만들기','엉뚱한 글자 하나가 섞여 있어요'] , e: ["🔊","받아쓰기","엉뚱한 글자 하나가 섞여요"], f: ["🐸","흉내 내는 말","소리·모양을 듣고 낱말을 골라요"] },
+    pro:  { word: ['🔍','바른 낱말 찾기','글자 하나 틀린 낱말을 골라내요'], syll: ['🐰','빠진 글자','받침·모음이 다른 글자 중에서 채워요'], cons: ['🦄','첫소리 찾기','된소리도 보기에 나와요'], order: ['🧩','낱말 만들기','글자 6개, 엉뚱한 글자 둘'] , e: ["🔊","받아쓰기","엉뚱한 글자 둘, 긴 낱말"], f: ["🔄","반대말","크다의 반대말은?"] },
+    nine: { word: ['🔍','바른 낱말 찾기','소리는 같은데 틀리게 쓴 낱말을 골라내요'], syll: ['🐰','빈칸 두 개','빈칸 두 개를 순서대로 채워요'], cons: ['📝','문장 채우기','문장에 알맞은 낱말을 골라요'], order: ['🧩','문장 만들기','흩어진 낱말로 문장을 만들어요'] , e: ["🔊","받아쓰기","소리가 같은 글자가 섞여요"], f: ["🔄","반대말·비슷한말","비슷한말도 나와요"] },
   };
   const modeName = (m, l) => MODE_LABEL[l][m][1];
   const $ = id => document.getElementById(id);
@@ -431,7 +440,8 @@
   const sndBad = () => { tone(220, 0, .25, 'triangle', .12); };
   const sndTap = () => { tone(880, 0, .08, 'sine', .1); };
   const sndWin = () => { [523,659,784,1047,784,1047].forEach((f,i)=>tone(f, i*.13, .25)); };
-  function speak(text) {
+  function speak(t) { if (window.rpSpeak) return window.rpSpeak(t); speakTTS(t); }
+  function speakTTS(text) {
     try {
       if (!('speechSynthesis' in window)) return;
       speechSynthesis.cancel();
@@ -493,6 +503,7 @@
   /* 낱말 풀 */
   function wordPool() {
     const l = state.level, m = state.mode;
+    if (m === "e" || m === "f") return extraPool();
     if (l === 'easy') return WORDS.filter(w => m === 'order' ? w[0].length >= 2 && w[0].length <= 3 : w[0].length <= 3);
     if (l === 'hard') return m === 'order' ? WORDS.filter(w => w[0].length >= 3) : WORDS;
     if (l === 'pro') return m === 'order' ? WORDS.filter(w => w[0].length >= 4) : WORDS.filter(w => w[0].length >= 2);
@@ -553,6 +564,50 @@
     return { before: sent.slice(0, i), after: sent.slice(i + w.length) };
   }
 
+  /* ───── 받아쓰기(e) · 흉내 내는 말 / 반대말·비슷한말(f) ───── */
+  const ONOMAT = [['개굴개굴','개구리','🐸'],['멍멍','강아지','🐶'],['야옹','고양이','🐱'],['꿀꿀','돼지','🐷'],['음매','소','🐮'],['꼬끼오','닭','🐔'],['삐약삐약','병아리','🐤'],['짹짹','새','🐦'],['어흥','호랑이','🐯'],['붕붕','자동차','🚗'],
+    ['칙칙폭폭','기차','🚂'],['반짝반짝','별','⭐'],['깡충깡충','토끼','🐰'],['엉금엉금','거북이','🐢'],['뒤뚱뒤뚱','펭귄','🐧'],['쿨쿨','잠','😴'],['주룩주룩','비','🌧️'],['쨍쨍','해','☀️'],['둥실둥실','구름','☁️'],['팔랑팔랑','나비','🦋'],
+    ['꼬불꼬불','뱀','🐍'],['데굴데굴','공','🏐'],['딸랑딸랑','종','🔔'],['똑딱똑딱','시계','⏰'],['쌩쌩','바람','🌬️'],['우르르쾅','번개','⚡'],['부릉부릉','오토바이','🏍️'],['첨벙첨벙','물','💧'],['활활','불','🔥'],['살랑살랑','잎','🍃'],
+    ['윙윙','벌','🐝'],['꽥꽥','오리','🦆'],['히힝','말','🐴'],['음머','염소','🐐'],['찍찍','쥐','🐭'],['붕붕','벌','🐝'],['펑','풍선','🎈'],['뿡뿡','버스','🚌'],['하하','웃음','😊'],['엉엉','눈물','😢']];
+  const ANTONYM = [['크다','작다'],['길다','짧다'],['높다','낮다'],['많다','적다'],['빠르다','느리다'],['무겁다','가볍다'],['덥다','춥다'],['뜨겁다','차갑다'],['밝다','어둡다'],['넓다','좁다'],['깊다','얕다'],['두껍다','얇다'],['멀다','가깝다'],['굵다','가늘다'],['달다','쓰다'],
+    ['앞','뒤'],['위','아래'],['안','밖'],['낮','밤'],['아침','저녁'],['여름','겨울'],['오른쪽','왼쪽'],['열다','닫다'],['웃다','울다'],['앉다','서다'],['주다','받다'],['사다','팔다'],['오다','가다'],['시작','끝'],['처음','마지막'],['맞다','틀리다'],['쉽다','어렵다'],['깨끗하다','더럽다'],['조용하다','시끄럽다'],['예쁘다','밉다'],['착하다','나쁘다'],['어른','아이'],['입다','벗다'],['켜다','끄다'],['살다','죽다']];
+  const SYNONYM = [['예쁘다','곱다'],['기쁘다','즐겁다'],['크다','커다랗다'],['작다','조그맣다'],['빠르다','재빠르다'],['말하다','이야기하다'],['보다','바라보다'],['집','가정'],['얼굴','낯'],['가끔','때때로'],['모두','전부'],['어린이','아이'],['친구','동무'],['생각','마음'],['길','도로'],['달리다','뛰다'],['먹다','드시다'],['자다','주무시다'],['화나다','성나다'],['무섭다','두렵다'],['아름답다','예쁘다'],['조용하다','고요하다'],['똑똑하다','영리하다'],['깨끗하다','말끔하다']];
+  function extraPool() {
+    const L = state.level, m = state.mode;
+    if (m === 'e') return L === 'easy' ? WORDS.filter(w => w[0].length >= 2 && w[0].length <= 3) : L === 'hard' ? WORDS.filter(w => w[0].length >= 2 && w[0].length <= 4) : WORDS.filter(w => w[0].length >= 3);
+    if (L === 'easy' || L === 'hard') return ONOMAT.map(o => [o[0], o[2], o[1]]);
+    const ant = ANTONYM.flatMap(([a, b]) => [['반대말:' + a, '🔄', b, a, '반대말'], ['반대말:' + b, '🔄', a, b, '반대말']]);
+    if (L === 'pro') return ant;
+    return ant.concat(SYNONYM.flatMap(([a, b]) => [['비슷한말:' + a, '🟰', b, a, '비슷한말'], ['비슷한말:' + b, '🟰', a, b, '비슷한말']]));
+  }
+  function makeExtraQ(entry, w, e) {
+    const L = state.level, m = state.mode, nC = L === 'easy' ? 3 : 4;
+    if (m === 'e') {
+      // 받아쓰기: 듣고 글자 타일로 조립
+      let tiles = shuffle([...w]);
+      if (tiles.join('') === w && w.length > 1) tiles = [...tiles.slice(1), tiles[0]];
+      const decoys = L === 'easy' ? 0 : L === 'hard' ? 1 : 2;
+      for (let k = 0; k < decoys; k++) {
+        const extra = (L !== 'hard' ? variantsOf(pick([...w]), 3, L === 'nine').filter(x => !w.includes(x) && !tiles.includes(x))[0] : null)
+          || similarSyllables(pick([...w]), w, 1).filter(x => !tiles.includes(x))[0] || randomSyllables(w[0], w, 1)[0];
+        if (extra) tiles.push(extra);
+      }
+      return { w, e, sent: '', ans: w, choices: [], blank: -1, blanks: [], tiles: shuffle(tiles), dict: true };
+    }
+    if (L === 'easy' || L === 'hard') {
+      // 흉내 내는 말: 소리·모양 → 무엇?
+      const ans = entry[2];
+      const others = shuffle(ONOMAT.filter(o => o[1] !== ans && o[0] !== w)).slice(0, nC - 1);
+      const choices = shuffle([[ans, e], ...others.map(o => [o[1], o[2]])]);
+      return { w, e, sent: ans, ans, choices: choices.map(c => c[0]), choiceEmoji: L === 'easy' ? Object.fromEntries(choices) : null, blank: -1, blanks: [], tiles: [], mimic: true };
+    }
+    // 반대말 · 비슷한말
+    const ans = entry[2], base = entry[3], type = entry[4];
+    const pool = (type === '반대말' ? ANTONYM : SYNONYM).flat().filter(x => x !== ans && x !== base);
+    const choices = shuffle([ans, ...shuffle([...new Set(pool)]).slice(0, nC - 1)]);
+    return { w: base, e, sent: ans, ans, choices, blank: -1, blanks: [], tiles: [], pair: type };
+  }
+
   function makeQ() {
     const pool = wordPool();
     if (!state.deck.length) state.deck = shuffle(pool.map(w => w[0]));
@@ -561,6 +616,7 @@
     const e = entry[1], sent = entry[2] || '';
     const others = WORDS.filter(x => x[0] !== w);
     const L = state.level, m = state.mode;
+    if (m === "e" || m === "f") return makeExtraQ(entry, w, e);
     const nC = L === 'easy' ? 3 : 4;
     let choices = [], ans = '', blank = -1, blanks = [], tiles = [];
 
@@ -596,6 +652,17 @@
       ans = w;
       const dis = shuffle(SENTS.map(s => s[0]).filter(x => x !== w)).sort((a, b) => Math.abs(a.length - w.length) - Math.abs(b.length - w.length)).slice(0, 6);
       choices = shuffle([w, ...shuffle(dis).slice(0, nC - 1)]);
+    } else if (m === 'cons' && L === 'easy') {
+      // 6살: 자음 + 모음 = 글자
+      const CONS = ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ','ㅈ','ㅎ'];
+      const VOW = [['ㅏ',0],['ㅑ',2],['ㅓ',4],['ㅕ',6],['ㅗ',8],['ㅛ',12],['ㅜ',13],['ㅠ',17],['ㅡ',18],['ㅣ',20]];
+      const c = pick(CONS), [v, vi] = pick(VOW);
+      const ci = CHO.indexOf(c);
+      ans = makeSyl(ci, vi, 0);
+      const sameC = shuffle(VOW.filter(x => x[0] !== v)).slice(0, 2).map(x => makeSyl(ci, x[1], 0));
+      const sameV = shuffle(CONS.filter(x => x !== c)).slice(0, 1).map(x => makeSyl(CHO.indexOf(x), vi, 0));
+      choices = shuffle([ans, ...shuffle([...sameC, ...sameV]).slice(0, nC - 1)]);
+      return { w: ans, e: '🔤', sent: '', ans, choices, blank: -1, blanks: [], tiles: [], jamo: { c, v } };
     } else if (m === 'cons') {
       blank = L === 'easy' ? 0 : rnd(w.length);
       ans = cho(w[blank]);
@@ -634,19 +701,23 @@
   function renderQ() {
     const q = state.q, m = state.mode, L = state.level;
     const isSentFill = m === 'cons' && L === 'nine', isSentOrder = m === 'order' && L === 'nine', isTwoBlank = m === 'syll' && L === 'nine';
-    const useTiles = m === 'order' || isTwoBlank;
+    const useTiles = m === "order" || isTwoBlank || q.dict;
     $('round').textContent = (state.round + 1) + ' / ' + TOTAL;
     $('tag').textContent = LEVEL_NAME[L] + ' · ' + modeName(m, L);
     renderStars();
     const em = $('emoji');
-    em.textContent = isSentFill ? '❓' : q.e;
+    em.textContent = q.dict ? "🔊" : isSentFill ? "❓" : q.e;
     em.classList.toggle('small', isSentFill || isSentOrder);
     em.style.animation = 'none'; void em.offsetWidth; em.style.animation = '';
     const wordEl = $('word');
     wordEl.className = 'word' + (q.w.length >= 5 && !isSentFill && !isSentOrder ? ' longword' : '') + (isSentFill || isSentOrder ? ' sentence' : '');
     let html = '', ask = '';
     state.built = [];
-    if (m === 'word') {
+    if (q.jamo) { ask = "자음과 모음을 합치면 무슨 글자일까요?"; html = `<span class="ch">${q.jamo.c}</span><span class="ch hint">+</span><span class="ch">${q.jamo.v}</span><span class="ch hint">=</span><span class="ch blank" id="ansbox">?</span>`; }
+    else     if (q.dict) { ask = "잘 듣고 글자를 순서대로 눌러요"; html = [...q.w].map((_, i) => `<span class="ch slot" data-i="${i}" id="slot-${i}"></span>`).join(""); }
+    else if (q.mimic) { ask = "무엇을 흉내 낸 말일까요?"; html = `<span class="ch" style="font-size:.7em;min-width:auto;padding:0 .35em">${q.w}</span><span class="ch hint">→</span><span class="ch blank" id="ansbox">?</span>`; }
+    else if (q.pair) { ask = `"${q.w}"의 ${q.pair}은 무엇일까요?`; html = `<span class="ch" style="font-size:.7em;min-width:auto;padding:0 .35em">${q.w}</span><span class="ch hint">${q.pair === "반대말" ? "↔" : "≈"}</span><span class="ch blank" id="ansbox">?</span>`; }
+    else     if (m === 'word') {
       ask = L === 'nine' ? '바르게 쓴 낱말은 어느 것일까요? (소리는 다 같아요)' : L === 'pro' ? '바르게 쓴 낱말은 어느 것일까요?' : '이 그림은 무엇일까요?';
       html = `<span class="ch blank" id="ansbox">?</span>`;
     } else if (isTwoBlank) {
@@ -680,11 +751,13 @@
       $('choices').hidden = false; $('tiles').hidden = true; $('tools').hidden = true;
       $('choices').className = 'choices' + (q.choices.length === 4 ? ' four' : '');
       $('choices').innerHTML = q.choices.map((c, i) =>
-        `<button class="btn choice ${c.length >= 5 ? 'xlong' : c.length >= 3 ? 'long' : ''}" id="choice-${i}" data-v="${c}">${c}</button>`).join('');
+        `<button class="btn choice ${c.length >= 5 ? 'xlong' : c.length >= 3 ? 'long' : ''}" id="choice-${i}" data-v="${c}">${q.choiceEmoji ? q.choiceEmoji[c] + `<small style="display:block;font-size:15px;font-family:var(--body)">${c}</small>` : c}</button>`).join('');
     }
     $('feedback').textContent = ''; $('feedback').className = 'feedback';
     state.locked = false; state.missed = false;
-    if (m === 'cons' && L !== 'nine') speak(q.w);
+    state.wrongTiles = 0;
+    if (m === "cons" && L !== "nine" && !q.jamo) speak(q.w);
+    if (q.dict || q.mimic) speak(q.w);
     if (m === 'order' && L !== 'nine') speak(q.w);
     if (isSentOrder) speak(q.sent);
   }
@@ -720,6 +793,25 @@
 
   /* 타일 놀이 (낱말 만들기·빈칸 두 개·문장 만들기) */
   function slotCount() { return document.querySelectorAll('.slot').length; }
+  function expectedAt(i) {
+    const q = state.q;
+    if (state.mode === "order" && state.level === "nine") return q.sent.split(" ")[i];
+    if (q.blanks && q.blanks.length) return q.w[q.blanks[i]];
+    return q.w[i];
+  }
+  function hintTile() {
+    const want = expectedAt(state.built.length);
+    const t = [...document.querySelectorAll(".tile")].find(x => !x.classList.contains("used") && x.dataset.c === want);
+    if (t) t.classList.add("hint");
+  }
+  function revealTiles() {
+    state.locked = true; state.missed = true;
+    const total = slotCount();
+    for (let i = 0; i < total; i++) { const s = $("slot-" + i); s.textContent = expectedAt(i); s.classList.add("filled", "reveal"); }
+    $("feedback").textContent = "이렇게 놓는 거예요. 다음 문제로 가요!";
+    document.querySelectorAll(".tile").forEach(t => t.disabled = true);
+    setTimeout(next, 2200);
+  }
   function tapTile(btn) {
     if (state.locked || btn.classList.contains('used')) return;
     const q = state.q, i = state.built.length, total = slotCount();
@@ -736,14 +828,17 @@
       } else {
         state.missed = true;
         document.querySelectorAll('.slot').forEach(s => { s.classList.remove('no'); void s.offsetWidth; s.classList.add('no'); });
-        $('feedback').textContent = '순서가 달라요. 다시 놓아 볼까요? 🍀';
+        state.wrongTiles = (state.wrongTiles || 0) + 1;
+        if (state.wrongTiles >= 3) { sndBad(); return setTimeout(revealTiles, 500); }
+        $("feedback").textContent = state.wrongTiles >= 2 ? "반짝이는 글자부터 눌러 봐요 ✨" : "순서가 달라요. 다시 놓아 볼까요? 🍀";
         sndBad();
-        setTimeout(resetTiles, 700);
+        setTimeout(() => { resetTiles(); if (state.wrongTiles >= 2) hintTile(); }, 700);
       }
     }
   }
   function tapSlot(slot) {
     if (state.locked) return;
+    if (slot.classList.contains("reveal")) return;
     const i = +slot.dataset.i;
     if (i !== state.built.length - 1) return; // 마지막에 놓은 것만 되돌리기
     const b = state.built.pop();
@@ -793,7 +888,7 @@
     level = l;
     document.querySelectorAll('.level button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === l ? 'true' : 'false'));
     $('level-note').textContent = LEVEL_NOTE[l];
-    for (const m of ['word','syll','cons','order']) {
+    for (const m of ["word","syll","cons","order","e","f"]) {
       const [ico, title, small] = MODE_LABEL[l][m];
       $('ico-' + m).textContent = ico;
       $('label-' + m).innerHTML = title + '<small>' + small + '</small>';
@@ -825,7 +920,7 @@
       const key = "rp-results", all = JSON.parse(localStorage.getItem(key) || "{}");
       const d = new Date(), day = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
       all[day] = all[day] || {};
-      all[day][missionId] = Math.max(all[day][missionId] || 0, state.score);
+      all[day][missionId] = Math.max(all[day][missionId] || 0, Math.round(state.score * 10 / TOTAL));
       localStorage.setItem(key, JSON.stringify(all));
     } catch (e) {}
     $("to-hub").hidden = false; $("home-btn").hidden = true;
@@ -835,6 +930,7 @@
     const l = p.get("level"), m = p.get("mode");
     if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
     missionId = p.get("mission");
+    const n = +p.get("n"); if (n === 5 || n === 10) TOTAL = n;
     setLevel(l); start(m); return true;
   }
   function boot(data) {

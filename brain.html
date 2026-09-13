@@ -10,6 +10,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="voice.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
 <title>무지개 두뇌 놀이</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -104,6 +105,14 @@
   .mode.simon:active { box-shadow: 0 2px 0 #9560C0; }
   .mode.odd { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
   .mode.odd:active { box-shadow: 0 2px 0 #3F8FC2; }
+  .mode.tap { background: #F2C94C; box-shadow: 0 7px 0 #C9A227; } .mode.tap:active { box-shadow: 0 2px 0 #C9A227; }
+  @media (min-width: 600px) { .modes { grid-template-columns: 1fr 1fr; } }
+  .tgrid { display: grid; gap: 8px; }
+  .tcell { aspect-ratio: 1; border: 0; border-radius: 14px; background: var(--r3); font-family: var(--display); font-size: 26px; color: var(--plum); cursor: pointer; box-shadow: 0 5px 0 #E8CF4A; }
+  .tcell:active { transform: translateY(3px); box-shadow: 0 2px 0 #E8CF4A; }
+  .tcell.done { background: var(--good); color: #fff; box-shadow: none; opacity: .55; }
+  .tcell.no { animation: tshake .4s; background: var(--oops); }
+  @keyframes tshake { 0%,100% { transform: translateX(0);} 25% { transform: translateX(-8px);} 75% { transform: translateX(8px);} }
   .best { text-align: center; font-size: 15px; color: var(--plum-soft); margin: 14px 0 0; line-height: 1.6; }
 
   .stars { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -236,6 +245,7 @@
       <button class="btn mode pattern" id="mode-pattern" data-mode="pattern"><span class="ico" id="ico-pattern">🔮</span><span id="label-pattern"></span></button>
       <button class="btn mode simon" id="mode-simon" data-mode="simon"><span class="ico" id="ico-simon">🎵</span><span id="label-simon"></span></button>
       <button class="btn mode odd" id="mode-odd" data-mode="odd"><span class="ico" id="ico-odd">🔍</span><span id="label-odd"></span></button>
+      <button class="btn mode tap" id="mode-tap" data-mode="tap"><span class="ico" id="ico-tap">🔢</span><span id="label-tap"></span></button>
     </div>
     <p class="best" id="best"></p>
   </section>
@@ -267,7 +277,7 @@
 
 <script>
 (function () {
-  const TOTAL = 10;
+  let TOTAL = 10;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
   const pick = a => a[rnd(a.length)];
@@ -282,10 +292,10 @@
     nine: '닮은 짝 8쌍 · 두 가지 규칙과 수열 · 6개 판 · 6×6에 10초 제한'
   };
   const MODE_LABEL = {
-    easy: { memory: ['🃏','짝 맞추기','카드 6장에서 같은 그림 3쌍을 찾아요'], pattern: ['🔮','규칙 찾기','다음에 올 그림을 골라요'], simon: ['🎵','순서 기억','불이 켜진 순서대로 눌러요'], odd: ['🔍','다른 그림 찾기','9개 중 다른 하나를 찾아요'] },
-    hard: { memory: ['🃏','짝 맞추기','카드 8장에서 4쌍을 찾아요'], pattern: ['🔮','규칙 찾기','세 가지가 섞인 규칙을 찾아요'], simon: ['🎵','순서 기억','3개부터 점점 길어져요'], odd: ['🔍','다른 그림 찾기','16개 중 비슷한 그림 하나를 찾아요'] },
-    pro:  { memory: ['🃏','짝 맞추기','카드 12장에서 6쌍을 찾아요'], pattern: ['🔮','규칙 찾기','색깔이 바뀌고 점이 늘어나요'], simon: ['🎵','순서 기억','4개부터, 더 빨라져요'], odd: ['🔍','다른 그림 찾기','25개 중 아주 비슷한 하나를 찾아요'] },
-    nine: { memory: ['🃏','닮은 짝 맞추기','서로 닮은 그림 16장에서 8쌍을 찾아요'], pattern: ['🔮','규칙 찾기','두 가지 규칙과 숫자 수열'], simon: ['🎵','순서 기억','판 6개, 5개부터 시작해요'], odd: ['🔍','다른 그림 찾기','36개 중 하나를 10초 안에 찾아요'] },
+    easy: { memory: ['🃏','짝 맞추기','카드 6장에서 같은 그림 3쌍을 찾아요'], pattern: ['🔮','규칙 찾기','다음에 올 그림을 골라요'], simon: ['🎵','순서 기억','불이 켜진 순서대로 눌러요'], odd: ['🔍','다른 그림 찾기','9개 중 다른 하나를 찾아요'] , tap: ["🔢","순서대로 누르기","1부터 10까지 빨리 눌러요"] },
+    hard: { memory: ['🃏','짝 맞추기','카드 8장에서 4쌍을 찾아요'], pattern: ['🔮','규칙 찾기','세 가지가 섞인 규칙을 찾아요'], simon: ['🎵','순서 기억','3개부터 점점 길어져요'], odd: ['🔍','다른 그림 찾기','16개 중 비슷한 그림 하나를 찾아요'] , tap: ["🔢","순서대로 누르기","1부터 15까지, 더 빨리!"] },
+    pro:  { memory: ['🃏','짝 맞추기','카드 12장에서 6쌍을 찾아요'], pattern: ['🔮','규칙 찾기','색깔이 바뀌고 점이 늘어나요'], simon: ['🎵','순서 기억','4개부터, 더 빨라져요'], odd: ['🔍','다른 그림 찾기','25개 중 아주 비슷한 하나를 찾아요'] , tap: ["🔢","순서대로 누르기","2씩 뛰어 세며 32까지"] },
+    nine: { memory: ['🃏','닮은 짝 맞추기','서로 닮은 그림 16장에서 8쌍을 찾아요'], pattern: ['🔮','규칙 찾기','두 가지 규칙과 숫자 수열'], simon: ['🎵','순서 기억','판 6개, 5개부터 시작해요'], odd: ['🔍','다른 그림 찾기','36개 중 하나를 10초 안에 찾아요'] , tap: ["🔢","순서대로 누르기","3씩 뛰어 세며 60까지"] },
   };
   const modeName = (m, l) => MODE_LABEL[l][m][1];
 
@@ -388,7 +398,7 @@
     say('');
     show('game');
     renderStars(0);
-    ({ memory: setupMemory, pattern: nextPattern, simon: startSimon, odd: nextOdd })[mode]();
+    ({ memory: setupMemory, pattern: nextPattern, simon: startSimon, odd: nextOdd, tap: setupTap })[mode]();
   }
   function praise() { say(pick(PRAISE) + ' 🌟', true); sndGood(); confetti(30); }
   function advance(nextFn, delay = 1100) {
@@ -399,10 +409,10 @@
 
   /* ───────── 1. 짝 맞추기 ───────── */
   function setupMemory() {
-    const pairs = { easy: 3, hard: 4, pro: 6, nine: 8 }[state.level];
-    const cols = { easy: 3, hard: 4, pro: 4, nine: 4 }[state.level];
+    const pairs = { easy: 3, hard: 4, pro: 6, nine: 8 }[state.level] + (missionId ? 2 : 0);   // 미션일 때는 두 쌍 더
+    const cols = pairs >= 10 ? 5 : pairs >= 5 ? 4 : 3;
     let faces;
-    if (state.level === 'nine') faces = shuffle(LOOK_GROUPS).slice(0, 4).flatMap(g => shuffle(g).slice(0, 2));
+    if (state.level === 'nine') faces = shuffle(LOOK_GROUPS).slice(0, Math.ceil(pairs / 2)).flatMap(g => shuffle(g).slice(0, 2)).slice(0, pairs);
     else faces = shuffle(EMO).slice(0, pairs);
     const cards = shuffle(faces.flatMap(f => [f, f]));
     state.m = { pairs, moves: 0, matched: 0, open: [] };
@@ -624,6 +634,41 @@
     }
   }
 
+  /* ───────── 5. 순서대로 누르기 ───────── */
+  function setupTap() {
+    const cfg = { easy: { n: 10, step: 1, par: 20 }, hard: { n: 15, step: 1, par: 25 }, pro: { n: 16, step: 2, par: 32 }, nine: { n: 20, step: 3, par: 45 } }[state.level];
+    const nums = Array.from({ length: cfg.n }, (_, i) => (i + 1) * cfg.step);
+    const order = shuffle(nums);
+    state.t = { nums, next: 0, wrong: 0, t0: Date.now(), par: cfg.par };
+    setRound('한 판');
+    ask(cfg.step === 1 ? `1부터 ${cfg.n}까지 순서대로 눌러요` : `${cfg.step}씩 뛰어 세며 순서대로 눌러요 (${cfg.step}, ${cfg.step * 2}, ${cfg.step * 3}…)`);
+    const cols = cfg.n <= 10 ? 5 : cfg.n <= 16 ? 4 : 5;
+    $('area').innerHTML = `<p class="info" id="tinfo">⏱ 0초 · 다음 수: ${nums[0]}</p><div class="tgrid" style="grid-template-columns:repeat(${cols},1fr)">${order.map(v => `<button class="tcell" data-v="${v}">${v}</button>`).join('')}</div>`;
+    state.locked = false;
+    state.t.tick = setInterval(() => { const el = $('tinfo'); if (el && state.t) el.textContent = `⏱ ${Math.floor((Date.now() - state.t.t0) / 1000)}초 · 다음 수: ${state.t.nums[state.t.next] ?? '끝!'}`; }, 500);
+    timers.push(state.t.tick);
+  }
+  function tapNum(btn) {
+    if (state.locked || state.mode !== 'tap' || btn.disabled) return;
+    const v = +btn.dataset.v, T = state.t;
+    if (v === T.nums[T.next]) {
+      btn.classList.add('done'); btn.disabled = true; T.next++; tone(880, 0, .08, 'sine', .1);
+      if (T.next >= T.nums.length) {
+        clearInterval(T.tick); state.locked = true;
+        const secs = (Date.now() - T.t0) / 1000;
+        const over = Math.max(0, Math.floor((secs - T.par) / 5));
+        state.score = Math.max(1, Math.min(TOTAL, TOTAL - T.wrong - over));
+        renderStars();
+        say(`${Math.round(secs)}초 만에 다 눌렀어요! 🌟`, true); sndGood(); confetti(60);
+        later(finish, 1400);
+      }
+    } else {
+      T.wrong++;
+      btn.classList.remove('no'); void btn.offsetWidth; btn.classList.add('no');
+      say(`다음은 ${T.nums[T.next]}이에요 🍀`); sndBad();
+    }
+  }
+
   /* ───────── 결과 ───────── */
   function finish() {
     clearTimers();
@@ -650,7 +695,7 @@
     level = l;
     document.querySelectorAll('.level button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === l ? 'true' : 'false'));
     $('level-note').textContent = LEVEL_NOTE[l];
-    for (const m of ['memory','pattern','simon','odd']) {
+    for (const m of ["memory","pattern","simon","odd","tap"]) {
       const [ico, title, small] = MODE_LABEL[l][m];
       $('ico-' + m).textContent = ico;
       $('label-' + m).innerHTML = title + '<small>' + small + '</small>';
@@ -668,6 +713,7 @@
     const ch = t.closest('.choice'); if (ch && state.mode === 'pattern') return tapPatternChoice(ch);
     const pad = t.closest('.pad'); if (pad && state.mode === 'simon') return tapPad(pad);
     const cell = t.closest('.ocell'); if (cell && state.mode === 'odd') return tapCell(cell);
+    const tc = t.closest(".tcell"); if (tc && state.mode === "tap") return tapNum(tc);
   });
   $('again').addEventListener('click', () => start(state.mode));
   $('home-btn').addEventListener('click', () => { clearTimers(); show('home'); });
@@ -681,7 +727,7 @@
       const key = "rp-results", all = JSON.parse(localStorage.getItem(key) || "{}");
       const d = new Date(), day = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
       all[day] = all[day] || {};
-      all[day][missionId] = Math.max(all[day][missionId] || 0, state.score);
+      all[day][missionId] = Math.max(all[day][missionId] || 0, Math.round(state.score * 10 / TOTAL));
       localStorage.setItem(key, JSON.stringify(all));
     } catch (e) {}
     $("to-hub").hidden = false; $("home-btn").hidden = true;
@@ -691,6 +737,7 @@
     const l = p.get("level"), m = p.get("mode");
     if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
     missionId = p.get("mission");
+    const n = +p.get("n"); if (n === 5 || n === 10) TOTAL = n;
     setLevel(l); start(m); return true;
   }
   function boot(data) {

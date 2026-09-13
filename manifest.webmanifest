@@ -1,0 +1,17 @@
+{
+  "name": "무지개 놀이터",
+  "short_name": "무지개 놀이터",
+  "description": "6~9살을 위한 산수·한글·두뇌 놀이. 매일 새로운 미션과 스티커!",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFE4F0",
+  "theme_color": "#FF5FA2",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

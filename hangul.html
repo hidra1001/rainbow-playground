@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#FF5FA2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
+<title>무지개 한글 놀이</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+  :root {
+    --ground: #FFE4F0;
+    --ground-2: #FFF3F8;
+    --card: #FFFFFF;
+    --pink: #FF5FA2;
+    --pink-deep: #E8408A;
+    --plum: #5B2A4E;
+    --plum-soft: #9A6A8C;
+    --r1: #FF6B6B; --r2: #FFB347; --r3: #FFE66D; --r4: #7ED957; --r5: #5DADE2; --r6: #B57EDC;
+    --good: #5FC97A;
+    --oops: #FF8A80;
+    --display: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --body: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    background-image:
+      radial-gradient(circle at 15% 20%, #FFD1E6 0 60px, transparent 61px),
+      radial-gradient(circle at 85% 30%, #FFD9EA 0 80px, transparent 81px),
+      radial-gradient(circle at 70% 85%, #FFCCE2 0 50px, transparent 51px),
+      radial-gradient(circle at 20% 80%, #FFDDEC 0 70px, transparent 71px);
+    color: var(--plum);
+    font-family: var(--body);
+    padding-inline: 16px;
+    padding-block: 20px 40px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  .arch { position: relative; height: 120px; overflow: hidden; margin-bottom: -20px; }
+  .arch svg { width: 100%; height: 100%; display: block; }
+  .cloud { position: absolute; bottom: 4px; width: 88px; height: 34px; background: #fff; border-radius: 40px; box-shadow: 0 6px 0 #FFD1E6; }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+  .cloud::before { width: 42px; height: 42px; left: 10px; top: -20px; }
+  .cloud::after { width: 32px; height: 32px; right: 12px; top: -12px; }
+  .cloud.l { left: 2%; } .cloud.r { right: 2%; }
+  .letters { position: absolute; inset: 0; pointer-events: none; font-family: var(--display); font-size: 26px; color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.08); }
+  .letters span { position: absolute; }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(34px, 9vw, 46px);
+    text-align: center; margin: 0; line-height: 1.1; text-wrap: balance;
+    background: linear-gradient(90deg, var(--r1), var(--r2), #F2C94C, var(--r4), var(--r5), var(--r6));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 0 #fff);
+  }
+  .sub { text-align: center; margin: 0; font-size: 17px; color: var(--plum-soft); }
+
+  .card {
+    background: var(--card); border-radius: 32px; padding: 24px 22px 26px;
+    box-shadow: 0 10px 0 #FFC2DB, 0 16px 30px rgba(232, 64, 138, .15);
+    border: 4px solid #FFD6E7;
+  }
+  [hidden] { display: none !important; }
+
+  .btn {
+    font-family: var(--display); font-size: 26px; border: 0; border-radius: 24px;
+    padding: 16px 20px; cursor: pointer; color: #fff; background: var(--pink);
+    box-shadow: 0 7px 0 var(--pink-deep);
+    transition: transform .08s ease, box-shadow .08s ease; touch-action: manipulation; line-height: 1.1;
+  }
+  .btn:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--pink-deep); }
+  .btn:focus-visible { outline: 4px solid var(--r5); outline-offset: 3px; }
+
+  /* 난이도 */
+  .level { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 12px 0 16px; }
+  .level button {
+    font-family: var(--display); font-size: 20px; padding: 10px 16px; border-radius: 30px; cursor: pointer;
+    border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft);
+  }
+  .level button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 4px 0 var(--pink-deep); }
+  .level button:focus-visible { outline: 4px solid var(--r5); outline-offset: 2px; }
+  .level-note { text-align: center; font-size: 14px; color: var(--plum-soft); margin: -6px 0 10px; }
+
+  .modes { display: grid; gap: 14px; }
+  .mode { display: flex; align-items: center; gap: 16px; text-align: left; padding: 14px 20px; }
+  .mode .ico { font-size: 38px; line-height: 1; }
+  .mode small { display: block; font-family: var(--body); font-size: 15px; opacity: .9; margin-top: 4px; }
+  .mode.word { background: var(--r1); box-shadow: 0 7px 0 #D94E4E; }
+  .mode.word:active { box-shadow: 0 2px 0 #D94E4E; }
+  .mode.syll { background: var(--r2); box-shadow: 0 7px 0 #D9902E; }
+  .mode.syll:active { box-shadow: 0 2px 0 #D9902E; }
+  .mode.cons { background: var(--r6); box-shadow: 0 7px 0 #9560C0; }
+  .mode.cons:active { box-shadow: 0 2px 0 #9560C0; }
+  .mode.order { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .mode.order:active { box-shadow: 0 2px 0 #3F8FC2; }
+  .best { text-align: center; font-size: 15px; color: var(--plum-soft); margin: 14px 0 0; line-height: 1.6; }
+
+  .stars { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .stars span { font-size: 24px; filter: grayscale(1) opacity(.35); transition: transform .3s, filter .3s; }
+  .stars span.on { filter: none; transform: scale(1.15); }
+
+  .pic { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .pic .emoji {
+    font-size: 96px; line-height: 1; width: 150px; height: 150px; display: grid; place-items: center;
+    background: var(--ground-2); border-radius: 40px; border: 4px solid #FFD6E7;
+    animation: pop .45s backwards;
+  }
+  .pic .emoji.small { font-size: 56px; width: 96px; height: 96px; border-radius: 28px; }
+  .speak {
+    background: #fff; border: 3px solid var(--r5); color: #2E7DB3; border-radius: 30px;
+    font-family: var(--display); font-size: 18px; padding: 8px 18px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 0 #BFE0F5;
+  }
+  .speak:active { transform: translateY(3px); box-shadow: 0 1px 0 #BFE0F5; }
+  .speak:focus-visible { outline: 4px solid var(--r2); outline-offset: 3px; }
+  .ask { text-align: center; font-size: 17px; color: var(--plum-soft); margin: 4px 0 8px; }
+
+  /* 낱말 칸 */
+  .word {
+    display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;
+    font-family: var(--display); font-size: clamp(40px, 12vw, 60px); line-height: 1; margin: 6px 0 20px;
+  }
+  .word .ch {
+    display: inline-grid; place-items: center; min-width: 1.25em; height: 1.25em; border-radius: 20px;
+    background: var(--ground-2); border: 4px solid #FFD6E7; color: var(--plum);
+  }
+  .word .ch.blank { border: 4px dashed var(--pink); color: var(--pink); }
+  .word .ch.focus { border-color: var(--pink); background: #FFE4F0; color: var(--pink-deep); }
+  .word .ch.ok { border-style: solid; background: var(--good); border-color: #4DB369; color: #fff; }
+  .word .ch.no { border-color: var(--oops); animation: shake .4s; }
+  .word .ch.hint { font-size: .55em; color: var(--plum-soft); }
+  .word .ch.slot { cursor: pointer; }
+  .word .ch.slot.filled { background: var(--r3); border-color: #E8CF4A; color: var(--plum); }
+  .word.longword { font-size: clamp(30px, 9vw, 46px); gap: 6px; }
+  .word.longword .ch { border-radius: 14px; border-width: 3px; }
+  /* 문장 칸 */
+  .word.sentence { font-size: clamp(22px, 6vw, 30px); gap: 6px 8px; line-height: 1.3; }
+  .word.sentence .ch { min-width: 0; height: auto; padding: 8px 12px; border-radius: 14px; border-width: 3px; }
+  .word.sentence .plain { background: none; border-color: transparent; padding: 8px 2px; }
+  .word.sentence .ch.blank { min-width: 3.2em; }
+
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .choices.four { grid-template-columns: repeat(2, 1fr); }
+  .choice { font-size: 38px; padding: 14px 4px; word-break: keep-all; }
+  .choice.long { font-size: 28px; }
+  .choice.xlong { font-size: 22px; }
+  .choice:nth-child(1) { background: var(--r1); box-shadow: 0 7px 0 #D94E4E; }
+  .choice:nth-child(2) { background: var(--r2); box-shadow: 0 7px 0 #D9902E; }
+  .choice:nth-child(3) { background: var(--r6); box-shadow: 0 7px 0 #9560C0; }
+  .choice:nth-child(4) { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .choice:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+  .choice:disabled { cursor: default; }
+  .choice.right { background: var(--good) !important; box-shadow: 0 7px 0 #4DB369 !important; }
+  .choice.wrong { background: #E9C8D6 !important; box-shadow: 0 7px 0 #C9A6B8 !important; color: #fff; }
+
+  /* 글자·낱말 타일 */
+  .tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .tile { font-size: 36px; padding: 12px 0; min-width: 76px; background: var(--r6); box-shadow: 0 7px 0 #9560C0; }
+  .tile:nth-child(2n) { background: var(--r2); box-shadow: 0 7px 0 #D9902E; }
+  .tile:nth-child(3n) { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .tile.used { visibility: hidden; }
+  .tile:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+  .tiles.words .tile { font-size: 24px; padding: 12px 16px; min-width: 0; }
+  .tools { display: flex; justify-content: center; margin-top: 12px; }
+  .tools button {
+    background: none; border: 2px solid #FFD6E7; border-radius: 30px; font-family: var(--body); font-size: 15px;
+    color: var(--plum-soft); padding: 6px 16px; cursor: pointer;
+  }
+
+  .feedback { min-height: 34px; text-align: center; font-family: var(--display); font-size: 26px; margin-top: 16px; color: var(--pink-deep); }
+  .feedback.good { color: #3FA85D; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 15px; color: var(--plum-soft); }
+  .topbar button { background: none; border: 0; font-family: var(--body); font-size: 15px; color: var(--plum-soft); cursor: pointer; text-decoration: underline; padding: 6px; }
+  .topbar button:focus-visible { outline: 3px solid var(--r5); border-radius: 8px; }
+  .tag { background: var(--ground-2); border: 2px solid #FFD6E7; border-radius: 20px; padding: 3px 10px; font-family: var(--display); }
+
+  .result { text-align: center; }
+  .result .big { font-size: 80px; line-height: 1; margin: 6px 0 10px; animation: bounce 1s infinite alternate; }
+  .result h2 { font-family: var(--display); font-size: 34px; margin: 0 0 6px; color: var(--pink-deep); }
+  .result p { margin: 0 0 20px; font-size: 18px; }
+  .result .score { font-family: var(--display); font-size: 30px; color: var(--plum); }
+  .result .learned { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
+  .result .learned span { background: var(--ground-2); border: 2px solid #FFD6E7; border-radius: 30px; padding: 6px 12px; font-family: var(--display); font-size: 18px; }
+  .result .actions { display: grid; gap: 12px; }
+  .result .again { background: var(--r4); box-shadow: 0 7px 0 #5FB25A; }
+  .result .home { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .result .hub { display: block; text-decoration: none; text-align: center; background: var(--pink); box-shadow: 0 7px 0 var(--pink-deep); }
+  .hublink { display: inline-block; font-family: var(--body); font-size: 15px; color: var(--plum-soft); text-decoration: none; border: 2px solid #FFD6E7; border-radius: 30px; padding: 6px 14px; margin-bottom: 10px; }
+
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+
+  @keyframes pop { from { transform: scale(0); } 70% { transform: scale(1.15); } to { transform: scale(1); } }
+  @keyframes shake { 0%,100% { transform: translateX(0);} 25% { transform: translateX(-8px);} 75% { transform: translateX(8px);} }
+  @keyframes bounce { from { transform: translateY(0);} to { transform: translateY(-14px);} }
+  @media (prefers-reduced-motion: reduce) {
+    .pic .emoji, .word .ch.no, .result .big { animation: none; }
+    .btn, .stars span { transition: none; }
+  }
+  @media (max-width: 400px) {
+    .choice { font-size: 32px; } .choice.long { font-size: 24px; } .choice.xlong { font-size: 19px; }
+    .tile { font-size: 30px; min-width: 64px; }
+    .tiles.words .tile { font-size: 20px; padding: 10px 12px; }
+    .pic .emoji { font-size: 80px; width: 130px; height: 130px; }
+    .card { padding: 20px 16px 22px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <div class="arch" aria-hidden="true">
+    <svg viewBox="0 0 520 130" preserveAspectRatio="xMidYMax meet">
+      <path d="M20 130 A240 240 0 0 1 500 130" fill="none" stroke="#FF6B6B" stroke-width="16"/>
+      <path d="M36 130 A224 224 0 0 1 484 130" fill="none" stroke="#FFB347" stroke-width="16"/>
+      <path d="M52 130 A208 208 0 0 1 468 130" fill="none" stroke="#FFE66D" stroke-width="16"/>
+      <path d="M68 130 A192 192 0 0 1 452 130" fill="none" stroke="#7ED957" stroke-width="16"/>
+      <path d="M84 130 A176 176 0 0 1 436 130" fill="none" stroke="#5DADE2" stroke-width="16"/>
+      <path d="M100 130 A160 160 0 0 1 420 130" fill="none" stroke="#B57EDC" stroke-width="16"/>
+    </svg>
+    <div class="letters">
+      <span style="left:24%;top:38%">ㄱ</span><span style="left:41%;top:16%">ㅏ</span>
+      <span style="left:56%;top:16%">ㄴ</span><span style="left:72%;top:38%">ㅗ</span>
+    </div>
+    <div class="cloud l"></div>
+    <div class="cloud r"></div>
+  </div>
+
+  <h1>무지개 한글 놀이</h1>
+  <p class="sub">그림을 보고 맞는 글자를 눌러요 🌈</p>
+
+  <section class="card" id="home">
+    <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
+    <p class="sub">몇 살 놀이로 할까요?</p>
+    <div class="level" role="group" aria-label="난이도">
+      <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
+      <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
+      <button type="button" id="level-pro" data-level="pro" aria-pressed="false">🌈 8살</button>
+      <button type="button" id="level-nine" data-level="nine" aria-pressed="false">👑 9살</button>
+    </div>
+    <p class="level-note" id="level-note"></p>
+    <div class="modes">
+      <button class="btn mode word" id="mode-word" data-mode="word"><span class="ico" id="ico-word">🍎</span><span id="label-word"></span></button>
+      <button class="btn mode syll" id="mode-syll" data-mode="syll"><span class="ico" id="ico-syll">🐰</span><span id="label-syll"></span></button>
+      <button class="btn mode cons" id="mode-cons" data-mode="cons"><span class="ico" id="ico-cons">🦄</span><span id="label-cons"></span></button>
+      <button class="btn mode order" id="mode-order" data-mode="order"><span class="ico" id="ico-order">🧩</span><span id="label-order"></span></button>
+    </div>
+    <p class="best" id="best"></p>
+  </section>
+
+  <section class="card" id="game" hidden>
+    <div class="topbar">
+      <span id="round">1 / 10</span>
+      <span class="tag" id="tag"></span>
+      <button id="quit" type="button">처음으로</button>
+    </div>
+    <div class="stars" id="stars" aria-label="모은 별"></div>
+    <div class="pic">
+      <div class="emoji" id="emoji"></div>
+      <button class="speak" id="speak" type="button">🔊 읽어 줘</button>
+    </div>
+    <p class="ask" id="ask"></p>
+    <div class="word" id="word"></div>
+    <div class="choices" id="choices"></div>
+    <div class="tiles" id="tiles" hidden></div>
+    <div class="tools" id="tools" hidden><button type="button" id="reset-tiles">↩ 다시 놓기</button></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+  </section>
+
+  <section class="card result" id="result" hidden>
+    <div class="big" id="result-emoji">🎉</div>
+    <h2 id="result-title">참 잘했어요!</h2>
+    <p class="score" id="result-score"></p>
+    <p id="result-msg"></p>
+    <div class="learned" id="learned"></div>
+    <div class="actions">
+      <button class="btn again" id="again">한 번 더! 🌟</button>
+      <button class="btn home" id="home-btn">처음으로 🏠</button>
+      <a class="btn hub" id="to-hub" href="index.html" hidden>🏠 놀이터로 돌아가기</a>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const TOTAL = 10;
+  const WORDS = [
+    // 짧은 낱말 (6살·7살 공통)
+    ['사과','🍎'],['바나나','🍌'],['딸기','🍓'],['포도','🍇'],['수박','🍉'],['당근','🥕'],['빵','🍞'],['우유','🥛'],['피자','🍕'],['케이크','🎂'],
+    ['고양이','🐱'],['강아지','🐶'],['토끼','🐰'],['사자','🦁'],['코끼리','🐘'],['나비','🦋'],['곰','🐻'],['호랑이','🐯'],['돼지','🐷'],['오리','🦆'],
+    ['병아리','🐤'],['개구리','🐸'],['물고기','🐟'],['거북이','🐢'],['원숭이','🐵'],['펭귄','🐧'],['말','🐴'],['소','🐮'],['벌','🐝'],['새','🐦'],
+    ['꽃','🌸'],['나무','🌳'],['별','⭐'],['달','🌙'],['해','☀️'],['비','🌧️'],['눈사람','⛄'],['무지개','🌈'],['산','⛰️'],['바다','🌊'],
+    ['자동차','🚗'],['버스','🚌'],['배','⛵'],['비행기','✈️'],['기차','🚂'],['집','🏠'],['모자','🎩'],['신발','👟'],['가방','🎒'],['책','📚'],
+    ['공','🏐'],['풍선','🎈'],['선물','🎁'],['로봇','🤖'],['우산','☂️'],['시계','⏰'],['연필','✏️'],['안경','👓'],['열쇠','🔑'],['전화','📞'],
+    // 긴 낱말·받침 많은 낱말 (7살)
+    ['해바라기','🌻'],['아이스크림','🍦'],['햄버거','🍔'],['소방차','🚒'],['오토바이','🏍️'],['헬리콥터','🚁'],['컴퓨터','💻'],['텔레비전','📺'],['냉장고','🧊'],['색연필','🖍️'],
+    ['지우개','🩹'],['가위','✂️'],['칫솔','🪥'],['비누','🧼'],['무당벌레','🐞'],['달팽이','🐌'],['문어','🐙'],['상어','🦈'],['고래','🐳'],['낙타','🐪'],
+    ['기린','🦒'],['얼룩말','🦓'],['캥거루','🦘'],['다람쥐','🐿️'],['앵무새','🦜'],['공룡','🦖'],['코뿔소','🦏'],['악어','🐊'],['잠자리','🪰'],['옥수수','🌽'],
+    ['수영장','🏊'],['놀이터','🛝'],['유치원','🏫'],['눈송이','❄️'],['튤립','🌷'],['선인장','🌵'],['버섯','🍄'],['도넛','🍩'],['김밥','🍙'],['떡볶이','🍢'],
+    // 받침 많고 긴 낱말 (8살)
+    ['자전거','🚲'],['우주선','🚀'],['경찰관','👮'],['소방관','🧑‍🚒'],['장난감','🧸'],['놀이공원','🎡'],['롤러코스터','🎢'],['농구공','🏀'],['태권도','🥋'],['도서관','📖'],
+    ['병원','🏥'],['숟가락','🥄'],['젓가락','🥢'],['달걀','🥚'],['북극곰','🐻‍❄️'],['하마','🦛'],['독수리','🦅'],['부엉이','🦉'],['박쥐','🦇'],['개미','🐜'],
+    ['거미','🕷️'],['불꽃놀이','🎆'],['목도리','🧣'],['장갑','🧤'],['장화','🥾'],['횡단보도','🚸'],['신호등','🚦'],['엘리베이터','🛗'],['배드민턴','🏸'],['스케이트','⛸️'],
+    ['눈썰매','🛷'],['텐트','⛺'],['볼링','🎳'],['탁구','🏓'],['축구','⚽'],['화장실','🚻'],['전자레인지','🍱'],['세탁기','🧺'],['크레파스','🖌️'],['생일잔치','🥳'],
+    // 몸·가족·사람
+    ['눈','👁️'],['코','👃'],['입','👄'],['귀','👂'],['손','✋'],['발','🦶'],['이','🦷'],['혀','👅'],['뼈','🦴'],['머리카락','💇'],
+    ['엄마','👩'],['아빠','👨'],['할머니','👵'],['할아버지','👴'],['아기','👶'],['가족','👨‍👩‍👧'],['친구','🧑‍🤝‍🧑'],['웃음','😊'],['눈물','😢'],['잠','😴'],
+    // 직업·사람들
+    ['의사','🧑‍⚕️'],['요리사','🧑‍🍳'],['선생님','🧑‍🏫'],['화가','🧑‍🎨'],['가수','🧑‍🎤'],['농부','🧑‍🌾'],['우주비행사','🧑‍🚀'],['과학자','🧑‍🔬'],['왕','🤴'],['공주','👸'],
+    ['마법사','🧙'],['해적','🏴‍☠️'],['산타','🎅'],['유니콘','🦄'],['용','🐉'],
+    // 자연·우주
+    ['구름','☁️'],['번개','⚡'],['바람','🌬️'],['강','🏞️'],['화산','🌋'],['사막','🏜️'],['섬','🏝️'],['숲','🌲'],['지구','🌍'],['토성','🪐'],
+    ['별똥별','🌠'],['보름달','🌕'],['불','🔥'],['물','💧'],['돌','🪨'],['조개','🐚'],['잎','🍃'],['단풍','🍁'],['장미','🌹'],['클로버','🍀'],
+    // 동물 더
+    ['사슴','🦌'],['여우','🦊'],['늑대','🐺'],['양','🐑'],['염소','🐐'],['닭','🐔'],['쥐','🐭'],['햄스터','🐹'],['판다','🐼'],['코알라','🐨'],
+    ['고슴도치','🦔'],['도마뱀','🦎'],['뱀','🐍'],['오징어','🦑'],['게','🦀'],['새우','🦐'],['공작','🦚'],['홍학','🦩'],['백조','🦢'],['비둘기','🕊️'],
+    ['모기','🦟'],['지렁이','🪱'],['애벌레','🐛'],['돌고래','🐬'],['물개','🦭'],['고릴라','🦍'],['너구리','🦝'],['수달','🦦'],['사슴벌레','🪲'],['귀뚜라미','🦗'],
+    // 음식 더
+    ['라면','🍜'],['만두','🥟'],['초밥','🍣'],['치킨','🍗'],['샌드위치','🥪'],['사탕','🍬'],['초콜릿','🍫'],['팝콘','🍿'],['주스','🧃'],['밥','🍚'],
+    ['떡','🍡'],['국','🍲'],['땅콩','🥜'],['레몬','🍋'],['복숭아','🍑'],['체리','🍒'],['키위','🥝'],['파인애플','🍍'],['멜론','🍈'],['토마토','🍅'],
+    ['감자','🥔'],['고구마','🍠'],['양파','🧅'],['오이','🥒'],['브로콜리','🥦'],['고추','🌶️'],['배추','🥬'],['꿀','🍯'],['치즈','🧀'],['핫도그','🌭'],
+    ['쿠키','🍪'],['팬케이크','🥞'],['컵','🥤'],['접시','🍽️'],['프라이팬','🍳'],
+    // 집·물건
+    ['거울','🪞'],['침대','🛏️'],['의자','🪑'],['문','🚪'],['창문','🪟'],['양초','🕯️'],['상자','📦'],['편지','✉️'],['돈','💰'],['지도','🗺️'],
+    ['나침반','🧭'],['망원경','🔭'],['현미경','🔬'],['자석','🧲'],['종','🔔'],['카메라','📷'],['라디오','📻'],['전구','💡'],['건전지','🔋'],['자물쇠','🔒'],
+    ['망치','🔨'],['톱','🪚'],['바늘','🪡'],['실','🧵'],['빗자루','🧹'],['양동이','🪣'],['달력','📅'],['공책','📓'],['자','📏'],['물감','🎨'],
+    // 악기·놀이
+    ['북','🥁'],['피아노','🎹'],['기타','🎸'],['트럼펫','🎺'],['바이올린','🎻'],['노래','🎤'],['헤드폰','🎧'],['주사위','🎲'],['퍼즐','🧩'],['연','🪁'],
+    ['요요','🪀'],['보석','💎'],['하트','💗'],['그림','🖼️'],['춤','💃'],
+    // 옷
+    ['왕관','👑'],['반지','💍'],['치마','👗'],['바지','👖'],['티셔츠','👕'],['양말','🧦'],['넥타이','👔'],['수영복','🩱'],
+    // 탈것·장소
+    ['택시','🚕'],['트럭','🚚'],['구급차','🚑'],['경찰차','🚓'],['지하철','🚇'],['트랙터','🚜'],['교회','⛪'],['성','🏰'],['공장','🏭'],['다리','🌉'],
+    ['탑','🗼'],['은행','🏦'],['우체국','🏤'],['호텔','🏨'],['편의점','🏪'],
+    // 운동·명절
+    ['야구','⚾'],['테니스','🎾'],['스키','⛷️'],['서핑','🏄'],['낚시','🎣'],['등산','🧗'],['달리기','🏃'],['체조','🤸'],['골프','⛳'],['활쏘기','🏹'],
+    ['권투','🥊'],['요가','🧘'],['크리스마스','🎄'],['설날','🧧'],
+  ];
+  // 9살: 문장 (낱말이 문장 안에 그대로 들어 있어야 해요)
+  const SENTS = [
+    ['사과','빨간 사과를 한 입 베어 먹었어요.'],['바나나','노란 바나나는 원숭이가 좋아해요.'],['딸기','봄에는 달콤한 딸기가 많이 나와요.'],
+    ['수박','여름에는 시원한 수박을 먹어요.'],['우유','아침마다 흰 우유를 한 컵 마셔요.'],['고양이','고양이가 야옹 하고 울어요.'],
+    ['강아지','강아지가 꼬리를 흔들며 반겨요.'],['토끼','토끼는 귀가 길고 깡충깡충 뛰어요.'],['코끼리','코끼리는 코가 아주 길어요.'],
+    ['나비','꽃밭에서 나비가 팔랑팔랑 날아요.'],['개구리','비가 오면 개구리가 개굴개굴 울어요.'],['펭귄','펭귄은 추운 남극에 살아요.'],
+    ['무지개','비가 그치고 하늘에 무지개가 떴어요.'],['눈사람','겨울에 친구와 눈사람을 만들었어요.'],['비행기','비행기가 하늘 높이 날아가요.'],
+    ['기차','기차가 칙칙폭폭 달려요.'],['우산','비가 와서 우산을 펼쳤어요.'],['연필','연필로 이름을 또박또박 썼어요.'],
+    ['시계','벽에 걸린 시계가 세 시를 가리켜요.'],['풍선','빨간 풍선이 하늘로 날아갔어요.'],['해바라기','해바라기는 해를 따라 고개를 돌려요.'],
+    ['아이스크림','더운 날에는 아이스크림이 최고예요.'],['소방차','불이 나자 소방차가 달려왔어요.'],['칫솔','밥을 먹고 칫솔로 이를 닦아요.'],
+    ['달팽이','달팽이는 등에 집을 지고 다녀요.'],['기린','기린은 목이 길어서 높은 나뭇잎을 먹어요.'],['공룡','공룡은 아주 먼 옛날에 살았어요.'],
+    ['자전거','공원에서 자전거를 신나게 탔어요.'],['우주선','우주선을 타고 달나라에 가고 싶어요.'],['장난감','동생과 장난감을 사이좋게 나눠 놀아요.'],
+    ['숟가락','숟가락으로 국을 떠먹어요.'],['목도리','추워서 목에 목도리를 둘렀어요.'],['신호등','신호등이 초록불로 바뀌면 건너요.'],
+    ['도서관','도서관에서는 조용히 책을 읽어요.'],['병원','감기에 걸려서 병원에 갔어요.'],['달걀','닭이 낳은 달걀을 삶아 먹었어요.'],
+    ['김밥','소풍 가는 날 김밥을 쌌어요.'],['축구','운동장에서 친구들과 축구를 했어요.'],['선물','생일에 받은 선물을 풀어 보았어요.'],
+    ['별','밤하늘에 별이 반짝반짝 빛나요.'],['나무','나무 그늘 아래에서 쉬었어요.'],['바다','여름 방학에 바다로 놀러 갔어요.'],
+    ['가방','가방에 책과 공책을 넣었어요.'],['모자','햇볕이 뜨거워서 모자를 썼어요.'],['개미','개미가 줄지어 먹이를 나르고 있어요.'],
+    ['부엉이','부엉이는 밤에 깨어 있어요.'],['거북이','거북이는 느리지만 끝까지 걸어요.'],['세탁기','세탁기가 빨래를 깨끗이 빨아요.'],
+    ['구름','하얀 구름이 두둥실 떠 있어요.'],['번개','번개가 번쩍 치고 천둥이 울렸어요.'],['여우','여우는 꾀가 많다고 해요.'],
+    ['판다','판다는 대나무를 좋아해요.'],['라면','일요일 점심에 라면을 끓여 먹었어요.'],['사탕','달콤한 사탕을 입에 넣었어요.'],
+    ['피아노','누나가 피아노를 아름답게 쳐요.'],['거울','거울을 보며 머리를 빗었어요.'],['할머니','할머니가 옛날이야기를 들려주셨어요.'],
+    ['의사','의사 선생님이 주사를 놓아 주었어요.'],['지구','우리가 사는 지구는 둥글어요.'],['보름달','추석 밤에 둥근 보름달을 보았어요.'],
+    ['양말','발이 시려서 두꺼운 양말을 신었어요.'],['지하철','지하철을 타고 할아버지 댁에 갔어요.'],['돌고래','돌고래가 물 위로 폴짝 뛰어올랐어요.'],
+    ['토마토','텃밭에서 빨간 토마토를 땄어요.'],['크리스마스','크리스마스에 트리를 예쁘게 꾸몄어요.'],['낚시','아빠와 강가에서 낚시를 했어요.'],
+    ['망원경','망원경으로 밤하늘의 별을 보았어요.'],['요리사','요리사가 맛있는 음식을 만들어요.'],['달력','달력에 생일을 동그라미 쳤어요.'],
+    ['비둘기','공원에서 비둘기에게 모이를 주었어요.'],['전구','전구가 깜빡이더니 꺼졌어요.'],['빗자루','빗자루로 마당을 깨끗이 쓸었어요.'],
+    ['엄마','엄마가 따뜻한 국을 끓여 주셨어요.'],['친구','친구와 손을 잡고 학교에 갔어요.'],['불','캠핑장에서 불을 피우고 고구마를 구웠어요.'],
+    ['치즈','쥐가 노란 치즈를 갉아 먹었어요.'],['왕관','공주가 반짝이는 왕관을 썼어요.'],['연','바람 부는 날 연을 높이 날렸어요.'],
+  ];
+  const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const JONG = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const TENSE = ['ㄲ','ㄸ','ㅃ','ㅆ','ㅉ'];
+  const CHO_FAM = [['ㄱ','ㄲ','ㅋ'],['ㄷ','ㄸ','ㅌ'],['ㄴ','ㄹ'],['ㅂ','ㅃ','ㅍ','ㅁ'],['ㅅ','ㅆ'],['ㅈ','ㅉ','ㅊ'],['ㅇ','ㅎ']];
+  const CHO_FAM_WIDE = [['ㄱ','ㄲ','ㅋ'],['ㄷ','ㄸ','ㅌ','ㄴ','ㄹ'],['ㅂ','ㅃ','ㅍ','ㅁ'],['ㅅ','ㅆ','ㅈ','ㅉ','ㅊ'],['ㅇ','ㅎ']];
+  const JONG_COMMON = ['ㄱ','ㄴ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ'];
+  // 소리가 같은 받침 (9살 맞춤법): ㅅ·ㄷ·ㅈ·ㅊ·ㅌ, ㄱ·ㅋ·ㄲ, ㅂ·ㅍ
+  const JONG_SOUND = [['ㅅ','ㄷ','ㅈ','ㅊ','ㅌ'],['ㄱ','ㅋ','ㄲ'],['ㅂ','ㅍ']];
+  // 비슷한 모음 (ㅏ0 ㅐ1 ㅑ2 ㅓ4 ㅔ5 ㅕ6 ㅗ8 ㅙ10 ㅚ11 ㅛ12 ㅜ13 ㅞ15 ㅟ16 ㅠ17 ㅡ18 ㅢ19 ㅣ20)
+  const VOWEL_SIM = {0:[4,1],1:[5,0],2:[6,12],4:[0,5],5:[1,4],6:[2,4],8:[13,12],12:[8,17],13:[8,17],17:[13,12],18:[13,20],20:[18,5]};
+  const VOWEL_SOUND = {1:[5],5:[1],10:[11,15],11:[10,15],15:[10,11],19:[20],20:[19],16:[13]};
+  const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답이에요!', '최고예요!', '멋져요!'];
+  const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  const LEVEL_NOTE = {
+    easy: '보기 3개 · 짧은 낱말 · 첫 글자의 첫소리',
+    hard: '보기 4개 · 긴 낱말 · 비슷한 글자로 헷갈리게',
+    pro: '틀린 맞춤법 골라내기 · 글자 6개로 낱말 만들기',
+    nine: '소리가 같은 맞춤법 · 빈칸 두 개 · 문장 채우기 · 문장 만들기'
+  };
+  const MODE_LABEL = {
+    easy: { word: ['🍎','낱말 찾기','그림에 맞는 낱말을 골라요'], syll: ['🐰','빠진 글자','비어 있는 글자를 채워요'], cons: ['🦄','첫소리 찾기','ㄱㄴㄷ… 첫 글자의 첫 자음을 찾아요'], order: ['🧩','낱말 만들기','흩어진 글자를 순서대로 모아요'] },
+    hard: { word: ['🍎','낱말 찾기','비슷한 낱말 중에서 골라요'], syll: ['🐰','빠진 글자','비슷한 글자 중에서 채워요'], cons: ['🦄','첫소리 찾기','분홍색 글자의 첫 자음을 찾아요'], order: ['🧩','낱말 만들기','엉뚱한 글자 하나가 섞여 있어요'] },
+    pro:  { word: ['🔍','바른 낱말 찾기','글자 하나 틀린 낱말을 골라내요'], syll: ['🐰','빠진 글자','받침·모음이 다른 글자 중에서 채워요'], cons: ['🦄','첫소리 찾기','된소리도 보기에 나와요'], order: ['🧩','낱말 만들기','글자 6개, 엉뚱한 글자 둘'] },
+    nine: { word: ['🔍','바른 낱말 찾기','소리는 같은데 틀리게 쓴 낱말을 골라내요'], syll: ['🐰','빈칸 두 개','빈칸 두 개를 순서대로 채워요'], cons: ['📝','문장 채우기','문장에 알맞은 낱말을 골라요'], order: ['🧩','문장 만들기','흩어진 낱말로 문장을 만들어요'] },
+  };
+  const modeName = (m, l) => MODE_LABEL[l][m][1];
+  const $ = id => document.getElementById(id);
+  const rnd = n => Math.floor(Math.random() * n);
+  const pick = a => a[rnd(a.length)];
+  const shuffle = a => a.slice().sort(() => Math.random() - .5);
+  const decomp = ch => { const c = ch.codePointAt(0) - 0xAC00; return c >= 0 && c < 11172 ? { cho: Math.floor(c / 588), jung: Math.floor(c % 588 / 28), jong: c % 28 } : null; };
+  const cho = ch => { const d = decomp(ch); return d ? CHO[d.cho] : ''; };
+  const makeSyl = (c, j, g) => String.fromCodePoint(0xAC00 + c * 588 + j * 28 + g);
+  const emojiOf = w => (WORDS.find(x => x[0] === w) || ['','❓'])[1];
+
+  let level = 'hard';
+  let state = { mode: 'word', level, round: 0, score: 0, q: null, locked: false, deck: [], learned: [], built: [] };
+
+  /* 소리 */
+  let ac = null;
+  function tone(freq, t0, dur, type = 'sine', vol = .18) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ac.currentTime + t0);
+      g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + t0 + dur);
+      o.connect(g).connect(ac.destination);
+      o.start(ac.currentTime + t0); o.stop(ac.currentTime + t0 + dur);
+    } catch (e) {}
+  }
+  const sndGood = () => { tone(523, 0, .15); tone(659, .12, .15); tone(784, .24, .3); };
+  const sndBad = () => { tone(220, 0, .25, 'triangle', .12); };
+  const sndTap = () => { tone(880, 0, .08, 'sine', .1); };
+  const sndWin = () => { [523,659,784,1047,784,1047].forEach((f,i)=>tone(f, i*.13, .25)); };
+  function speak(text) {
+    try {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ko-KR'; u.rate = .8; u.pitch = 1.15;
+      const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('ko'));
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  /* 색종이 */
+  const cv = $('confetti'), cx = cv.getContext('2d');
+  let bits = [], raf = null;
+  function resize() { cv.width = innerWidth; cv.height = innerHeight; }
+  addEventListener('resize', resize); resize();
+  function confetti(n) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const colors = ['#FF6B6B','#FFB347','#FFE66D','#7ED957','#5DADE2','#B57EDC','#FF5FA2'];
+    for (let i = 0; i < n; i++) bits.push({
+      x: cv.width / 2 + (Math.random() - .5) * 200, y: cv.height * .45,
+      vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 4,
+      r: 4 + Math.random() * 6, c: colors[i % colors.length], a: Math.random() * 6, s: (Math.random() - .5) * .3
+    });
+    if (!raf) loop();
+  }
+  function loop() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    bits = bits.filter(b => b.y < cv.height + 20);
+    for (const b of bits) {
+      b.vy += .35; b.x += b.vx; b.y += b.vy; b.a += b.s; b.vx *= .99;
+      cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.fillStyle = b.c;
+      cx.fillRect(-b.r, -b.r / 2, b.r * 2, b.r); cx.restore();
+    }
+    raf = bits.length ? requestAnimationFrame(loop) : (cx.clearRect(0,0,cv.width,cv.height), null);
+  }
+
+  /* 최고 기록 */
+  const bestKey = (l, m) => 'rainbow-hangul-best-' + l + '-' + m;
+  function loadBest() {
+    try {
+      const lines = Object.keys(LEVEL_NAME).map(l => {
+        const parts = Object.keys(MODE_LABEL[l]).map(m => {
+          const v = localStorage.getItem(bestKey(l, m));
+          return v ? modeName(m, l) + ' ' + v + '점' : null;
+        }).filter(Boolean);
+        return parts.length ? '🏆 ' + LEVEL_NAME[l] + ' · ' + parts.join(' · ') : null;
+      }).filter(Boolean);
+      $('best').innerHTML = lines.join('<br>');
+    } catch (e) { $('best').textContent = ''; }
+  }
+  function saveBest() {
+    try {
+      const k = bestKey(state.level, state.mode), prev = +(localStorage.getItem(k) || 0);
+      if (state.score > prev) localStorage.setItem(k, state.score);
+    } catch (e) {}
+  }
+
+  /* 낱말 풀 */
+  function wordPool() {
+    const l = state.level, m = state.mode;
+    if (l === 'easy') return WORDS.filter(w => m === 'order' ? w[0].length >= 2 && w[0].length <= 3 : w[0].length <= 3);
+    if (l === 'hard') return m === 'order' ? WORDS.filter(w => w[0].length >= 3) : WORDS;
+    if (l === 'pro') return m === 'order' ? WORDS.filter(w => w[0].length >= 4) : WORDS.filter(w => w[0].length >= 2);
+    // 9살
+    if (m === 'cons' || m === 'order') return SENTS.map(s => [s[0], emojiOf(s[0]), s[1]]);
+    return WORDS.filter(w => w[0].length >= 3);
+  }
+
+  /* 글자를 살짝 바꾼 '틀린 낱말' (8살: 모양이 비슷한 글자 / 9살: 소리가 같은 글자, 두 군데도) */
+  function variantsOf(w, n, sound = false) {
+    const out = new Set(); let tries = 0;
+    const jongIdx = JONG_COMMON.map(x => JONG.indexOf(x)).concat([0]);
+    const edit = (s) => {
+      const i = rnd(s.length), d = decomp(s[i]); if (!d) return null;
+      let { cho: c, jung: j, jong: g } = d;
+      const t = rnd(3);
+      if (t === 0) {
+        if (sound && g) { const fam = JONG_SOUND.find(f => f.includes(JONG[g])); if (fam) g = JONG.indexOf(pick(fam.filter(x => x !== JONG[g]))); else g = pick(jongIdx.filter(x => x !== g)); }
+        else g = pick(jongIdx.filter(x => x !== g));
+      } else if (t === 1) {
+        const sim = (sound && VOWEL_SOUND[j]) || VOWEL_SIM[j] || [0,4,8,13,18,20];
+        j = pick(sim.filter(x => x !== j));
+      } else {
+        const fam = CHO_FAM.find(f => f.includes(CHO[c])) || []; const alt = fam.filter(x => x !== CHO[c]); if (!alt.length) return null;
+        c = CHO.indexOf(pick(alt));
+      }
+      return s.slice(0, i) + makeSyl(c, j, g) + s.slice(i + 1);
+    };
+    while (out.size < n && tries++ < 120) {
+      let v = edit(w); if (!v) continue;
+      if (sound && w.length >= 3 && Math.random() < .35) v = edit(v) || v;
+      if (v !== w && !WORDS.some(x => x[0] === v)) out.add(v);
+    }
+    return [...out];
+  }
+  function similarWords(w, others, n) {
+    const first = w[0], c = cho(first);
+    const score = x => (x[0] === first ? 3 : cho(x[0]) === c ? 2 : 0) + (x.length === w.length ? 1 : 0) + (x[x.length - 1] === w[w.length - 1] ? 1 : 0);
+    return shuffle(others).map(o => o[0]).filter(x => x !== w).sort((a, b) => score(b) - score(a)).slice(0, n);
+  }
+  function similarSyllables(target, w, n) {
+    const d = decomp(target), out = new Set();
+    if (d) {
+      const cands = [];
+      for (let j = 0; j < 21; j++) if (j !== d.jung) cands.push(makeSyl(d.cho, j, d.jong));
+      for (let c = 0; c < 19; c++) if (c !== d.cho) cands.push(makeSyl(c, d.jung, d.jong));
+      cands.push(makeSyl(d.cho, d.jung, d.jong ? 0 : pick([1,4,8,16,17,21])));
+      for (const x of shuffle(cands)) { if (out.size >= n) break; if (x !== target && !w.includes(x)) out.add(x); }
+    }
+    return [...out];
+  }
+  function randomSyllables(target, w, n) {
+    const pool = [...new Set(WORDS.flatMap(o => [...o[0]]))].filter(c => c !== target && !w.includes(c));
+    return shuffle(pool).slice(0, n);
+  }
+  function sentenceParts(sent, w) {
+    const i = sent.indexOf(w);
+    return { before: sent.slice(0, i), after: sent.slice(i + w.length) };
+  }
+
+  function makeQ() {
+    const pool = wordPool();
+    if (!state.deck.length) state.deck = shuffle(pool.map(w => w[0]));
+    const w = state.deck.pop();
+    const entry = pool.find(x => x[0] === w);
+    const e = entry[1], sent = entry[2] || '';
+    const others = WORDS.filter(x => x[0] !== w);
+    const L = state.level, m = state.mode;
+    const nC = L === 'easy' ? 3 : 4;
+    let choices = [], ans = '', blank = -1, blanks = [], tiles = [];
+
+    if (m === 'word') {
+      ans = w;
+      let dis;
+      if (L === 'nine') dis = variantsOf(w, nC - 1, true);
+      else if (L === 'pro') dis = variantsOf(w, nC - 1);
+      else if (L === 'hard') dis = similarWords(w, others, nC - 1);
+      else dis = shuffle([...new Set(others.filter(o => o[0].length === w.length).map(o => o[0]).concat(others.map(o => o[0])))]).slice(0, nC - 1);
+      if (dis.length < nC - 1) dis = [...new Set(dis.concat(similarWords(w, others, nC - 1 - dis.length)))];
+      choices = shuffle([w, ...dis]);
+    } else if (m === 'syll' && L === 'nine') {
+      // 빈칸 두 개: 타일로 순서대로 채우기
+      const idx = shuffle([...w].map((_, i) => i)).slice(0, 2).sort((a, b) => a - b);
+      blanks = idx; ans = idx.map(i => w[i]).join('');
+      const correct = idx.map(i => w[i]);
+      let decoys = [];
+      for (const c of correct) decoys = decoys.concat(variantsOf(c, 2, true));
+      decoys = [...new Set(decoys)].filter(x => !w.includes(x));
+      if (decoys.length < 3) decoys = decoys.concat(randomSyllables(w[0], w, 3 - decoys.length));
+      tiles = shuffle([...correct, ...shuffle(decoys).slice(0, 3)]);
+    } else if (m === 'syll') {
+      blank = w.length === 1 ? 0 : rnd(w.length);
+      ans = w[blank];
+      let dis = [];
+      if (L === 'pro') dis = variantsOf(ans, nC * 2).filter(x => !w.includes(x)).slice(0, nC - 1);
+      if (dis.length < nC - 1 && L !== 'easy') dis = [...new Set(dis.concat(similarSyllables(ans, w, nC - 1 - dis.length)))];
+      if (dis.length < nC - 1) dis = dis.concat(randomSyllables(ans, w, nC - 1 - dis.length));
+      choices = shuffle([ans, ...dis.slice(0, nC - 1)]);
+    } else if (m === 'cons' && L === 'nine') {
+      // 문장 채우기: 빈칸에 들어갈 낱말 고르기
+      ans = w;
+      const dis = shuffle(SENTS.map(s => s[0]).filter(x => x !== w)).sort((a, b) => Math.abs(a.length - w.length) - Math.abs(b.length - w.length)).slice(0, 6);
+      choices = shuffle([w, ...shuffle(dis).slice(0, nC - 1)]);
+    } else if (m === 'cons') {
+      blank = L === 'easy' ? 0 : rnd(w.length);
+      ans = cho(w[blank]);
+      const base = CHO.filter(c => c !== ans && (L !== 'easy' || !TENSE.includes(c)));
+      const fam = CHO_FAM_WIDE.find(f => f.includes(ans)) || [];
+      const dis = L === 'easy' ? shuffle(base).slice(0, nC - 1)
+                : [...new Set([...shuffle(fam.filter(c => c !== ans)), ...shuffle(base)])].slice(0, nC - 1);
+      choices = shuffle([ans, ...dis]);
+    } else if (m === 'order' && L === 'nine') {
+      // 문장 만들기: 어절 순서 맞추기
+      const parts = sent.split(' ');
+      ans = sent;
+      tiles = shuffle(parts);
+      if (tiles.join(' ') === sent) tiles = [...tiles.slice(1), tiles[0]];
+    } else {
+      ans = w;
+      tiles = shuffle([...w]);
+      if (tiles.join('') === w && w.length > 1) tiles = [...tiles.slice(1), tiles[0]];
+      const decoys = L === 'pro' ? 2 : L === 'hard' ? 1 : 0;
+      for (let k = 0; k < decoys; k++) {
+        const extra = (L === 'pro' ? variantsOf(pick([...w]), 3).filter(x => !w.includes(x) && !tiles.includes(x))[0] : null)
+          || similarSyllables(pick([...w]), w, 1).filter(x => !tiles.includes(x))[0]
+          || randomSyllables(w[0], w, 1)[0];
+        if (extra) tiles.push(extra);
+      }
+      tiles = shuffle(tiles);
+    }
+    return { w, e, sent, ans, choices, blank, blanks, tiles };
+  }
+
+  function renderStars() {
+    $('stars').innerHTML = Array.from({length: TOTAL}, (_, i) =>
+      `<span class="${i < state.score ? 'on' : ''}">⭐</span>`).join('');
+  }
+
+  function renderQ() {
+    const q = state.q, m = state.mode, L = state.level;
+    const isSentFill = m === 'cons' && L === 'nine', isSentOrder = m === 'order' && L === 'nine', isTwoBlank = m === 'syll' && L === 'nine';
+    const useTiles = m === 'order' || isTwoBlank;
+    $('round').textContent = (state.round + 1) + ' / ' + TOTAL;
+    $('tag').textContent = LEVEL_NAME[L] + ' · ' + modeName(m, L);
+    renderStars();
+    const em = $('emoji');
+    em.textContent = isSentFill ? '❓' : q.e;
+    em.classList.toggle('small', isSentFill || isSentOrder);
+    em.style.animation = 'none'; void em.offsetWidth; em.style.animation = '';
+    const wordEl = $('word');
+    wordEl.className = 'word' + (q.w.length >= 5 && !isSentFill && !isSentOrder ? ' longword' : '') + (isSentFill || isSentOrder ? ' sentence' : '');
+    let html = '', ask = '';
+    state.built = [];
+    if (m === 'word') {
+      ask = L === 'nine' ? '바르게 쓴 낱말은 어느 것일까요? (소리는 다 같아요)' : L === 'pro' ? '바르게 쓴 낱말은 어느 것일까요?' : '이 그림은 무엇일까요?';
+      html = `<span class="ch blank" id="ansbox">?</span>`;
+    } else if (isTwoBlank) {
+      ask = '빈칸 두 개를 순서대로 채워요';
+      html = [...q.w].map((c, i) => q.blanks.includes(i) ? `<span class="ch slot" data-i="${q.blanks.indexOf(i)}" id="slot-${q.blanks.indexOf(i)}"></span>` : `<span class="ch">${c}</span>`).join('');
+    } else if (m === 'syll') {
+      ask = '빈칸에 들어갈 글자는?';
+      html = [...q.w].map((c, i) => i === q.blank ? `<span class="ch blank" id="ansbox">?</span>` : `<span class="ch">${c}</span>`).join('');
+    } else if (isSentFill) {
+      ask = '빈칸에 들어갈 낱말은?';
+      const p = sentenceParts(q.sent, q.w);
+      html = `<span class="ch plain">${p.before}</span><span class="ch blank" id="ansbox">?</span><span class="ch plain">${p.after}</span>`;
+    } else if (m === 'cons') {
+      ask = L === 'easy' ? '첫 글자의 첫소리는?' : '분홍색 글자의 첫소리는?';
+      html = `<span class="ch blank" id="ansbox">?</span>` +
+        [...q.w].map((c, i) => `<span class="ch hint ${i === q.blank ? 'focus' : ''}">${c}</span>`).join('');
+    } else if (isSentOrder) {
+      ask = '낱말을 순서대로 눌러 문장을 만들어요';
+      html = q.sent.split(' ').map((_, i) => `<span class="ch slot" data-i="${i}" id="slot-${i}">&nbsp;</span>`).join('');
+    } else {
+      ask = '글자를 순서대로 눌러 낱말을 만들어요';
+      html = [...q.w].map((_, i) => `<span class="ch slot" data-i="${i}" id="slot-${i}"></span>`).join('');
+    }
+    $('ask').textContent = ask;
+    wordEl.innerHTML = html;
+    if (useTiles) {
+      $('choices').hidden = true; $('tiles').hidden = false; $('tools').hidden = false;
+      $('tiles').className = 'tiles' + (isSentOrder ? ' words' : '');
+      $('tiles').innerHTML = q.tiles.map((c, i) => `<button class="btn tile" id="tile-${i}" data-i="${i}" data-c="${c}">${c}</button>`).join('');
+    } else {
+      $('choices').hidden = false; $('tiles').hidden = true; $('tools').hidden = true;
+      $('choices').className = 'choices' + (q.choices.length === 4 ? ' four' : '');
+      $('choices').innerHTML = q.choices.map((c, i) =>
+        `<button class="btn choice ${c.length >= 5 ? 'xlong' : c.length >= 3 ? 'long' : ''}" id="choice-${i}" data-v="${c}">${c}</button>`).join('');
+    }
+    $('feedback').textContent = ''; $('feedback').className = 'feedback';
+    state.locked = false; state.missed = false;
+    if (m === 'cons' && L !== 'nine') speak(q.w);
+    if (m === 'order' && L !== 'nine') speak(q.w);
+    if (isSentOrder) speak(q.sent);
+  }
+
+  function correct(q) {
+    state.locked = true;
+    if (!state.missed) state.score++;          // 한 번에 맞혀야 별을 받아요
+    if (!state.learned.includes(q.w)) state.learned.push(q.w);
+    $('feedback').textContent = (state.missed ? '이번엔 맞았어요!' : pick(PRAISE)) + ' 🌟';
+    $('feedback').className = 'feedback good';
+    renderStars(); sndGood(); if (!state.missed) confetti(40);
+    $('emoji').textContent = q.e;
+    setTimeout(() => speak(q.sent && state.level === 'nine' && state.mode !== 'word' && state.mode !== 'syll' ? q.sent : q.w), 350);
+    document.querySelectorAll('.choice, .tile').forEach(b => b.disabled = true);
+    setTimeout(next, q.sent && state.level === 'nine' ? 2200 : 1500);
+  }
+
+  function answer(btn) {
+    if (state.locked) return;
+    const v = btn.dataset.v, q = state.q, box = $('ansbox');
+    if (v === q.ans) {
+      btn.classList.add('right');
+      box.textContent = v; box.classList.add('ok');
+      correct(q);
+    } else {
+      state.missed = true;
+      btn.classList.add('wrong'); btn.disabled = true;
+      box.classList.remove('no'); void box.offsetWidth; box.classList.add('no');
+      $('feedback').textContent = '다시 한번 볼까요? 🍀';
+      sndBad();
+    }
+  }
+
+  /* 타일 놀이 (낱말 만들기·빈칸 두 개·문장 만들기) */
+  function slotCount() { return document.querySelectorAll('.slot').length; }
+  function tapTile(btn) {
+    if (state.locked || btn.classList.contains('used')) return;
+    const q = state.q, i = state.built.length, total = slotCount();
+    if (i >= total) return;
+    btn.classList.add('used'); sndTap();
+    state.built.push({ c: btn.dataset.c, tile: btn.id });
+    const slot = $('slot-' + i); slot.textContent = btn.dataset.c; slot.classList.add('filled');
+    if (state.built.length === total) {
+      const isSent = state.mode === 'order' && state.level === 'nine';
+      const made = state.built.map(b => b.c).join(isSent ? ' ' : '');
+      if (made === q.ans) {
+        document.querySelectorAll('.slot').forEach(s => s.classList.add('ok'));
+        correct(q);
+      } else {
+        state.missed = true;
+        document.querySelectorAll('.slot').forEach(s => { s.classList.remove('no'); void s.offsetWidth; s.classList.add('no'); });
+        $('feedback').textContent = '순서가 달라요. 다시 놓아 볼까요? 🍀';
+        sndBad();
+        setTimeout(resetTiles, 700);
+      }
+    }
+  }
+  function tapSlot(slot) {
+    if (state.locked) return;
+    const i = +slot.dataset.i;
+    if (i !== state.built.length - 1) return; // 마지막에 놓은 것만 되돌리기
+    const b = state.built.pop();
+    $(b.tile).classList.remove('used');
+    slot.innerHTML = state.mode === 'order' && state.level === 'nine' ? '&nbsp;' : ''; slot.classList.remove('filled');
+    sndTap();
+  }
+  function resetTiles() {
+    if (state.locked) return;
+    state.built = [];
+    document.querySelectorAll('.tile').forEach(t => t.classList.remove('used'));
+    document.querySelectorAll('.slot').forEach(s => { s.innerHTML = state.mode === 'order' && state.level === 'nine' ? '&nbsp;' : ''; s.classList.remove('filled', 'no'); });
+  }
+
+  function next() {
+    state.round++;
+    if (state.round >= TOTAL) return finish();
+    state.q = makeQ(); renderQ();
+  }
+
+  function start(mode) {
+    state = { mode, level, round: 0, score: 0, q: null, locked: false, deck: [], learned: [], built: [] };
+    state.q = makeQ();
+    show('game'); renderQ();
+  }
+
+  function finish() {
+    saveBest();
+    const s = state.score, L = state.level;
+    $('result-score').textContent = '⭐ ' + s + ' / ' + TOTAL;
+    if (s === TOTAL) {
+      $('result-emoji').textContent = '🦄'; $('result-title').textContent = '완벽해요! 한글 박사님!';
+      $('result-msg').textContent = L === 'easy' ? '이제 7살 놀이에 도전해 볼까요?' : L === 'hard' ? '이제 8살 놀이에 도전해 볼까요?' : L === 'pro' ? '이제 9살 놀이에 도전해 볼까요?' : '별 열 개를 모두 모았어요. 한글 왕이에요!';
+    }
+    else if (s >= 7) { $('result-emoji').textContent = '🌈'; $('result-title').textContent = '정말 잘했어요!'; $('result-msg').textContent = '조금만 더 하면 별을 다 모을 수 있어요.'; }
+    else { $('result-emoji').textContent = '🌸'; $('result-title').textContent = '열심히 했어요!'; $('result-msg').textContent = '읽어 줘 버튼을 누르고 따라 읽어 보세요.'; }
+    $('learned').innerHTML = state.learned.map(w => `<span>${w}</span>`).join('');
+    show('result'); sndWin(); confetti(120);
+  }
+
+  function show(id) {
+    ['home','game','result'].forEach(x => $(x).hidden = x !== id);
+    if (id === "home") loadBest();
+    if (id === "result") reportMission();
+  }
+  function setLevel(l) {
+    level = l;
+    document.querySelectorAll('.level button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === l ? 'true' : 'false'));
+    $('level-note').textContent = LEVEL_NOTE[l];
+    for (const m of ['word','syll','cons','order']) {
+      const [ico, title, small] = MODE_LABEL[l][m];
+      $('ico-' + m).textContent = ico;
+      $('label-' + m).innerHTML = title + '<small>' + small + '</small>';
+    }
+    try { localStorage.setItem('rainbow-hangul-level', l); } catch (e) {}
+  }
+
+  document.querySelectorAll('.level button').forEach(b => b.addEventListener('click', () => setLevel(b.dataset.level)));
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => start(b.dataset.mode)));
+  $('choices').addEventListener('click', e => { const b = e.target.closest('.choice'); if (b) answer(b); });
+  $('tiles').addEventListener('click', e => { const b = e.target.closest('.tile'); if (b) tapTile(b); });
+  $('word').addEventListener('click', e => { const s = e.target.closest('.slot'); if (s) tapSlot(s); });
+  $('reset-tiles').addEventListener('click', resetTiles);
+  $('speak').addEventListener('click', () => {
+    if (!state.q) return;
+    const q = state.q, L = state.level, m = state.mode;
+    speak(L === 'nine' && m === 'order' ? q.sent : L === 'nine' && m === 'cons' ? q.sent.replace(q.w, '땡') : q.w);
+  });
+  $('again').addEventListener('click', () => start(state.mode));
+  $('home-btn').addEventListener('click', () => show('home'));
+  $('quit').addEventListener('click', () => show('home'));
+  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
+
+  /* 놀이터(index.html) 미션 연동 */
+  let missionId = null;
+  function reportMission() {
+    if (!missionId) return;
+    try {
+      const key = "rp-results", all = JSON.parse(localStorage.getItem(key) || "{}");
+      const d = new Date(), day = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      all[day] = all[day] || {};
+      all[day][missionId] = Math.max(all[day][missionId] || 0, state.score);
+      localStorage.setItem(key, JSON.stringify(all));
+    } catch (e) {}
+    $("to-hub").hidden = false; $("home-btn").hidden = true;
+  }
+  function launchFromUrl() {
+    const p = new URLSearchParams(location.search);
+    const l = p.get("level"), m = p.get("mode");
+    if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
+    missionId = p.get("mission");
+    setLevel(l); start(m); return true;
+  }
+  function boot(data) {
+    let saved = 'hard';
+    try { saved = localStorage.getItem('rainbow-hangul-level') || 'hard'; } catch (e) {}
+    if (!LEVEL_NAME[saved]) saved = 'hard';
+    setLevel(saved);
+    if (launchFromUrl()) return;
+    if (data && data.state && data.state.q && data.screen === 'game' && LEVEL_NAME[data.state.level]) {
+      state = data.state; level = state.level; setLevel(level); show('game'); renderQ();
+    } else show('home');
+  }
+  if (window.claude?.hot?.snapshot) {
+    window.claude.hot.snapshot(() => ({ state, screen: $('game').hidden ? ($('result').hidden ? 'home' : 'result') : 'game' }));
+  }
+  window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body>
+</html>

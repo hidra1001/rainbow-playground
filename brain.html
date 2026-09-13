@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#FF5FA2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
+<title>무지개 두뇌 놀이</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+  :root {
+    --ground: #FFE4F0;
+    --ground-2: #FFF3F8;
+    --card: #FFFFFF;
+    --pink: #FF5FA2;
+    --pink-deep: #E8408A;
+    --plum: #5B2A4E;
+    --plum-soft: #9A6A8C;
+    --r1: #FF6B6B; --r2: #FFB347; --r3: #FFE66D; --r4: #7ED957; --r5: #5DADE2; --r6: #B57EDC;
+    --good: #5FC97A;
+    --oops: #FF8A80;
+    --display: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --body: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    background-image:
+      radial-gradient(circle at 15% 20%, #FFD1E6 0 60px, transparent 61px),
+      radial-gradient(circle at 85% 30%, #FFD9EA 0 80px, transparent 81px),
+      radial-gradient(circle at 70% 85%, #FFCCE2 0 50px, transparent 51px),
+      radial-gradient(circle at 20% 80%, #FFDDEC 0 70px, transparent 71px);
+    color: var(--plum);
+    font-family: var(--body);
+    padding-inline: 16px;
+    padding-block: 20px 40px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  .arch { position: relative; height: 120px; overflow: hidden; margin-bottom: -20px; }
+  .arch svg { width: 100%; height: 100%; display: block; }
+  .cloud { position: absolute; bottom: 4px; width: 88px; height: 34px; background: #fff; border-radius: 40px; box-shadow: 0 6px 0 #FFD1E6; }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+  .cloud::before { width: 42px; height: 42px; left: 10px; top: -20px; }
+  .cloud::after { width: 32px; height: 32px; right: 12px; top: -12px; }
+  .cloud.l { left: 2%; } .cloud.r { right: 2%; }
+  .letters { position: absolute; inset: 0; pointer-events: none; font-size: 26px; }
+  .letters span { position: absolute; }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(34px, 9vw, 46px);
+    text-align: center; margin: 0; line-height: 1.1; text-wrap: balance;
+    background: linear-gradient(90deg, var(--r1), var(--r2), #F2C94C, var(--r4), var(--r5), var(--r6));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 0 #fff);
+  }
+  .sub { text-align: center; margin: 0; font-size: 17px; color: var(--plum-soft); }
+
+  .card {
+    background: var(--card); border-radius: 32px; padding: 24px 22px 26px;
+    box-shadow: 0 10px 0 #FFC2DB, 0 16px 30px rgba(232, 64, 138, .15);
+    border: 4px solid #FFD6E7;
+  }
+  [hidden] { display: none !important; }
+
+  .btn {
+    font-family: var(--display); font-size: 26px; border: 0; border-radius: 24px;
+    padding: 16px 20px; cursor: pointer; color: #fff; background: var(--pink);
+    box-shadow: 0 7px 0 var(--pink-deep);
+    transition: transform .08s ease, box-shadow .08s ease; touch-action: manipulation; line-height: 1.1;
+  }
+  .btn:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--pink-deep); }
+  .btn:focus-visible { outline: 4px solid var(--r5); outline-offset: 3px; }
+
+  /* 난이도 */
+  .level { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 12px 0 16px; }
+  .level button {
+    font-family: var(--display); font-size: 20px; padding: 10px 16px; border-radius: 30px; cursor: pointer;
+    border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft);
+  }
+  .level button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 4px 0 var(--pink-deep); }
+  .level button:focus-visible { outline: 4px solid var(--r5); outline-offset: 2px; }
+  .level-note { text-align: center; font-size: 14px; color: var(--plum-soft); margin: -6px 0 10px; }
+
+  .modes { display: grid; gap: 14px; }
+  .mode { display: flex; align-items: center; gap: 16px; text-align: left; padding: 14px 20px; }
+  .mode .ico { font-size: 38px; line-height: 1; }
+  .mode small { display: block; font-family: var(--body); font-size: 15px; opacity: .9; margin-top: 4px; }
+  .mode.memory { background: var(--r1); box-shadow: 0 7px 0 #D94E4E; }
+  .mode.memory:active { box-shadow: 0 2px 0 #D94E4E; }
+  .mode.pattern { background: var(--r2); box-shadow: 0 7px 0 #D9902E; }
+  .mode.pattern:active { box-shadow: 0 2px 0 #D9902E; }
+  .mode.simon { background: var(--r6); box-shadow: 0 7px 0 #9560C0; }
+  .mode.simon:active { box-shadow: 0 2px 0 #9560C0; }
+  .mode.odd { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .mode.odd:active { box-shadow: 0 2px 0 #3F8FC2; }
+  .best { text-align: center; font-size: 15px; color: var(--plum-soft); margin: 14px 0 0; line-height: 1.6; }
+
+  .stars { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .stars span { font-size: 24px; filter: grayscale(1) opacity(.35); transition: transform .3s, filter .3s; }
+  .stars span.on { filter: none; transform: scale(1.15); }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 15px; color: var(--plum-soft); }
+  .topbar button { background: none; border: 0; font-family: var(--body); font-size: 15px; color: var(--plum-soft); cursor: pointer; text-decoration: underline; padding: 6px; }
+  .topbar button:focus-visible { outline: 3px solid var(--r5); border-radius: 8px; }
+  .tag { background: var(--ground-2); border: 2px solid #FFD6E7; border-radius: 20px; padding: 3px 10px; font-family: var(--display); }
+  .ask { text-align: center; font-size: 17px; color: var(--plum-soft); margin: 4px 0 12px; min-height: 22px; }
+  .info { text-align: center; font-family: var(--display); font-size: 20px; color: var(--plum); margin: 0 0 12px; }
+  .feedback { min-height: 34px; text-align: center; font-family: var(--display); font-size: 26px; margin-top: 16px; color: var(--pink-deep); }
+  .feedback.good { color: #3FA85D; }
+
+  /* 짝 맞추기 */
+  .mgrid { display: grid; gap: 10px; }
+  .mcard { aspect-ratio: 3 / 4; perspective: 700px; background: none; border: 0; padding: 0; cursor: pointer; }
+  .mcard:focus-visible { outline: 4px solid var(--r5); border-radius: 16px; }
+  .mcard .in { position: relative; display: block; width: 100%; height: 100%; transition: transform .4s; transform-style: preserve-3d; }
+  .mcard.open .in, .mcard.done .in { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; display: grid; place-items: center; font-size: clamp(28px, 9vw, 44px); }
+  .face.front { background: linear-gradient(135deg, var(--r1), var(--r2), var(--r3), var(--r4), var(--r5), var(--r6)); color: #fff; box-shadow: 0 5px 0 rgba(0,0,0,.12); }
+  .face.back { background: #fff; border: 3px solid #FFD6E7; transform: rotateY(180deg); }
+  .mcard.done .face.back { background: #EAF9EE; border-color: #4DB369; }
+  .mcard.done { animation: pop .4s; }
+
+  /* 규칙 찾기 */
+  .prow { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .pitem {
+    width: 54px; height: 54px; display: grid; place-items: center; font-size: 34px; line-height: 1;
+    border-radius: 14px; background: var(--ground-2); border: 3px solid #FFD6E7;
+  }
+  .pitem.q { border: 3px dashed var(--pink); color: var(--pink); font-family: var(--display); font-size: 32px; }
+  .pitem.num { font-family: var(--display); font-size: 24px; }
+  .pitem.dots, .choice .dots { display: flex; flex-wrap: wrap; gap: 3px; padding: 7px; align-content: center; justify-content: center; }
+  .pitem.dots i, .choice .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--pink); }
+  .choice .dots { width: 54px; height: 54px; margin: 0 auto; }
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .choices.four { grid-template-columns: repeat(2, 1fr); }
+  .choice { font-size: 36px; padding: 12px 4px; line-height: 1; }
+  .choice.pc { background: #fff !important; color: var(--plum); border: 4px solid #FFD6E7; box-shadow: 0 7px 0 #FFC2DB !important; }
+  .choice.pc.num { font-size: 30px; }
+  .choice:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.2) !important; }
+  .choice:disabled { cursor: default; }
+  .choice.right { background: var(--good) !important; color: #fff; border-color: #4DB369; box-shadow: 0 7px 0 #4DB369 !important; }
+  .choice.wrong { background: #E9C8D6 !important; color: #fff; border-color: #C9A6B8; box-shadow: 0 7px 0 #C9A6B8 !important; }
+
+  /* 순서 기억 */
+  .pads { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0 auto; max-width: 340px; }
+  .pads.six { grid-template-columns: repeat(3, 1fr); max-width: 400px; }
+  .pad { aspect-ratio: 1; border: 0; border-radius: 28px; cursor: pointer; opacity: .5; transition: opacity .12s, transform .12s; box-shadow: 0 6px 0 rgba(0,0,0,.15); }
+  .pad.lit { opacity: 1; transform: scale(1.06); box-shadow: 0 0 0 5px #fff, 0 0 26px rgba(0,0,0,.2); }
+  .pad:focus-visible { outline: 4px solid var(--plum); }
+  .pads.shake { animation: shake .4s; }
+
+  /* 다른 그림 찾기 */
+  .ogrid { display: grid; gap: 6px; }
+  .ocell { aspect-ratio: 1; border: 0; border-radius: 12px; background: var(--ground-2); cursor: pointer; line-height: 1; padding: 0; display: grid; place-items: center; }
+  .ocell:focus-visible { outline: 3px solid var(--r5); }
+  .ocell.no { animation: shake .4s; background: #FFE0DC; }
+  .ocell.yes { background: #DFF5E5; outline: 4px solid var(--good); animation: pop .4s; }
+  .ocell.reveal { outline: 4px dashed var(--pink); }
+  .timer { height: 12px; background: #FFD6E7; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .timer i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--r1), var(--r2), var(--r4), var(--r5), var(--r6)); transition: width 10s linear; }
+
+  .result { text-align: center; }
+  .result .big { font-size: 80px; line-height: 1; margin: 6px 0 10px; animation: bounce 1s infinite alternate; }
+  .result h2 { font-family: var(--display); font-size: 34px; margin: 0 0 6px; color: var(--pink-deep); }
+  .result p { margin: 0 0 20px; font-size: 18px; }
+  .result .score { font-family: var(--display); font-size: 30px; color: var(--plum); }
+  .result .actions { display: grid; gap: 12px; }
+  .result .again { background: var(--r4); box-shadow: 0 7px 0 #5FB25A; }
+  .result .home { background: var(--r5); box-shadow: 0 7px 0 #3F8FC2; }
+  .result .hub { display: block; text-decoration: none; text-align: center; background: var(--pink); box-shadow: 0 7px 0 var(--pink-deep); }
+  .hublink { display: inline-block; font-family: var(--body); font-size: 15px; color: var(--plum-soft); text-decoration: none; border: 2px solid #FFD6E7; border-radius: 30px; padding: 6px 14px; margin-bottom: 10px; }
+
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+
+  @keyframes pop { from { transform: scale(.6); } 70% { transform: scale(1.12); } to { transform: scale(1); } }
+  @keyframes shake { 0%,100% { transform: translateX(0);} 25% { transform: translateX(-8px);} 75% { transform: translateX(8px);} }
+  @keyframes bounce { from { transform: translateY(0);} to { transform: translateY(-14px);} }
+  @media (prefers-reduced-motion: reduce) {
+    .result .big, .mcard.done, .ocell.yes { animation: none; }
+    .btn, .stars span { transition: none; }
+    .mcard .in { transition: transform .15s; }
+  }
+  @media (max-width: 400px) {
+    .card { padding: 20px 14px 22px; }
+    .choice { font-size: 32px; }
+    .pitem { width: 46px; height: 46px; font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <div class="arch" aria-hidden="true">
+    <svg viewBox="0 0 520 130" preserveAspectRatio="xMidYMax meet">
+      <path d="M20 130 A240 240 0 0 1 500 130" fill="none" stroke="#FF6B6B" stroke-width="16"/>
+      <path d="M36 130 A224 224 0 0 1 484 130" fill="none" stroke="#FFB347" stroke-width="16"/>
+      <path d="M52 130 A208 208 0 0 1 468 130" fill="none" stroke="#FFE66D" stroke-width="16"/>
+      <path d="M68 130 A192 192 0 0 1 452 130" fill="none" stroke="#7ED957" stroke-width="16"/>
+      <path d="M84 130 A176 176 0 0 1 436 130" fill="none" stroke="#5DADE2" stroke-width="16"/>
+      <path d="M100 130 A160 160 0 0 1 420 130" fill="none" stroke="#B57EDC" stroke-width="16"/>
+    </svg>
+    <div class="letters">
+      <span style="left:26%;top:40%">🧩</span><span style="left:44%;top:14%">💡</span>
+      <span style="left:60%;top:20%">🔍</span><span style="left:72%;top:44%">🎵</span>
+    </div>
+    <div class="cloud l"></div>
+    <div class="cloud r"></div>
+  </div>
+
+  <h1>무지개 두뇌 놀이</h1>
+  <p class="sub">기억하고, 찾고, 규칙을 알아맞혀요 🌈</p>
+
+  <section class="card" id="home">
+    <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
+    <p class="sub">몇 살 놀이로 할까요?</p>
+    <div class="level" role="group" aria-label="난이도">
+      <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
+      <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
+      <button type="button" id="level-pro" data-level="pro" aria-pressed="false">🌈 8살</button>
+      <button type="button" id="level-nine" data-level="nine" aria-pressed="false">👑 9살</button>
+    </div>
+    <p class="level-note" id="level-note"></p>
+    <div class="modes">
+      <button class="btn mode memory" id="mode-memory" data-mode="memory"><span class="ico" id="ico-memory">🃏</span><span id="label-memory"></span></button>
+      <button class="btn mode pattern" id="mode-pattern" data-mode="pattern"><span class="ico" id="ico-pattern">🔮</span><span id="label-pattern"></span></button>
+      <button class="btn mode simon" id="mode-simon" data-mode="simon"><span class="ico" id="ico-simon">🎵</span><span id="label-simon"></span></button>
+      <button class="btn mode odd" id="mode-odd" data-mode="odd"><span class="ico" id="ico-odd">🔍</span><span id="label-odd"></span></button>
+    </div>
+    <p class="best" id="best"></p>
+  </section>
+
+  <section class="card" id="game" hidden>
+    <div class="topbar">
+      <span id="round">1 / 10</span>
+      <span class="tag" id="tag"></span>
+      <button id="quit" type="button">처음으로</button>
+    </div>
+    <div class="stars" id="stars" aria-label="모은 별"></div>
+    <p class="ask" id="ask"></p>
+    <div id="area"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+  </section>
+
+  <section class="card result" id="result" hidden>
+    <div class="big" id="result-emoji">🎉</div>
+    <h2 id="result-title">참 잘했어요!</h2>
+    <p class="score" id="result-score"></p>
+    <p id="result-msg"></p>
+    <div class="actions">
+      <button class="btn again" id="again">한 번 더! 🌟</button>
+      <button class="btn home" id="home-btn">처음으로 🏠</button>
+      <a class="btn hub" id="to-hub" href="index.html" hidden>🏠 놀이터로 돌아가기</a>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const TOTAL = 10;
+  const $ = id => document.getElementById(id);
+  const rnd = n => Math.floor(Math.random() * n);
+  const pick = a => a[rnd(a.length)];
+  const shuffle = a => a.slice().sort(() => Math.random() - .5);
+  const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답이에요!', '최고예요!', '멋져요!'];
+
+  const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  const LEVEL_NOTE = {
+    easy: '짝 3쌍 · 쉬운 규칙 · 순서 2개부터 · 3×3 찾기',
+    hard: '짝 4쌍 · 세 가지 규칙 · 순서 3개부터 · 4×4 비슷한 그림',
+    pro: '짝 6쌍 · 색깔·개수 규칙 · 순서 4개부터 · 5×5 아주 비슷한 그림',
+    nine: '닮은 짝 8쌍 · 두 가지 규칙과 수열 · 6개 판 · 6×6에 10초 제한'
+  };
+  const MODE_LABEL = {
+    easy: { memory: ['🃏','짝 맞추기','카드 6장에서 같은 그림 3쌍을 찾아요'], pattern: ['🔮','규칙 찾기','다음에 올 그림을 골라요'], simon: ['🎵','순서 기억','불이 켜진 순서대로 눌러요'], odd: ['🔍','다른 그림 찾기','9개 중 다른 하나를 찾아요'] },
+    hard: { memory: ['🃏','짝 맞추기','카드 8장에서 4쌍을 찾아요'], pattern: ['🔮','규칙 찾기','세 가지가 섞인 규칙을 찾아요'], simon: ['🎵','순서 기억','3개부터 점점 길어져요'], odd: ['🔍','다른 그림 찾기','16개 중 비슷한 그림 하나를 찾아요'] },
+    pro:  { memory: ['🃏','짝 맞추기','카드 12장에서 6쌍을 찾아요'], pattern: ['🔮','규칙 찾기','색깔이 바뀌고 점이 늘어나요'], simon: ['🎵','순서 기억','4개부터, 더 빨라져요'], odd: ['🔍','다른 그림 찾기','25개 중 아주 비슷한 하나를 찾아요'] },
+    nine: { memory: ['🃏','닮은 짝 맞추기','서로 닮은 그림 16장에서 8쌍을 찾아요'], pattern: ['🔮','규칙 찾기','두 가지 규칙과 숫자 수열'], simon: ['🎵','순서 기억','판 6개, 5개부터 시작해요'], odd: ['🔍','다른 그림 찾기','36개 중 하나를 10초 안에 찾아요'] },
+  };
+  const modeName = (m, l) => MODE_LABEL[l][m][1];
+
+  /* 그림 재료 */
+  const EMO = ['🍎','🍌','🍓','🐶','🐱','🐰','⭐','🌈','🎈','🚗','🐸','🦋','🌸','🍩','🦄','🐥','🍉','🐢','🎁','🚀'];
+  const LOOK_GROUPS = [['😀','😃','😄','😁'],['🐢','🐊','🦎'],['🌝','🌕','🌞'],['🔵','🟦','🔷'],['🍎','🍅','🍒'],['🐶','🐺','🦊'],['🐱','🐯','🦁'],['🍪','🥞','🍩'],['🌲','🌳','🎄'],['🐭','🐹','🐨']];
+  const SHAPES = ['●','■','▲','★','◆'];
+  const COLORS = ['#FF6B6B','#FFB347','#7ED957','#5DADE2','#B57EDC'];
+  const ODD = {
+    easy: [['🐱','🐶'],['🍎','🍌'],['⭐','🌙'],['🐸','🐷'],['🚗','🚌'],['🌸','🌻'],['🍓','🍇'],['🐰','🐻'],['🎈','🎁'],['🦋','🐝']],
+    hard: [['🐶','🐺'],['🍎','🍅'],['🐱','🐯'],['🍪','🍩'],['🌝','🌚'],['🐢','🐊'],['🦋','🐛'],['🍋','🍊'],['🐭','🐹'],['🌷','🌹'],['🐔','🐓'],['🚗','🚙']],
+    pro:  [['😀','😃'],['😄','😁'],['🌝','🌕'],['🔵','🟦'],['🟢','🟩'],['🐢','🦎'],['🍏','🍐'],['🐑','🐐'],['🦆','🐤'],['🥛','🥤'],['🌲','🌳'],['🕐','🕑'],['🔴','🟠'],['🐈','🐆'],['🙂','😊']],
+    nine: [['😀','😃'],['😄','😁'],['🌝','🌕'],['🔵','🟦'],['🟢','🟩'],['🐢','🦎'],['🍏','🍐'],['🐑','🐐'],['🕐','🕜'],['🌛','🌜'],['◀️','▶️'],['🔺','🔻'],['🙂','🙃'],['😊','😌'],['🌞','🌝'],['🟥','🟧'],['🚙','🚗'],['🐈','🐈‍⬛']],
+  };
+
+  let level = 'hard';
+  let state = null;
+  let timers = [];
+  const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
+  const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
+
+  /* 소리 */
+  let ac = null;
+  function tone(freq, t0, dur, type = 'sine', vol = .18) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ac.currentTime + t0);
+      g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + t0 + dur);
+      o.connect(g).connect(ac.destination);
+      o.start(ac.currentTime + t0); o.stop(ac.currentTime + t0 + dur);
+    } catch (e) {}
+  }
+  const sndGood = () => { tone(523, 0, .15); tone(659, .12, .15); tone(784, .24, .3); };
+  const sndBad = () => { tone(220, 0, .25, 'triangle', .12); };
+  const sndTap = () => { tone(880, 0, .08, 'sine', .1); };
+  const sndWin = () => { [523,659,784,1047,784,1047].forEach((f,i)=>tone(f, i*.13, .25)); };
+  const PAD_FREQ = [262, 330, 392, 523, 659, 784];
+
+  /* 색종이 */
+  const cv = $('confetti'), cx = cv.getContext('2d');
+  let bits = [], raf = null;
+  function resize() { cv.width = innerWidth; cv.height = innerHeight; }
+  addEventListener('resize', resize); resize();
+  function confetti(n) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const colors = ['#FF6B6B','#FFB347','#FFE66D','#7ED957','#5DADE2','#B57EDC','#FF5FA2'];
+    for (let i = 0; i < n; i++) bits.push({
+      x: cv.width / 2 + (Math.random() - .5) * 200, y: cv.height * .45,
+      vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 4,
+      r: 4 + Math.random() * 6, c: colors[i % colors.length], a: Math.random() * 6, s: (Math.random() - .5) * .3
+    });
+    if (!raf) loop();
+  }
+  function loop() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    bits = bits.filter(b => b.y < cv.height + 20);
+    for (const b of bits) {
+      b.vy += .35; b.x += b.vx; b.y += b.vy; b.a += b.s; b.vx *= .99;
+      cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.fillStyle = b.c;
+      cx.fillRect(-b.r, -b.r / 2, b.r * 2, b.r); cx.restore();
+    }
+    raf = bits.length ? requestAnimationFrame(loop) : (cx.clearRect(0,0,cv.width,cv.height), null);
+  }
+
+  /* 최고 기록 */
+  const bestKey = (l, m) => 'rainbow-brain-best-' + l + '-' + m;
+  function loadBest() {
+    try {
+      const lines = Object.keys(LEVEL_NAME).map(l => {
+        const parts = Object.keys(MODE_LABEL[l]).map(m => {
+          const v = localStorage.getItem(bestKey(l, m));
+          return v ? modeName(m, l) + ' ' + v + '점' : null;
+        }).filter(Boolean);
+        return parts.length ? '🏆 ' + LEVEL_NAME[l] + ' · ' + parts.join(' · ') : null;
+      }).filter(Boolean);
+      $('best').innerHTML = lines.join('<br>');
+    } catch (e) { $('best').textContent = ''; }
+  }
+  function saveBest() {
+    try {
+      const k = bestKey(state.level, state.mode), prev = +(localStorage.getItem(k) || 0);
+      if (state.score > prev) localStorage.setItem(k, state.score);
+    } catch (e) {}
+  }
+
+  /* 공통 화면 */
+  function renderStars(n = state.score) {
+    $('stars').innerHTML = Array.from({length: TOTAL}, (_, i) => `<span class="${i < n ? 'on' : ''}">⭐</span>`).join('');
+  }
+  function setRound(text) { $('round').textContent = text || ((state.round + 1) + ' / ' + TOTAL); }
+  function say(text, good) { $('feedback').textContent = text; $('feedback').className = 'feedback' + (good ? ' good' : ''); }
+  function ask(text) { $('ask').textContent = text; }
+
+  function start(mode) {
+    clearTimers();
+    state = { mode, level, round: 0, score: 0, locked: false, tried: false };
+    $('tag').textContent = LEVEL_NAME[level] + ' · ' + modeName(mode, level);
+    say('');
+    show('game');
+    renderStars(0);
+    ({ memory: setupMemory, pattern: nextPattern, simon: startSimon, odd: nextOdd })[mode]();
+  }
+  function praise() { say(pick(PRAISE) + ' 🌟', true); sndGood(); confetti(30); }
+  function advance(nextFn, delay = 1100) {
+    state.round++;
+    if (state.round >= TOTAL) return later(finish, delay);
+    later(nextFn, delay);
+  }
+
+  /* ───────── 1. 짝 맞추기 ───────── */
+  function setupMemory() {
+    const pairs = { easy: 3, hard: 4, pro: 6, nine: 8 }[state.level];
+    const cols = { easy: 3, hard: 4, pro: 4, nine: 4 }[state.level];
+    let faces;
+    if (state.level === 'nine') faces = shuffle(LOOK_GROUPS).slice(0, 4).flatMap(g => shuffle(g).slice(0, 2));
+    else faces = shuffle(EMO).slice(0, pairs);
+    const cards = shuffle(faces.flatMap(f => [f, f]));
+    state.m = { pairs, moves: 0, matched: 0, open: [] };
+    setRound('한 판');
+    ask('같은 그림 두 장을 찾아 뒤집어요');
+    $('area').innerHTML = `<p class="info" id="minfo"></p>
+      <div class="mgrid" style="grid-template-columns:repeat(${cols},1fr)">${cards.map((f, k) =>
+        `<button class="mcard" id="mc-${k}" data-f="${f}" aria-label="카드 ${k + 1}"><span class="in"><span class="face front">✨</span><span class="face back">${f}</span></span></button>`).join('')}</div>`;
+    memInfo();
+  }
+  function memInfo() {
+    const m = state.m;
+    $('minfo').textContent = `짝 ${m.matched} / ${m.pairs} · 뒤집은 횟수 ${m.moves}번`;
+    renderStars(Math.round(m.matched / m.pairs * TOTAL));
+  }
+  function memScore() { const m = state.m; return Math.max(1, Math.min(TOTAL, Math.round(TOTAL * m.pairs * 2 / m.moves))); }
+  function tapCard(btn) {
+    const m = state.m;
+    if (state.locked || btn.classList.contains('open') || btn.classList.contains('done')) return;
+    btn.classList.add('open'); sndTap(); m.open.push(btn);
+    if (m.open.length < 2) return;
+    m.moves++;
+    const [a, b] = m.open; m.open = [];
+    if (a.dataset.f === b.dataset.f) {
+      a.classList.add('done'); b.classList.add('done'); a.classList.remove('open'); b.classList.remove('open');
+      m.matched++; memInfo();
+      tone(659, 0, .15); tone(880, .1, .2); confetti(12);
+      if (m.matched === m.pairs) { state.score = memScore(); say('다 찾았어요! 🌟', true); sndGood(); later(finish, 1000); }
+    } else {
+      memInfo();
+      state.locked = true;
+      later(() => { a.classList.remove('open'); b.classList.remove('open'); state.locked = false; }, 750);
+    }
+  }
+
+  /* ───────── 2. 규칙 찾기 ───────── */
+  const emo = v => ({ t: 'emo', v });
+  const shp = (s, c) => ({ t: 'shape', s, c });
+  const dots = n => ({ t: 'dots', n });
+  const num = n => ({ t: 'num', n });
+  const key = it => JSON.stringify(it);
+  function inner(it) {
+    if (it.t === 'emo') return it.v;
+    if (it.t === 'shape') return `<span style="color:${it.c}">${it.s}</span>`;
+    if (it.t === 'dots') return `<span class="dots">${'<i></i>'.repeat(it.n)}</span>`;
+    return String(it.n);
+  }
+  function itemHTML(it) {
+    const cls = it.t === 'dots' ? ' dots' : it.t === 'num' ? ' num' : '';
+    return `<span class="pitem${cls}">${it.t === 'dots' ? '<i></i>'.repeat(it.n) : inner(it)}</span>`;
+  }
+  function uniq(items) { const seen = new Set(); return items.filter(i => { const k = key(i); if (seen.has(k)) return false; seen.add(k); return true; }); }
+  function fromUnit(unit, map, len) {
+    const seq = []; for (let i = 0; i < len; i++) seq.push(map[unit[i % unit.length]]);
+    return { seq, ans: map[unit[len % unit.length]] };
+  }
+  function makePattern() {
+    const L = state.level;
+    if (L === 'easy') {
+      const em = shuffle(EMO).slice(0, 3);
+      const { seq, ans } = fromUnit(pick(['AB','AAB','ABB']), { A: emo(em[0]), B: emo(em[1]) }, 6);
+      const choices = uniq([ans, emo(em[0]), emo(em[1]), emo(em[2])]).slice(0, 3);
+      return { seq, ans, choices: shuffle(choices), kind: 'emo' };
+    }
+    if (L === 'hard') {
+      const em = shuffle(EMO).slice(0, 4);
+      const { seq, ans } = fromUnit(pick(['ABC','ABB','AABB','ABAC','ABCC']), { A: emo(em[0]), B: emo(em[1]), C: emo(em[2]) }, 7);
+      const choices = uniq([ans, emo(em[0]), emo(em[1]), emo(em[2]), emo(em[3])]).slice(0, 4);
+      return { seq, ans, choices: shuffle(choices), kind: 'emo' };
+    }
+    if (L === 'pro') {
+      if (rnd(3) === 0) {           // 점이 늘거나 줄어요
+        const asc = rnd(2) === 0, start = asc ? 1 + rnd(2) : 7;
+        const seq = []; for (let i = 0; i < 5; i++) seq.push(dots(asc ? start + i : start - i));
+        const a = asc ? start + 5 : start - 5;
+        const cands = [a + 1, a - 1, a + 2, a - 2].filter(n => n >= 1 && n <= 8 && n !== a);
+        return { seq, ans: dots(a), choices: shuffle(uniq([dots(a), ...cands.map(dots)]).slice(0, 4)), kind: 'dots' };
+      }
+      const sh = shuffle(SHAPES).slice(0, 3), co = shuffle(COLORS).slice(0, 3);
+      const map = { A: shp(sh[0], co[0]), B: shp(sh[1], co[1]), C: shp(sh[2], co[2]) };
+      const { seq, ans } = fromUnit(pick(['AB','ABC','AABB','ABB','ABAC']), map, 7);
+      const oc = co.find(c => c !== ans.c), os = sh.find(s => s !== ans.s);
+      const choices = uniq([ans, shp(ans.s, oc), shp(os, ans.c), shp(os, oc), map.A, map.B, map.C]).slice(0, 4);
+      return { seq, ans, choices: shuffle(choices), kind: 'shape' };
+    }
+    // 9살
+    if (rnd(3) === 0) {             // 모양과 색깔이 서로 다른 주기로 바뀌어요
+      const p1 = pick([2, 3]), p2 = p1 === 2 ? 3 : 2;
+      const sh = shuffle(SHAPES).slice(0, p1), co = shuffle(COLORS).slice(0, p2);
+      const item = i => shp(sh[i % p1], co[i % p2]);
+      const seq = []; for (let i = 0; i < 7; i++) seq.push(item(i));
+      const ans = item(7);
+      const oc = pick(co.filter(c => c !== ans.c)), os = pick(sh.filter(s => s !== ans.s));
+      return { seq, ans, choices: shuffle([ans, shp(ans.s, oc), shp(os, ans.c), shp(os, oc)]), kind: 'shape' };
+    }
+    // 숫자 수열
+    const kind = pick(['arith', 'arith', 'double', 'tri', 'grow', 'alt']);
+    let seq = [], a, step = 1;
+    if (kind === 'arith') { const s = 1 + rnd(10); step = 2 + rnd(6); seq = [0,1,2,3,4].map(i => s + i * step); a = s + 5 * step; }
+    else if (kind === 'double') { const s = pick([1, 2, 3]); seq = [0,1,2,3,4].map(i => s * 2 ** i); a = s * 32; step = a / 2; }
+    else if (kind === 'tri') { const s = pick([0, 1, 2]); seq = [1,3,6,10,15].map(n => n + s); a = 21 + s; step = 6; }
+    else if (kind === 'grow') { const s = pick([1, 2, 3]); seq = [0,1,3,6,10].map(n => n + s); a = 15 + s; step = 5; }
+    else { const s = 1 + rnd(5), d1 = 1 + rnd(3), d2 = 4 + rnd(4); seq = [s]; for (let i = 1; i < 5; i++) seq.push(seq[i-1] + (i % 2 ? d1 : d2)); a = seq[4] + d1; step = d1; }
+    const cands = uniq([a + step, a - step, a + 1, a - 1, a + 2, a - 2, a + step + 1].filter(n => n > 0 && n !== a).map(num));
+    return { seq: seq.map(num), ans: num(a), choices: shuffle([num(a), ...shuffle(cands).slice(0, 3)]), kind: 'num' };
+  }
+  function nextPattern() {
+    const q = makePattern(); state.q = q; state.tried = false;
+    setRound();
+    ask(q.kind === 'num' ? '규칙을 찾아 다음 숫자를 골라요' : q.kind === 'dots' ? '점이 어떻게 변하는지 보고 다음을 골라요' : '규칙을 찾아 다음에 올 것을 골라요');
+    $('area').innerHTML = `<div class="prow">${q.seq.map(itemHTML).join('')}<span class="pitem q">?</span></div>
+      <div class="choices${q.choices.length === 4 ? ' four' : ''}">${q.choices.map((c, i) =>
+        `<button class="btn choice pc${c.t === 'num' ? ' num' : ''}" id="pch-${i}" data-i="${i}">${inner(c)}</button>`).join('')}</div>`;
+    say('');
+    state.locked = false;
+  }
+  function tapPatternChoice(btn) {
+    if (state.locked) return;
+    const q = state.q, c = q.choices[+btn.dataset.i];
+    if (key(c) === key(q.ans)) {
+      state.locked = true;
+      btn.classList.add('right');
+      if (!state.tried) state.score++;
+      renderStars(); praise();
+      document.querySelectorAll('.choice').forEach(b => b.disabled = true);
+      advance(nextPattern, 1200);
+    } else {
+      state.tried = true;
+      btn.classList.add('wrong'); btn.disabled = true;
+      say('다시 한번 볼까요? 🍀'); sndBad();
+    }
+  }
+
+  /* ───────── 3. 순서 기억 ───────── */
+  function startSimon() {
+    const n = state.level === 'nine' ? 6 : 4;
+    const startLen = { easy: 2, hard: 3, pro: 4, nine: 5 }[state.level];
+    const lit = { easy: 600, hard: 500, pro: 420, nine: 340 }[state.level];
+    state.s = { n, seq: [], pos: 0, input: false, lit, gap: 170 };
+    while (state.s.seq.length < startLen) state.s.seq.push(rnd(n));
+    const pal = ['var(--r1)','var(--r2)','var(--r4)','var(--r5)','var(--r6)','var(--r3)'];
+    $('area').innerHTML = `<div class="pads${n === 6 ? ' six' : ''}" id="pads">${Array.from({length: n}, (_, i) =>
+      `<button class="pad" id="pad-${i}" data-i="${i}" style="background:${pal[i]}" aria-label="${i + 1}번 판"></button>`).join('')}</div>`;
+    later(showSeq, 700);
+  }
+  function setPad(i, on) { const p = $('pad-' + i); if (p) p.classList.toggle('lit', on); }
+  function showSeq() {
+    const s = state.s; s.input = false; s.pos = 0;
+    setRound(); ask(`잘 보세요… ${s.seq.length}개예요`); say('');
+    s.seq.forEach((p, i) => {
+      later(() => { setPad(p, true); tone(PAD_FREQ[p], 0, s.lit / 1000, 'triangle', .2); }, 300 + i * (s.lit + s.gap));
+      later(() => setPad(p, false), 300 + i * (s.lit + s.gap) + s.lit);
+    });
+    later(() => { s.input = true; ask('이제 순서대로 눌러요!'); }, 300 + s.seq.length * (s.lit + s.gap) + 100);
+  }
+  function tapPad(btn) {
+    const s = state.s, i = +btn.dataset.i;
+    if (!s.input) return;
+    setPad(i, true); tone(PAD_FREQ[i], 0, .25, 'triangle', .2);
+    later(() => setPad(i, false), 180);
+    if (i === s.seq[s.pos]) {
+      s.pos++;
+      if (s.pos === s.seq.length) {
+        s.input = false;
+        state.score++; renderStars(); praise();
+        state.round++;
+        if (state.round >= TOTAL) return later(finish, 1000);
+        later(() => { s.seq.push(rnd(s.n)); showSeq(); }, 1000);
+      }
+    } else {
+      s.input = false;
+      $('pads').classList.add('shake'); sndBad();
+      say('앗, 순서가 달랐어요');
+      ask(`${state.score}개까지 기억했어요`);
+      later(finish, 1400);
+    }
+  }
+
+  /* ───────── 4. 다른 그림 찾기 ───────── */
+  function nextOdd() {
+    const g = { easy: 3, hard: 4, pro: 5, nine: 6 }[state.level];
+    let [base, odd] = pick(ODD[state.level]);
+    if (rnd(2)) [base, odd] = [odd, base];
+    const oddIdx = rnd(g * g);
+    state.o = { oddIdx, tried: false, done: false };
+    state.tried = false;
+    setRound(); ask('다른 그림 하나를 찾아 눌러요'); say('');
+    const fs = `calc(min(480px, 100vw - 90px) / ${g} * 0.58)`;
+    $('area').innerHTML = (state.level === 'nine' ? `<div class="timer"><i id="tbar"></i></div>` : '') +
+      `<div class="ogrid" style="grid-template-columns:repeat(${g},1fr)">${Array.from({length: g * g}, (_, i) =>
+        `<button class="ocell" id="oc-${i}" data-i="${i}" style="font-size:${fs}">${i === oddIdx ? odd : base}</button>`).join('')}</div>`;
+    state.locked = false;
+    if (state.level === 'nine') {
+      const bar = $('tbar');
+      requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = '0%'; }));
+      state.o.timer = later(() => {
+        if (state.o.done) return;
+        state.o.done = true; state.locked = true;
+        $('oc-' + oddIdx).classList.add('reveal');
+        say('시간이 다 됐어요 ⏰'); sndBad();
+        advance(nextOdd, 1300);
+      }, 10000);
+    }
+  }
+  function tapCell(btn) {
+    if (state.locked || state.o.done) return;
+    const i = +btn.dataset.i;
+    if (i === state.o.oddIdx) {
+      state.o.done = true; state.locked = true;
+      if (state.o.timer) clearTimeout(state.o.timer);
+      btn.classList.add('yes');
+      if (!state.o.tried) state.score++;
+      renderStars(); praise();
+      advance(nextOdd, 1000);
+    } else {
+      state.o.tried = true;
+      btn.classList.remove('no'); void btn.offsetWidth; btn.classList.add('no');
+      say('거기는 아니에요. 다시 찾아봐요 🍀'); sndBad();
+    }
+  }
+
+  /* ───────── 결과 ───────── */
+  function finish() {
+    clearTimers();
+    saveBest();
+    const s = state.score, L = state.level, m = state.mode;
+    $('result-score').textContent = '⭐ ' + s + ' / ' + TOTAL;
+    let extra = '';
+    if (m === 'memory') extra = `뒤집은 횟수 ${state.m.moves}번으로 ${state.m.pairs}쌍을 모두 찾았어요.`;
+    if (m === 'simon') extra = `순서 ${s}개까지 기억했어요.`;
+    if (s === TOTAL) {
+      $('result-emoji').textContent = '🦄'; $('result-title').textContent = '완벽해요! 두뇌 박사님!';
+      $('result-msg').textContent = extra || (L === 'easy' ? '이제 7살 놀이에 도전해 볼까요?' : L === 'hard' ? '이제 8살 놀이에 도전해 볼까요?' : L === 'pro' ? '이제 9살 놀이에 도전해 볼까요?' : '별 열 개를 모두 모았어요!');
+    } else if (s >= 7) { $('result-emoji').textContent = '🌈'; $('result-title').textContent = '정말 잘했어요!'; $('result-msg').textContent = extra || '조금만 더 하면 별을 다 모을 수 있어요.'; }
+    else { $('result-emoji').textContent = '🌸'; $('result-title').textContent = '열심히 했어요!'; $('result-msg').textContent = extra || '천천히 다시 해 보면 더 잘할 수 있어요.'; }
+    show('result'); sndWin(); confetti(120);
+  }
+
+  function show(id) {
+    ['home','game','result'].forEach(x => $(x).hidden = x !== id);
+    if (id === "home") loadBest();
+    if (id === "result") reportMission();
+  }
+  function setLevel(l) {
+    level = l;
+    document.querySelectorAll('.level button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === l ? 'true' : 'false'));
+    $('level-note').textContent = LEVEL_NOTE[l];
+    for (const m of ['memory','pattern','simon','odd']) {
+      const [ico, title, small] = MODE_LABEL[l][m];
+      $('ico-' + m).textContent = ico;
+      $('label-' + m).innerHTML = title + '<small>' + small + '</small>';
+    }
+    try { localStorage.setItem('rainbow-brain-level', l); } catch (e) {}
+  }
+
+  /* 이벤트 */
+  document.querySelectorAll('.level button').forEach(b => b.addEventListener('click', () => setLevel(b.dataset.level)));
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => start(b.dataset.mode)));
+  $('area').addEventListener('click', e => {
+    if (!state) return;
+    const t = e.target;
+    const card = t.closest('.mcard'); if (card && state.mode === 'memory') return tapCard(card);
+    const ch = t.closest('.choice'); if (ch && state.mode === 'pattern') return tapPatternChoice(ch);
+    const pad = t.closest('.pad'); if (pad && state.mode === 'simon') return tapPad(pad);
+    const cell = t.closest('.ocell'); if (cell && state.mode === 'odd') return tapCell(cell);
+  });
+  $('again').addEventListener('click', () => start(state.mode));
+  $('home-btn').addEventListener('click', () => { clearTimers(); show('home'); });
+  $('quit').addEventListener('click', () => { clearTimers(); show('home'); });
+
+  /* 놀이터(index.html) 미션 연동 */
+  let missionId = null;
+  function reportMission() {
+    if (!missionId) return;
+    try {
+      const key = "rp-results", all = JSON.parse(localStorage.getItem(key) || "{}");
+      const d = new Date(), day = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      all[day] = all[day] || {};
+      all[day][missionId] = Math.max(all[day][missionId] || 0, state.score);
+      localStorage.setItem(key, JSON.stringify(all));
+    } catch (e) {}
+    $("to-hub").hidden = false; $("home-btn").hidden = true;
+  }
+  function launchFromUrl() {
+    const p = new URLSearchParams(location.search);
+    const l = p.get("level"), m = p.get("mode");
+    if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
+    missionId = p.get("mission");
+    setLevel(l); start(m); return true;
+  }
+  function boot(data) {
+    let saved = 'hard';
+    try { saved = localStorage.getItem('rainbow-brain-level') || 'hard'; } catch (e) {}
+    if (data && data.level && LEVEL_NAME[data.level]) saved = data.level;
+    if (!LEVEL_NAME[saved]) saved = 'hard';
+    setLevel(saved);
+    if (launchFromUrl()) return;
+    show('home');
+  }
+  if (window.claude?.hot?.snapshot) window.claude.hot.snapshot(() => ({ level }));
+  window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body>
+</html>

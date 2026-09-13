@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="voice.js"></script>
+<script src="layout.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
 <title>무지개 아케이드</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -92,6 +93,10 @@
   .level button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 4px 0 var(--pink-deep); }
   .level button:focus-visible { outline: 4px solid var(--r5); outline-offset: 2px; }
   .level-note { text-align: center; font-size: 14px; color: var(--plum-soft); margin: -6px 0 10px; }
+  .diffrow { display: flex; gap: 5px; justify-content: center; align-items: center; flex-wrap: wrap; margin: -2px 0 12px; font-size: 14px; color: var(--plum-soft); }
+  .diffrow span { margin-right: 4px; }
+  .diffrow button { font-family: var(--display); font-size: 15px; min-width: 40px; height: 38px; padding: 0 8px; border-radius: 20px; border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft); cursor: pointer; }
+  .diffrow button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 3px 0 var(--pink-deep); }
 
   .modes { display: grid; gap: 14px; }
   .mode { display: flex; align-items: center; gap: 16px; text-align: left; padding: 14px 20px; }
@@ -131,6 +136,9 @@
   .water::before { content: "〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰"; position: absolute; top: -14px; left: 0; right: 0; color: #FFB7D5; font-size: 18px; letter-spacing: -2px; overflow: hidden; white-space: nowrap; }
   .sun { position: absolute; top: 14px; right: 18px; font-size: 34px; opacity: .8; }
   .layer { position: absolute; inset: 0; }
+  #area.plain .sun, #area.plain .water { display: none; }
+  #area.plain.mode-mole { background: linear-gradient(180deg, #E4F3CF 0%, #BEE3A0 100%); }
+  #area.plain.mode-balloon { background: linear-gradient(180deg, #F7FBFF 0%, #E3F1FD 100%); }
   .overlay { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: clamp(40px, 12vw, 64px); color: var(--pink-deep); text-shadow: 0 4px 0 #fff; pointer-events: none; z-index: 3; }
   .banner { position: absolute; left: 8%; right: 8%; top: 38%; background: rgba(255,255,255,.95); border: 4px solid var(--pink); border-radius: 24px; padding: 14px; text-align: center; font-family: var(--display); font-size: clamp(22px, 6vw, 30px); color: var(--plum); z-index: 3; animation: pop .4s; pointer-events: none; }
 
@@ -171,11 +179,12 @@
   }
   .balloon .s { width: 3px; height: 34px; background: #B0A0A8; margin: -2px auto 0; }
   .balloon .w { font-family: var(--display); font-size: 17px; color: var(--plum); background: rgba(255,255,255,.9); border-radius: 12px; padding: 2px 6px; margin-top: 2px; }
+  .balloon .b .bw { font-family: var(--display); font-size: clamp(16px, 4.4vw, 21px); line-height: 1.15; color: var(--plum); padding: 0 5px; word-break: keep-all; text-align: center; text-shadow: 0 1px 0 rgba(255,255,255,.7); }
   .balloon.pop { animation: popout .3s forwards; }
   .balloon.bad .b { background: #C9A6B8 !important; animation: shake .4s; }
 
   /* 두더지 */
-  .holes { position: absolute; inset: 8% 6% 12%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; }
+  .holes { position: absolute; inset: 7% 6% 7%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; }
   .hole { position: relative; border-radius: 50% / 40%; background: radial-gradient(ellipse at 50% 70%, #8D6E63 0 46%, transparent 47%); overflow: hidden; cursor: pointer; }
   .hole::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: 8%; height: 26%; border-radius: 50%; background: #5D4037; }
   .mole {
@@ -220,6 +229,7 @@
     .balloon { width: 76px; } .balloon .b { width: 70px; height: 80px; font-size: 36px; }
   }
 </style>
+<link rel="stylesheet" href="layout.css">
 </head>
 <body>
 <canvas id="confetti"></canvas>
@@ -250,10 +260,9 @@
     <div class="level" role="group" aria-label="난이도">
       <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
       <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
-      <button type="button" id="level-pro" data-level="pro" aria-pressed="false">🌈 8살</button>
-      <button type="button" id="level-nine" data-level="nine" aria-pressed="false">👑 9살</button>
     </div>
     <p class="level-note" id="level-note"></p>
+    <div class="diffrow" id="diffrow"><span>난이도</span><button type="button" data-diff="-3">−3</button><button type="button" data-diff="-2">−2</button><button type="button" data-diff="-1">−1</button><button type="button" data-diff="0">기본</button><button type="button" data-diff="1">+1</button><button type="button" data-diff="2">+2</button><button type="button" data-diff="3">+3</button></div>
     <div class="modes">
       <button class="btn mode fall_math" id="mode-fall_math" data-mode="fall_math"><span class="ico" id="ico-fall_math">💧</span><span id="label-fall_math"></span></button>
       <button class="btn mode fall_word" id="mode-fall_word" data-mode="fall_word"><span class="ico" id="ico-fall_word">🍎</span><span id="label-fall_word"></span></button>
@@ -302,6 +311,12 @@
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
+  let DIFF = 0;
+  try { DIFF = Math.max(-3, Math.min(3, +(localStorage.getItem("rp-diff") || 0) || 0)); } catch (e) {}
+  { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
+  const TS = () => 1 - DIFF * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
+  const DIFF_TXT = () => DIFF ? (DIFF > 0 ? " +" + DIFF : " " + DIFF) : "";
   const LEVEL_NOTE = {
     easy: '10까지 계산 · 쉬운 낱말 · ㄱㄴㄷㅁㅂㅅ 첫소리 · 1~10 수',
     hard: '받아올림 20까지 · 비슷한 낱말 · 모든 첫소리 · 1~30 수',
@@ -383,9 +398,10 @@
   function mathItem(L) {
     let a, b, op, ans, min = 0, max = 20, extra = [];
     if (L === 'easy') {
-      op = pick(['+','+','-']);
-      if (op === '+') { a = rng(1, 9); b = rng(1, 10 - a); ans = a + b; } else { a = rng(2, 10); b = rng(1, a - 1); ans = a - b; }
-      max = 10;
+      const cap = Math.max(5, Math.min(20, 10 + DIFF * 2));
+      op = DIFF <= -2 ? "+" : pick(["+","+","-"]);
+      if (op === "+") { a = rng(1, cap - 1); b = rng(1, cap - a); ans = a + b; } else { a = rng(2, cap); b = rng(1, a - 1); ans = a - b; }
+      max = cap;
     } else if (L === 'hard') {
       op = pick(['+','+','-']);
       if (op === '+') { a = rng(5, 9); b = rng(11 - a, 9); ans = a + b; extra = [ans - 10]; }
@@ -524,13 +540,14 @@
 
   function start(mode) {
     clearAll();
-    state = { mode, level, score: 0, lives: LIVES, handled: 0, locked: true, n: 0, items: [], last: 0 };
-    $('tag').textContent = LEVEL_NAME[level] + ' · ' + modeName(mode, level);
+    state = { mode, level, score: 0, lives: LIVES + (DIFF <= -2 ? 1 : 0) + (DIFF <= -3 ? 1 : 0) - (DIFF >= 3 ? 1 : 0), handled: 0, locked: true, n: 0, items: [], last: 0 };
+    $("tag").textContent = LEVEL_NAME[level] + DIFF_TXT() + ' · ' + modeName(mode, level);
     say(''); askRule('');
     $('answers').hidden = true; $('answers').innerHTML = '';
     show('game');
     renderHud();
-    $('area').innerHTML = stageHTML(mode === 'mole' ? holesHTML() : '');
+    $("area").className = mode === "mole" ? "plain mode-mole" : mode === "balloon" ? "plain mode-balloon" : "";
+    $("area").innerHTML = stageHTML(mode === "mole" ? holesHTML() : "");
     countdown(() => { state.locked = false; ({ fall_math: beginFall, fall_word: beginFall, balloon: beginBalloon, mole: beginMole })[mode](); });
   }
   function countdown(done) {
@@ -555,7 +572,7 @@
   /* ───────── 떨어지는 식·낱말 ───────── */
   function fallTime() {
     const base = { easy: 7.5, hard: 6.5, pro: 6, nine: 5.5 }[state.level] * (REDUCED ? 1.5 : 1);
-    return base * Math.max(.55, 1 - state.n * .045);
+    return base * TS() * Math.max(.55, 1 - state.n * .045);
   }
   function beginFall() { $('answers').hidden = false; spawnFall(); }
   function spawnFall() {
@@ -661,9 +678,9 @@
     const el = document.createElement('div');
     el.className = 'balloon';
     const color = pick(['#FF6B6B','#FFB347','#FFE66D','#7ED957','#5DADE2','#B57EDC','#FF8FBF']);
-    el.innerHTML = `<div class="b" style="background:${color}">${w[1]}</div><div class="s"></div>${(state.level === "pro" || state.level === "nine") && !/시작|첫소리/.test(rule.name) ? `<div class="w">${w[0]}</div>` : ""}`;
+    el.innerHTML = `<div class="b" style="background:${color}"><span class="bw">${w[0]}</span></div><div class="s"></div>`;   // 풍선에는 낱말(글자)을 써요
     $('layer').appendChild(el);
-    const speed = { easy: 55, hard: 68, pro: 80, nine: 92 }[state.level] * (REDUCED ? .65 : 1) * (1 + state.spawned * .02);
+    const speed = { easy: 55, hard: 68, pro: 80, nine: 92 }[state.level] / TS() * (REDUCED ? .65 : 1) * (1 + state.spawned * .02);
     const b = { el, x, y: H + 10, vy: speed, w, match, alive: true };
     el.style.transform = `translate(${x}px, ${b.y}px)`;
     el.addEventListener('click', () => tapBalloon(b));
@@ -725,7 +742,7 @@
     state.lastHole = hole;
     hole.querySelector('.num').textContent = num;
     hole.className = 'hole up';
-    const showMs = { easy: 1500, hard: 1300, pro: 1150, nine: 1000 }[state.level] * (REDUCED ? 1.4 : 1) * Math.max(.65, 1 - state.spawned * .03);
+    const showMs = { easy: 1500, hard: 1300, pro: 1150, nine: 1000 }[state.level] * TS() * (REDUCED ? 1.4 : 1) * Math.max(.65, 1 - state.spawned * .03);
     const m = { hole, num, match, alive: true };
     state.active = m;
     m.timer = later(() => {
@@ -773,6 +790,7 @@
     level = l;
     document.querySelectorAll('.level button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === l ? 'true' : 'false'));
     $('level-note').textContent = LEVEL_NOTE[l];
+    renderDiff();
     for (const m of ['fall_math','fall_word','balloon','mole']) {
       const [ico, title, small] = MODE_LABEL[l][m];
       $('ico-' + m).textContent = ico;
@@ -803,6 +821,10 @@
     } catch (e) {}
     $("to-hub").hidden = false; $("home-btn").hidden = true;
   }
+  function renderDiff() {
+    document.querySelectorAll("#diffrow button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === DIFF ? "true" : "false"));
+  }
+  document.querySelectorAll("#diffrow button").forEach(b => b.addEventListener("click", () => { DIFF = +b.dataset.diff; try { localStorage.setItem("rp-diff", DIFF); } catch (e) {} renderDiff(); }));
   function launchFromUrl() {
     const p = new URLSearchParams(location.search);
     const l = p.get("level"), m = p.get("mode");
@@ -814,6 +836,7 @@
     let saved = 'hard';
     try { saved = localStorage.getItem('rainbow-arcade-level') || 'hard'; } catch (e) {}
     if (!LEVEL_NAME[saved]) saved = 'hard';
+    if (saved === "pro" || saved === "nine") saved = "hard";   // 8살·9살은 숨김
     setLevel(saved);
     if (launchFromUrl()) return;
     show('home');

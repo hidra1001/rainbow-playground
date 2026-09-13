@@ -1,0 +1,79 @@
+/* 태블릿 가로 화면(16:9·16:10)에서 스크롤 없이 한 화면에 들어가도록 두 칸으로 배치해요 */
+.cols, .colL, .colR { display: contents; }
+
+@media (orientation: landscape) and (max-height: 960px) {
+  html, body { height: 100dvh; overflow: hidden; }
+  body { padding-block: 6px 6px; }
+  .arch, h1, .sub { display: none !important; }
+  .wrap { max-width: min(1500px, 100%); gap: 6px; }
+  .card { padding: 10px 22px 14px; border-radius: 22px; box-shadow: 0 6px 0 #FFC2DB; width: 100%; max-width: 1220px; margin: 0 auto; }
+  #game.card, #home.card, #result.card { min-height: calc(100dvh - 14px); display: flex; flex-direction: column; }
+  .topbar { margin-bottom: 2px; font-size: 16px; }
+  .stars { margin-bottom: 4px; gap: 5px; }
+  .stars span { font-size: 20px; }
+  .ask { margin: 2px 0 8px; font-size: 18px; }
+  .feedback { margin-top: 8px; min-height: 30px; font-size: 24px; }
+
+  /* 놀이 화면: 왼쪽 문제, 오른쪽 답 — 남는 높이를 채우고 가운데 정렬 */
+  #game .cols { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 28px; align-items: center; min-height: 0; }
+  #game .cols.wide-left { grid-template-columns: minmax(0, 1.7fr) minmax(240px, 1fr); }
+  #game .colL, #game .colR { display: flex; flex-direction: column; justify-content: center; align-items: stretch; min-width: 0; min-height: 0; }
+  #game .colR { gap: 6px; }
+  #area:has(> .layer) { height: calc(100dvh - 130px) !important; min-height: 240px !important; }   /* 아케이드 무대 */
+  #area:not(:has(> .layer)) { max-height: calc(100dvh - 130px); }                                    /* 두뇌 놀이 판 */
+  .mgrid { max-width: min(100%, 56vh); margin: 0 auto; gap: 8px; }
+  .ogrid, .tgrid { max-width: min(100%, 66vh); margin: 0 auto; }
+  .pads { max-width: min(340px, 60vh); }
+  .pads.six { max-width: min(480px, 90vh); }
+  .pic { margin-bottom: 6px; }
+  .pic .emoji { font-size: clamp(64px, 13vh, 110px); width: clamp(100px, 20vh, 160px); height: clamp(100px, 20vh, 160px); border-radius: 30px; }
+  .pic .emoji.small { font-size: 48px; width: 84px; height: 84px; }
+  .word { margin: 4px 0 8px; font-size: clamp(36px, 7vh, 64px); }
+  .word.longword { font-size: clamp(28px, 5.4vh, 46px); }
+  .word.sentence { font-size: clamp(18px, 3.4vh, 28px); }
+  .eq { margin: 2px 0 8px; font-size: clamp(40px, 9.5vh, 76px); }
+  .eq.small { font-size: clamp(30px, 7vh, 52px); }
+  .stage { margin-bottom: 6px; min-height: 40px; }
+  .group i { font-size: clamp(22px, 4.2vh, 34px); }
+  .column { font-size: clamp(36px, 8vh, 60px); padding: 6px 18px; }
+  .clock { width: min(220px, 40vh); height: min(220px, 40vh); }
+  .story { font-size: clamp(17px, 3vh, 22px); }
+  .choices { gap: 12px; }
+  .choice { font-size: clamp(30px, 6.4vh, 48px); padding: clamp(10px, 2.4vh, 20px) 4px; }
+  .choice.long { font-size: clamp(22px, 4.4vh, 32px); }
+  .pad { max-width: 340px; gap: 10px; }
+  .pad .btn { font-size: clamp(24px, 5vh, 34px); padding: clamp(6px, 1.6vh, 14px) 0; }
+  .tiles { gap: 10px; }
+  .tile { font-size: clamp(28px, 5.6vh, 40px); padding: 12px 0; min-width: 72px; }
+  .tiles.words .tile { font-size: clamp(20px, 3.6vh, 26px); }
+  .tools { margin-top: 10px; }
+  #answers { grid-template-columns: 1fr 1fr; gap: 10px; }
+  #game .cols.wide-left .colR .ask { font-size: clamp(22px, 4vh, 32px); font-family: var(--display); color: var(--pink-deep); margin-bottom: 14px; }
+  #game .cols.wide-left .colR .feedback { font-size: clamp(20px, 3.6vh, 28px); }
+  #game .cols.wide-left .colR #answers .btn { font-size: clamp(26px, 5.4vh, 40px); padding: clamp(10px, 2.2vh, 18px) 6px; }
+  .balloon { width: 108px; }
+  .balloon .b { width: 100px; height: 112px; }
+  .balloon .b .bw { font-size: clamp(18px, 3.4vh, 27px); }
+  .mole .num { font-size: clamp(24px, 5vh, 38px); }
+
+  /* 홈 화면: 놀이 버튼을 세 줄로, 남는 높이를 채워서 */
+  .level { margin: 4px 0 8px; }
+  .level button { font-size: 19px; padding: 9px 16px; }
+  .level-note { margin: -4px 0 6px; }
+  .diffrow { margin: -2px 0 10px; }
+  .diffrow button { height: 36px; min-width: 38px; font-size: 15px; }
+  .modes { flex: 1; grid-template-columns: repeat(3, 1fr) !important; gap: 12px; align-content: start; }
+  .mode { padding: clamp(10px, 2.4vh, 20px) 18px; font-size: clamp(20px, 3.4vh, 26px); }
+  .mode .ico { font-size: clamp(28px, 5vh, 40px); }
+  .mode small { font-size: 13px; }
+  .best { margin: 8px 0 0; font-size: 13px; line-height: 1.4; }
+  .hublink { margin-bottom: 4px; padding: 4px 12px; font-size: 13px; align-self: flex-start; }
+
+  /* 결과 화면 */
+  #result.card { justify-content: center; }
+  .result .big { font-size: 64px; margin: 0 0 6px; animation: none; }
+  .result h2 { font-size: 30px; }
+  .result p { margin: 0 0 10px; }
+  .result .actions { grid-template-columns: 1fr 1fr; max-width: 680px; margin: 0 auto; width: 100%; }
+  .result .learned, .result .review { margin-bottom: 10px; }
+}

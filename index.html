@@ -139,6 +139,47 @@
   @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-6px); } }
   @media (prefers-reduced-motion: reduce) { .stop.here, .sticker.new { animation: none; } }
   @media (min-width: 700px) { .missions { grid-template-columns: 1fr 1fr; } .road { grid-template-columns: repeat(10, 1fr); } }
+  /* 태블릿 가로 화면: 스크롤 없이 한 화면에 */
+  @media (orientation: landscape) and (max-height: 960px) {
+    html, body { height: 100dvh; overflow: hidden; }
+    body { padding-block: 6px 70px; }
+    .wrap { max-width: min(1500px, 100vw); gap: 8px; }
+    .hero { padding: 0 4px; gap: 10px; }
+    .hero .avatar { width: 50px; height: 50px; font-size: 26px; }
+    .hero h1 { font-size: 22px; }
+    .hero p { font-size: 13px; margin-top: 2px; }
+    .card { padding: 12px 16px 14px; border-radius: 22px; }
+    .card h2 { font-size: 19px; margin-bottom: 8px; }
+    #tab-today { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: start; }
+    #tab-today .card + .card { margin-top: 0; }
+    .today { margin-bottom: 8px; }
+    .stat { padding: 6px 12px; }
+    .stat b { font-size: 20px; }
+    .missions { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mission { padding: 7px 12px; gap: 10px; }
+    .mission .ico { width: 42px; height: 42px; font-size: 22px; border-radius: 14px; }
+    .mission .t b { font-size: 16px; }
+    .mission .t span { font-size: 12px; }
+    .allclear { margin-top: 8px; font-size: 17px; }
+    .wordday .e { font-size: 44px; }
+    .wordday b { font-size: 24px; }
+    .stickers { grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
+    .sticker { font-size: 22px; border-radius: 10px; }
+    .road { grid-template-columns: repeat(10, 1fr); gap: 6px; }
+    .stop { font-size: 17px; }
+    .stop.here { font-size: 24px; }
+    .free { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .free a { padding: 10px 14px; font-size: 19px; }
+    #tab-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; max-height: calc(100dvh - 88px); overflow: auto; }
+    #tab-settings .card + .card { margin-top: 0; }
+    .pickrow { margin: 6px 0 10px; gap: 8px; }
+    .pick { width: 50px; height: 50px; font-size: 26px; }
+    .tabs { padding: 4px 12px calc(4px + env(safe-area-inset-bottom)); }
+    .tabs button { font-size: 12px; padding: 3px 4px; }
+    .tabs button i { font-size: 20px; }
+    .toast { bottom: 70px; }
+    #setup { max-width: 760px; margin: 0 auto; }
+  }
 </style>
 <script src="voice.js"></script>
 <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
@@ -231,6 +272,10 @@
           <button type="button" data-voice="tts">📱 기기 목소리</button>
           <button type="button" id="voice-try">▶ 들어 보기</button>
         </div>
+        <p class="center" style="margin-top:16px">난이도 조정 (모든 놀이) <small style="display:block;color:var(--plum-soft);font-family:var(--body);font-size:12px">쉬우면 시간이 넉넉하고 보기가 적어요. 어려우면 빨라지고 비슷한 보기가 늘어요.</small></p>
+        <div class="seg" id="diff-seg">
+          <button type="button" data-diff="-3">−3</button><button type="button" data-diff="-2">−2</button><button type="button" data-diff="-1">−1</button><button type="button" data-diff="0">기본</button><button type="button" data-diff="1">+1</button><button type="button" data-diff="2">+2</button><button type="button" data-diff="3">+3</button>
+        </div>
         <p class="center" style="margin-top:16px">한 놀이의 문제 수</p>
         <div class="seg" id="count-seg">
           <button type="button" data-count="10">10문제</button>
@@ -270,8 +315,8 @@
     { a: '🦁', cond: '스티커 40개', test: p => p.stickers.length >= 40 },
     { a: '👑', cond: '무지개 성 도착', test: p => (p.roadRound || 1) >= 2 },
   ];
-  const AGES = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
-  const NEXT = { easy: 'hard', hard: 'pro', pro: 'nine', nine: 'nine' };
+  const AGES = { easy: "6살", hard: "7살" };   // 8살·9살은 숨김 (코드는 남아 있음)
+  const NEXT = { easy: "hard", hard: "hard", pro: "pro", nine: "nine" };
   const GAMES = {
     math:   { name: '산수', file: 'math.html', ico: '🔢', modes: ['a','b','c','d','e','f'], labels: {
       easy: ['더하기 빼기','몇 개일까?','10 만들기','빠진 수 찾기','문장제','돈 세기'], hard: ['20까지 더하기 빼기','가르기와 모으기','세 수 계산','뛰어 세기','문장제','돈 세기'],
@@ -330,7 +375,7 @@
       { game: 'arcade', level, mode: pickMode('arcadeM', ['fall_math', 'mole']), arcade: true },
       { game: 'arcade', level, mode: pickMode('arcadeW', ['fall_word', 'balloon']), arcade: true },
     ];
-    if (dayIndex % 2 === 0 || level === 'nine') list.push({ game: 'brain', level, mode: pickMode('brain', GAMES.brain.modes) });
+    if (dayIndex % 2 === 0 || NEXT[level] === level) list.push({ game: 'brain', level, mode: pickMode('brain', GAMES.brain.modes) });
     else {
       const g = ['math', 'hangul', 'brain'][Math.floor(dayIndex / 2) % 3], nl = NEXT[level];
       const used = list.find(x => x.game === g)?.mode;
@@ -373,9 +418,9 @@
       const sc = res[m.id]; const isDone = sc != null;
       if (isDone) { stars += sc; done++; }
       const tagHtml = m.challenge ? '<span class="crown">👑 도전 미션</span>' : m.arcade ? '<span class="crown">🕹️ 게임</span>' : '';
-      return `<a class="mission ${m.game} ${isDone ? 'done' : ''} ${m.challenge ? 'challenge' : ''}" href="${g.file}?level=${m.level}&mode=${m.mode}&mission=${encodeURIComponent(m.id)}&n=${load("rp-count", 10)}">
+      return `<a class="mission ${m.game} ${isDone ? 'done' : ''} ${m.challenge ? 'challenge' : ''}" href="${g.file}?level=${m.level}&mode=${m.mode}&mission=${encodeURIComponent(m.id)}&n=${load("rp-count", 10)}&diff=${load("rp-diff", 0)}">
         ${tagHtml}<span class="ico">${g.ico}</span>
-        <span class="t"><b>${label}</b><span>${g.name} 놀이 · ${AGES[m.level]}</span></span>
+        <span class="t"><b>${label}</b><span>${g.name} 놀이 · ${AGES[m.level]}${load("rp-diff", 0) ? " (" + (load("rp-diff", 0) > 0 ? "+" : "") + load("rp-diff", 0) + ")" : ""}</span></span>
         <span class="st">${isDone ? '⭐ ' + sc + '/10' : '시작 ▶'}</span></a>`;
     }).join('');
     $('stat-stars').textContent = stars;
@@ -385,7 +430,7 @@
     if (all) $('allclear').textContent = '🎉 오늘 미션을 다 했어요! ' + (P.days[TODAY]?.gold ? '반짝 스티커까지 받았어요 ✨' : '스티커를 받았어요 🎁');
     if (all && !P.days[TODAY]?.done) completeDay(stars);
     const tip = $("level-tip");
-    if (P.level !== "nine") {
+    if (NEXT[P.level] !== P.level) {
       let perfect = 0;
       const since = dayKey(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6));
       for (const day of Object.keys(R)) if (day >= since) for (const [id, sc] of Object.entries(R[day])) { const [g, l] = id.split(":"); if ((g === "math" || g === "hangul") && l === P.level && sc >= 10) perfect++; }
@@ -446,6 +491,8 @@
     $('stats-line').textContent = `지금까지 ${Object.keys(P.days).length}일 놀았고, 스티커 ${P.stickers.length}개를 모았어요. 최고 연속 출석 ${P.bestStreak || 0}일.`;
     const v = load('rp-voice', 'clip');
     const cnt = load("rp-count", 10);
+    const df = load("rp-diff", 0);
+    document.querySelectorAll("#diff-seg [data-diff]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === df ? "true" : "false"));
     document.querySelectorAll("#count-seg [data-count]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.count === cnt ? "true" : "false"));
     document.querySelectorAll('#voice-seg [data-voice]').forEach(b => b.setAttribute('aria-pressed', b.dataset.voice === v ? 'true' : 'false'));
     $('unlocks').innerHTML = UNLOCKS.map(u => `<div><b>${u.a}</b>${(P.unlocked || []).includes(u.a) ? '✅ ' : '🔒 '}${u.cond}</div>`).join('');
@@ -519,6 +566,7 @@
   document.addEventListener('click', e => {
     const av = e.target.closest('[data-av]'); if (av && !av.disabled) { P.avatar = av.dataset.av; if (P.days) save('rp-profile', P); renderPickers('avatars', 'ages'); renderPickers('avatars2', 'ages2'); $('avatar').textContent = P.avatar; if (P.days) renderRoad(); return; }
     const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderToday(); } renderPickers('avatars', 'ages'); renderPickers('avatars2', 'ages2'); return; }
+    const dc = e.target.closest("[data-diff]"); if (dc) { save("rp-diff", +dc.dataset.diff); renderSettings(); renderToday(); return; }
     const cc = e.target.closest("[data-count]"); if (cc) { save("rp-count", +cc.dataset.count); renderSettings(); renderToday(); return; }
     const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 무지개 놀이터 친구야'); return; }
     const tab = e.target.closest('.tabs button'); if (tab) showTab(tab.dataset.tab);
@@ -549,6 +597,7 @@
     $('setup').hidden = false;
   } else {
     if (P.lastDay && P.lastDay !== TODAY && P.lastDay !== yesterdayKey) { P.streak = 0; save('rp-profile', P); }
+    if (!AGES[P.level]) { P.level = "hard"; save("rp-profile", P); }
     $('app').hidden = false; $('tabs').hidden = false;
     renderAll(); checkUnlocks(); warmAudio();
   }

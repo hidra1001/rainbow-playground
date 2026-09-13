@@ -1,6 +1,6 @@
 /* 무지개 놀이터 서비스 워커: 오프라인에서도 놀 수 있게 파일을 저장해요 */
-const VERSION = 'rainbow-202609132014';
-const CORE = ['./', './index.html', './math.html', './hangul.html', './brain.html', './arcade.html', './voice.js', './audio/list.json', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const VERSION = 'rainbow-202609132043';
+const CORE = ['./', './index.html', './math.html', './hangul.html', './brain.html', './arcade.html', './voice.js', './layout.css', './layout.js', './audio/list.json', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

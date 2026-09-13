@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="voice.js"></script>
+<script src="layout.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
 <title>무지개 두뇌 놀이</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -92,6 +93,10 @@
   .level button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 4px 0 var(--pink-deep); }
   .level button:focus-visible { outline: 4px solid var(--r5); outline-offset: 2px; }
   .level-note { text-align: center; font-size: 14px; color: var(--plum-soft); margin: -6px 0 10px; }
+  .diffrow { display: flex; gap: 5px; justify-content: center; align-items: center; flex-wrap: wrap; margin: -2px 0 12px; font-size: 14px; color: var(--plum-soft); }
+  .diffrow span { margin-right: 4px; }
+  .diffrow button { font-family: var(--display); font-size: 15px; min-width: 40px; height: 38px; padding: 0 8px; border-radius: 20px; border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum-soft); cursor: pointer; }
+  .diffrow button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink-deep); color: #fff; box-shadow: 0 3px 0 var(--pink-deep); }
 
   .modes { display: grid; gap: 14px; }
   .mode { display: flex; align-items: center; gap: 16px; text-align: left; padding: 14px 20px; }
@@ -206,6 +211,7 @@
     .pitem { width: 46px; height: 46px; font-size: 28px; }
   }
 </style>
+<link rel="stylesheet" href="layout.css">
 </head>
 <body>
 <canvas id="confetti"></canvas>
@@ -236,10 +242,9 @@
     <div class="level" role="group" aria-label="난이도">
       <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
       <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
-      <button type="button" id="level-pro" data-level="pro" aria-pressed="false">🌈 8살</button>
-      <button type="button" id="level-nine" data-level="nine" aria-pressed="false">👑 9살</button>
     </div>
     <p class="level-note" id="level-note"></p>
+    <div class="diffrow" id="diffrow"><span>난이도</span><button type="button" data-diff="-3">−3</button><button type="button" data-diff="-2">−2</button><button type="button" data-diff="-1">−1</button><button type="button" data-diff="0">기본</button><button type="button" data-diff="1">+1</button><button type="button" data-diff="2">+2</button><button type="button" data-diff="3">+3</button></div>
     <div class="modes">
       <button class="btn mode memory" id="mode-memory" data-mode="memory"><span class="ico" id="ico-memory">🃏</span><span id="label-memory"></span></button>
       <button class="btn mode pattern" id="mode-pattern" data-mode="pattern"><span class="ico" id="ico-pattern">🔮</span><span id="label-pattern"></span></button>
@@ -285,6 +290,12 @@
   const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답이에요!', '최고예요!', '멋져요!'];
 
   const LEVEL_NAME = { easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
+  let DIFF = 0;
+  try { DIFF = Math.max(-3, Math.min(3, +(localStorage.getItem("rp-diff") || 0) || 0)); } catch (e) {}
+  { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
+  const TS = () => 1 - DIFF * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
+  const DIFF_TXT = () => DIFF ? (DIFF > 0 ? " +" + DIFF : " " + DIFF) : "";
   const LEVEL_NOTE = {
     easy: '짝 3쌍 · 쉬운 규칙 · 순서 2개부터 · 3×3 찾기',
     hard: '짝 4쌍 · 세 가지 규칙 · 순서 3개부터 · 4×4 비슷한 그림',
@@ -394,7 +405,7 @@
   function start(mode) {
     clearTimers();
     state = { mode, level, round: 0, score: 0, locked: false, tried: false };
-    $('tag').textContent = LEVEL_NAME[level] + ' · ' + modeName(mode, level);
+    $("tag").textContent = LEVEL_NAME[level] + DIFF_TXT() + ' · ' + modeName(mode, level);
     say('');
     show('game');
     renderStars(0);
@@ -409,7 +420,7 @@
 
   /* ───────── 1. 짝 맞추기 ───────── */
   function setupMemory() {
-    const pairs = { easy: 3, hard: 4, pro: 6, nine: 8 }[state.level] + (missionId ? 2 : 0);   // 미션일 때는 두 쌍 더
+    const pairs = Math.max(2, { easy: 3, hard: 4, pro: 6, nine: 8 }[state.level] + (missionId ? 2 : 0) + (DIFF >= 2 ? 1 : DIFF <= -2 ? -1 : 0));   // 미션일 때는 두 쌍 더
     const cols = pairs >= 10 ? 5 : pairs >= 5 ? 4 : 3;
     let faces;
     if (state.level === 'nine') faces = shuffle(LOOK_GROUPS).slice(0, Math.ceil(pairs / 2)).flatMap(g => shuffle(g).slice(0, 2)).slice(0, pairs);
@@ -549,8 +560,8 @@
   /* ───────── 3. 순서 기억 ───────── */
   function startSimon() {
     const n = state.level === 'nine' ? 6 : 4;
-    const startLen = { easy: 2, hard: 3, pro: 4, nine: 5 }[state.level];
-    const lit = { easy: 600, hard: 500, pro: 420, nine: 340 }[state.level];
+    const startLen = Math.max(1, { easy: 2, hard: 3, pro: 4, nine: 5 }[state.level] + (DIFF >= 2 ? 1 : DIFF <= -2 ? -1 : 0));
+    const lit = Math.round({ easy: 600, hard: 500, pro: 420, nine: 340 }[state.level] * TS());
     state.s = { n, seq: [], pos: 0, input: false, lit, gap: 170 };
     while (state.s.seq.length < startLen) state.s.seq.push(rnd(n));
     const pal = ['var(--r1)','var(--r2)','var(--r4)','var(--r5)','var(--r6)','var(--r3)'];
@@ -601,12 +612,12 @@
     state.tried = false;
     setRound(); ask('다른 그림 하나를 찾아 눌러요'); say('');
     const fs = `calc(min(480px, 100vw - 90px) / ${g} * 0.58)`;
-    $('area').innerHTML = (state.level === 'nine' ? `<div class="timer"><i id="tbar"></i></div>` : '') +
+    $("area").innerHTML = (state.level === "nine" || DIFF >= 2 ? `<div class="timer"><i id="tbar"></i></div>` : "") +
       `<div class="ogrid" style="grid-template-columns:repeat(${g},1fr)">${Array.from({length: g * g}, (_, i) =>
         `<button class="ocell" id="oc-${i}" data-i="${i}" style="font-size:${fs}">${i === oddIdx ? odd : base}</button>`).join('')}</div>`;
     state.locked = false;
-    if (state.level === 'nine') {
-      const bar = $('tbar');
+    if (state.level === "nine" || DIFF >= 2) {
+      const bar = $("tbar");
       requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = '0%'; }));
       state.o.timer = later(() => {
         if (state.o.done) return;
@@ -614,7 +625,7 @@
         $('oc-' + oddIdx).classList.add('reveal');
         say('시간이 다 됐어요 ⏰'); sndBad();
         advance(nextOdd, 1300);
-      }, 10000);
+      }, Math.round(10000 * TS()));
     }
   }
   function tapCell(btn) {
@@ -639,7 +650,7 @@
     const cfg = { easy: { n: 10, step: 1, par: 20 }, hard: { n: 15, step: 1, par: 25 }, pro: { n: 16, step: 2, par: 32 }, nine: { n: 20, step: 3, par: 45 } }[state.level];
     const nums = Array.from({ length: cfg.n }, (_, i) => (i + 1) * cfg.step);
     const order = shuffle(nums);
-    state.t = { nums, next: 0, wrong: 0, t0: Date.now(), par: cfg.par };
+    state.t = { nums, next: 0, wrong: 0, t0: Date.now(), par: cfg.par * TS() };
     setRound('한 판');
     ask(cfg.step === 1 ? `1부터 ${cfg.n}까지 순서대로 눌러요` : `${cfg.step}씩 뛰어 세며 순서대로 눌러요 (${cfg.step}, ${cfg.step * 2}, ${cfg.step * 3}…)`);
     const cols = cfg.n <= 10 ? 5 : cfg.n <= 16 ? 4 : 5;
@@ -695,6 +706,7 @@
     level = l;
     document.querySelectorAll('.level button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === l ? 'true' : 'false'));
     $('level-note').textContent = LEVEL_NOTE[l];
+    renderDiff();
     for (const m of ["memory","pattern","simon","odd","tap"]) {
       const [ico, title, small] = MODE_LABEL[l][m];
       $('ico-' + m).textContent = ico;
@@ -740,11 +752,16 @@
     const n = +p.get("n"); if (n === 5 || n === 10) TOTAL = n;
     setLevel(l); start(m); return true;
   }
+  function renderDiff() {
+    document.querySelectorAll("#diffrow button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === DIFF ? "true" : "false"));
+  }
+  document.querySelectorAll("#diffrow button").forEach(b => b.addEventListener("click", () => { DIFF = +b.dataset.diff; try { localStorage.setItem("rp-diff", DIFF); } catch (e) {} renderDiff(); }));
   function boot(data) {
     let saved = 'hard';
     try { saved = localStorage.getItem('rainbow-brain-level') || 'hard'; } catch (e) {}
     if (data && data.level && LEVEL_NAME[data.level]) saved = data.level;
     if (!LEVEL_NAME[saved]) saved = 'hard';
+    if (saved === "pro" || saved === "nine") saved = "hard";   // 8살·9살은 숨김
     setLevel(saved);
     if (launchFromUrl()) return;
     show('home');

@@ -111,6 +111,9 @@
   .pick.age { width: auto; border-radius: 30px; padding: 0 18px; font-family: var(--display); font-size: 20px; color: var(--plum-soft); }
   .pick[aria-pressed="true"] { border-color: var(--accent-deep); background: var(--accent); color: #fff; box-shadow: 0 4px 0 var(--accent-deep); }
   .center { text-align: center; }
+  .name { font-family: var(--display); font-size: 26px; text-align: center; width: min(320px, 80vw); padding: 12px 16px; border-radius: 20px; border: 3px solid #FFD6E7; background: var(--ground-2); color: var(--plum); outline: none; user-select: text; -webkit-user-select: text; }
+  .name:focus { border-color: var(--accent); box-shadow: 0 0 0 4px #FFD1E6; }
+  #login.card { max-width: 560px; margin: 8vh auto 0; }
   .note { color: var(--plum-soft); font-size: 13px; text-align: center; margin: 6px 0 0; }
   .danger { background: none; border: 2px solid #FFD6E7; border-radius: 30px; color: var(--plum-soft); font-family: var(--body); font-size: 14px; padding: 8px 16px; }
   .seg { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
@@ -175,12 +178,21 @@
   <!-- 처음 설정 -->
   <section class="card" id="setup" hidden>
     <h2 class="center" style="justify-content:center">🌈 무지개 놀이터에 온 걸 환영해요!</h2>
-    <p class="center">나를 대신할 친구를 골라요</p>
-    <div class="pickrow" id="avatars"></div>
+    <p class="center">이름을 적어 주세요</p>
+    <div class="center"><input id="name-in" class="name" type="text" maxlength="10" placeholder="예: 지우" autocomplete="off" enterkeyhint="done"></div>
     <p class="center">몇 살이에요?</p>
     <div class="pickrow" id="ages"></div>
     <div class="center"><button class="btn" id="setup-ok">시작하기 🚀</button></div>
-    <p class="note">놀이를 하고 나서 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 놀이를 많이·잘 하고 뽑을수록 좋은 등급이 나와요.</p>
+    <p class="note">처음에 뽑기권 🎟️ 3장을 드려요. 캐릭터를 뽑아 내 친구로 삼고, 놀이 2판을 할 때마다 뽑기권을 한 장씩 더 받아요.</p>
+  </section>
+
+  <!-- 로그인: 처음 정한 이름을 넣고 들어와요 -->
+  <section class="card" id="login" hidden>
+    <h2 class="center" style="justify-content:center">🌈 무지개 놀이터</h2>
+    <p class="center">이름을 넣고 들어와요</p>
+    <div class="center"><input id="login-in" class="name" type="text" maxlength="10" placeholder="내 이름" autocomplete="off" enterkeyhint="go"></div>
+    <div class="center" style="margin-top:12px"><button class="btn" id="login-ok">들어가기 🚪</button></div>
+    <p class="note" id="login-msg">&nbsp;</p>
   </section>
 
   <div id="app" hidden>
@@ -205,7 +217,7 @@
     <section id="tab-chars" hidden>
       <div class="card">
         <h2>캐릭터 도감 <small id="char-count"></small></h2>
-        <p class="note" style="margin:0 0 10px">놀이를 하고 "캐릭터 받기"를 누르면 캐릭터를 뽑아요. 뽑기 사이에 놀이를 많이·잘 할수록 희귀·영웅·전설·신화가 잘 나와요. 같은 친구를 또 만나면 숫자가 올라가요. 모은 캐릭터를 누르면 내 친구로 바꿀 수 있어요.</p>
+        <p class="note" style="margin:0 0 10px">놀이 2판을 하면 뽑기권 🎟️ 1장! 뽑기권으로 캐릭터를 뽑아요 (일반 62% · 희귀 24% · 영웅 9% · 전설 4% · 신화 1%). 같은 친구를 또 만나면 숫자가 올라가고, 모은 캐릭터를 누르면 내 친구로 바꿀 수 있어요.</p>
         <div id="chars"></div>
       </div>
     </section>
@@ -214,7 +226,9 @@
     <section id="tab-settings" hidden>
       <div class="card">
         <h2>설정</h2>
-        <p class="center">내 친구 바꾸기</p>
+        <p class="center">이름 바꾸기</p>
+        <div class="center"><input id="name-edit" class="name" type="text" maxlength="10" autocomplete="off"> <button class="btn" id="name-save" style="font-size:16px;padding:10px 14px;vertical-align:middle">저장</button></div>
+        <p class="center" style="margin-top:14px">내 친구 바꾸기</p>
         <div class="pickrow" id="avatars2"></div>
         <p class="center">나이</p>
         <div class="pickrow" id="ages2"></div>
@@ -229,7 +243,7 @@
           <button type="button" data-count="10">10문제</button>
           <button type="button" data-count="5">5문제 (짧게)</button>
         </div>
-        <p class="note">난이도는 놀이마다 시작 전 화면에서 따로 정해요. 캐릭터 뽑기는 놀이를 한 뒤 언제든 할 수 있고, 뽑기 사이에 놀이를 많이·잘 할수록 좋은 등급이 나와요.</p>
+        <p class="note">난이도는 놀이마다 시작 전 화면에서 따로 정해요. 놀이 2판마다 뽑기권 1장을 받고, 뽑기권으로 캐릭터를 뽑아요.</p>
         <p class="note" id="stats-line"></p>
         <div class="center" style="margin-top:14px"><button class="danger" id="reset">처음부터 다시 시작 (기록 지우기)</button></div>
       </div>
@@ -253,7 +267,6 @@
 <script>
 (function () {
   const $ = id => document.getElementById(id);
-  const AVATARS = ['🦄','🐰','🐻','🐱','🦊','🐼','🐥','🐸'];
   const AGES = { easy: '6살', hard: '7살' };
   const GAMES = {
     math:   { name: '산수 놀이', file: 'math.html', ico: '🔢', modes: ['a','b','c','d','e','f'], labels: {
@@ -303,21 +316,21 @@
   const starsToday = () => Object.values(todayRes()).reduce((a, b) => a + b, 0);
   const need = () => load('rp-need', 3);
 
-  /* 뽑기 에너지: 마지막 뽑기 이후에 한 놀이 수와 별. 많이·잘 할수록 좋은 등급이 잘 나와요. 뽑으면 에너지는 다시 0부터 */
-  function pending() {
-    const since = P.lastDrawAt || 0, rows = load('rp-log', []).filter(r => r.t > since);
-    return { n: rows.length, stars: rows.reduce((a, r) => a + (r.score || 0), 0) };
+  /* 뽑기권: 놀이 2판을 마칠 때마다 1장. 처음엔 3장. 등급 확률은 고정이에요 */
+  const GAMES_PER_TICKET = 2;
+  const CHANCES = { mythic: 1, legendary: 4, epic: 9, rare: 24, normal: 62 };
+  function grantTickets() {   // 놀이 기록(rp-log)에서 아직 세지 않은 판을 세어 뽑기권으로 바꿔요
+    const lg = load('rp-log', []);
+    const done = P.logDone || 0;
+    if (lg.length < done) { P.logDone = lg.length; }   // 기록이 지워졌으면 처음부터
+    let c = P.toward || 0, gained = 0;
+    for (let i = P.logDone || 0; i < lg.length; i++) { c++; if (c >= GAMES_PER_TICKET) { c = 0; gained++; } }
+    P.logDone = lg.length; P.toward = c;
+    if (gained) { P.tickets = (P.tickets || 0) + gained; save('rp-profile', P); toast(`🎟️ 뽑기권 ${gained}장을 받았어요! (놀이 ${GAMES_PER_TICKET}판마다 1장)`); }
+    else save('rp-profile', P);
   }
-  function tierChances() {
-    const { n, stars } = pending();
-    if (!n) return { mythic: 0, legendary: 0, epic: 0, rare: 0, normal: 100 };
-    const r1 = x => Math.round(x * 10) / 10;
-    const mythic = Math.min(10, r1(stars * 0.2));          // 별 10개 → 2%, 50개 → 10%
-    const legendary = Math.min(20, r1(stars * 0.4));       // 별 10개 → 4%, 50개 → 20%
-    const epic = Math.min(30, r1(1 + stars * 0.6));         // 별 10개 → 7%, 50개 → 30%
-    const rare = Math.min(35, r1(6 + stars * 0.7));         // 별 10개 → 13%, 50개 → 35%
-    return { mythic, legendary, epic, rare, normal: r1(100 - mythic - legendary - epic - rare) };
-  }
+  const canDraw = () => (P.tickets || 0) > 0;
+  function tierChances() { return { ...CHANCES }; }
   function drawTier() {
     const ch = tierChances(); let r = Math.random() * 100;
     for (const t of ['mythic', 'legendary', 'epic', 'rare', 'normal']) { if (r < ch[t]) return t; r -= ch[t]; }
@@ -335,28 +348,31 @@
   function greet() {
     const h = today.getHours();
     const when = h < 11 ? '좋은 아침!' : h < 17 ? '신나는 오후!' : '즐거운 저녁!';
-    $('greet').innerHTML = when + ' <b>무지개 놀이터</b>';
+    $('greet').innerHTML = when + ' <b>' + (P.name || '무지개 놀이터') + '</b>' + (P.name ? '!' : '');
     setAvatar();
   }
-  function setAvatar() { const a = $('avatar'); a.textContent = P.avatar; a.className = 'avatar t-' + tierOf(P.avatar); }
+  function setAvatar() {
+    if (!P.chars.includes(P.avatar)) P.avatar = P.chars[0] || '';   // 뽑아서 얻은 친구만 쓸 수 있어요
+    const a = $('avatar'); a.textContent = P.avatar || '🥚'; a.className = 'avatar' + (P.avatar ? ' t-' + tierOf(P.avatar) : '');
+  }
   function renderMain() {
     const res = todayRes(), n = playedToday();
     $('games').innerHTML = Object.entries(GAMES).map(([g, G]) => `<div class="card gcard ${g}"><h2><span><span class="ico">${G.ico}</span>${G.name}</span><small>${AGES[P.level]}</small></h2><div class="modes">${G.modes.map((m, i) => {
       const id = g + ':' + P.level + ':' + m, sc = res[id];
       return `<a class="${sc != null ? 'played' : ''}" href="${G.file}?level=${P.level}&mode=${m}&n=${load('rp-count', 10)}"><span>${G.labels[P.level][i]}</span>${sc != null ? `<span class="sc">⭐ ${sc}</span>` : ''}</a>`;
     }).join('')}</div></div>`).join('');
-    const pd = pending();
-    $('today-n').textContent = `뽑기 에너지 · 놀이 ${pd.n}개 · ⭐ ${pd.stars}`;
+    const tk = P.tickets || 0, left = GAMES_PER_TICKET - (P.toward || 0);
+    $('today-n').textContent = `🎟️ 뽑기권 ${tk}장 · 오늘 놀이 ${n}개 · ⭐ ${starsToday()} · 다음 뽑기권까지 ${left}판`;
     const btn = $('finish');
-    btn.textContent = pd.n ? '캐릭터 받기 🎁' : '놀이를 하면 뽑을 수 있어요';
-    btn.classList.toggle('done', !pd.n);
+    btn.textContent = tk ? `캐릭터 뽑기 🎟️ ${tk}장` : `놀이 ${left}판 더 하면 뽑기권 🎟️`;
+    btn.classList.toggle('done', !canDraw());
   }
   function openDraw() {
-    const pd = pending();
-    if (!pd.n) return toast('놀이를 하나 하고 오면 캐릭터를 뽑을 수 있어요!');
+    const tk = P.tickets || 0;
+    if (!canDraw()) return toast(`놀이를 ${GAMES_PER_TICKET - (P.toward || 0)}판 더 하면 뽑기권을 받아요!`);
     const ch = tierChances();
     const box = document.createElement('div'); box.className = 'reward'; box.id = 'draw';
-    box.innerHTML = `<div class="box"><div class="egg">🥚</div><h2>캐릭터 뽑기</h2><p>놀이 ${pd.n}개 · ⭐ ${pd.stars}개로 뽑아요. 더 놀고 오면 좋은 등급이 잘 나와요!</p>
+    box.innerHTML = `<div class="box"><div class="egg">🥚</div><h2>캐릭터 뽑기</h2><p>뽑기권 🎟️ 한 장을 써서 뽑아요 (남은 뽑기권 ${tk}장). 놀이 ${GAMES_PER_TICKET}판마다 뽑기권 1장!</p>
       <div class="chance"><div class="badge normal">일반<b>${ch.normal}%</b></div><div class="badge rare">희귀<b>${ch.rare}%</b></div><div class="badge epic">영웅<b>${ch.epic}%</b></div><div class="badge legendary">전설<b>${ch.legendary}%</b></div><div class="badge mythic">신화<b>${ch.mythic}%</b></div></div>
       <button class="btn" id="draw-go">뽑기! 🎲</button> <button class="danger" id="draw-cancel" style="margin-left:8px">더 놀고 올게요</button></div>`;
     document.body.appendChild(box);
@@ -370,7 +386,9 @@
     const isNew = !P.chars.includes(got);
     if (isNew) P.chars.push(got);
     P.counts = P.counts || {}; P.counts[got] = (P.counts[got] || 0) + 1;
-    P.draws = (P.draws || 0) + 1; P.lastDrawAt = Date.now(); P.lastChar = got;
+    P.tickets = Math.max(0, (P.tickets || 0) - 1);   // 뽑기권 한 장 사용
+    P.draws = (P.draws || 0) + 1; P.lastChar = got;
+    if (!P.avatar) P.avatar = got;
     P.days[TODAY] = (P.days[TODAY] || 0) + 1;
     save('rp-profile', P);
     // 룰렛처럼 잠깐 돌다가 공개
@@ -383,7 +401,7 @@
       clearInterval(spin);
       reel.outerHTML = `<div class="big t-${tier} char" style="cursor:default">${got}</div>`;
       box.querySelector('#reveal-title').textContent = `${TIERS[tier].name} ${got} ${isNew ? '새 친구를 만났어요!' : `친구를 또 만났어요! (×${P.counts[got]})`}`;
-      box.querySelector('#reveal-msg').textContent = { mythic: '우와! 세상에 몇 없는 신화 친구예요!!', legendary: '와! 아주 귀한 전설 친구예요!', epic: '반짝반짝 영웅 친구예요!', rare: '빛나는 희귀 친구예요!', normal: '귀여운 일반 친구예요. 놀이를 더 하고 뽑으면 더 좋은 친구가 나와요!' }[tier];
+      box.querySelector('#reveal-msg').textContent = { mythic: '우와! 세상에 몇 없는 신화 친구예요!!', legendary: '와! 아주 귀한 전설 친구예요!', epic: '반짝반짝 영웅 친구예요!', rare: '빛나는 희귀 친구예요!', normal: '귀여운 일반 친구예요. 놀이를 더 하고 또 뽑아 봐요!' }[tier];
       box.querySelector('#reward-ok').hidden = false;
       confetti({ mythic: 340, legendary: 260, epic: 180, rare: 130, normal: 90 }[tier]); sndWin();
       speak(TIERS[tier].name + ' 친구를 만났어요!');
@@ -397,7 +415,8 @@
     $('char-count').textContent = `서로 다른 캐릭터 ${P.chars.length} / ${ALL_CHARS.length} · 뽑기 ${P.draws || 0}번`;
   }
   function renderSettings() {
-    $('stats-line').textContent = `지금까지 ${Object.keys(P.days).length}일 놀았고, 캐릭터를 ${P.draws || 0}번 뽑아 서로 다른 ${P.chars.length}개를 모았어요.`;
+    $('stats-line').textContent = `지금까지 캐릭터를 ${P.draws || 0}번 뽑아 서로 다른 ${P.chars.length}개를 모았어요. 남은 뽑기권 🎟️ ${P.tickets || 0}장.`;
+    $('name-edit').value = P.name || '';
     const v = load('rp-voice', 'clip');
     document.querySelectorAll('#voice-seg [data-voice]').forEach(b => b.setAttribute('aria-pressed', b.dataset.voice === v ? 'true' : 'false'));
     const cnt = load('rp-count', 10);
@@ -421,8 +440,8 @@
     $('report-note').textContent = `지금까지 놀이 ${total}번을 했어요. 별은 한 번에 맞힌 문제에만 주니, 평균이 낮은 놀이를 함께 해 보세요.`;
   }
   function renderPickers(avId, ageId) {
-    const all = [...new Set(AVATARS.concat(P.chars || []))];
-    $(avId).innerHTML = all.map(a => `<button class="pick t-${tierOf(a)}" data-av="${a}" aria-pressed="${P.avatar === a}">${a}</button>`).join('');
+    const all = P.chars || [];
+    if ($(avId)) $(avId).innerHTML = all.length ? all.map(a => `<button class="pick t-${tierOf(a)}" data-av="${a}" aria-pressed="${P.avatar === a}">${a}</button>`).join('') : '<p class="note" style="margin:0">아직 친구가 없어요. 캐릭터 뽑기로 만나요! 🥚</p>';
     $(ageId).innerHTML = Object.keys(AGES).map(l => `<button class="pick age" data-lv="${l}" aria-pressed="${P.level === l}">${AGES[l]}</button>`).join('');
   }
   function renderAll() { greet(); renderMain(); renderChars(); renderSettings(); renderPickers('avatars2', 'ages2'); }
@@ -470,7 +489,7 @@
 
   /* 이벤트 */
   document.addEventListener('click', e => {
-    const av = e.target.closest('[data-av]'); if (av) { P.avatar = av.dataset.av; if (P.days) save('rp-profile', P); renderPickers('avatars', 'ages'); if (P.days) { renderPickers('avatars2', 'ages2'); renderChars(); } setAvatar(); return; }
+    const av = e.target.closest('[data-av]'); if (av) { P.avatar = av.dataset.av; save('rp-profile', P); renderPickers('avatars2', 'ages2'); renderChars(); setAvatar(); return; }
     const ch = e.target.closest('[data-char]'); if (ch && !ch.disabled) { P.avatar = ch.dataset.char; save('rp-profile', P); renderChars(); renderPickers('avatars2', 'ages2'); setAvatar(); toast(P.avatar + ' 친구로 바꿨어요!'); return; }
     const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderMain(); } renderPickers('avatars', 'ages'); if (P.days) renderPickers('avatars2', 'ages2'); return; }
     const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 무지개 놀이터 친구야'); return; }
@@ -479,39 +498,61 @@
   });
   $('finish').addEventListener('click', openDraw);
   $('voice-try').addEventListener('click', () => speak('안녕! 나는 무지개 놀이터 친구야'));
+  $('name-save').addEventListener('click', () => { const v = norm($('name-edit').value); if (!v) return toast('이름을 적어 주세요'); P.name = v; save('rp-profile', P); try { sessionStorage.setItem('rp-login', v); } catch (e) {} greet(); toast('이름을 ' + v + '(으)로 바꿨어요'); });
+  const norm = s => (s || '').trim().replace(/\s+/g, ' ');
+  function enterApp() {
+    try { sessionStorage.setItem('rp-login', P.name); } catch (e) {}
+    $('setup').hidden = true; $('login').hidden = true; $('app').hidden = false; $('tabs').hidden = false;
+    renderAll(); warmAudio();
+  }
   $('setup-ok').addEventListener('click', () => {
-    P.days = {}; P.chars = []; P.counts = {}; P.draws = 0; P.lastDrawAt = 0;
+    const name = norm($('name-in').value);
+    if (!name) { toast('이름을 적어 주세요'); $('name-in').focus(); return; }
+    P.name = name;
+    P.days = {}; P.chars = []; P.counts = {}; P.draws = 0; P.tickets = 3; P.avatar = ''; P.v2 = 1; P.v3 = 1; P.v4 = 1;
+    try { localStorage.removeItem('rp-log'); } catch (e) {}
+    P.logDone = 0; P.toward = 0;
     save('rp-profile', P);
-    $('setup').hidden = true; $('app').hidden = false; $('tabs').hidden = false;
-    renderAll(); toast('환영해요, ' + P.avatar + ' 친구! 하고 싶은 놀이를 골라요'); warmAudio();
+    enterApp(); toast('환영해요, ' + name + '! 뽑기권 🎟️ 3장으로 첫 친구를 뽑아 봐요');
   });
+  $('name-in').addEventListener('keydown', e => { if (e.key === 'Enter') $('setup-ok').click(); });
+  $('login-ok').addEventListener('click', () => {
+    const v = norm($('login-in').value);
+    if (v && P.name && v.toLowerCase() === P.name.toLowerCase()) { enterApp(); toast('어서 와요, ' + P.name + '!'); }
+    else { $('login-msg').textContent = v ? '이름이 달라요. 처음에 정한 이름을 넣어 주세요.' : '이름을 넣어 주세요.'; $('login-in').focus(); }
+  });
+  $('login-in').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-ok').click(); });
   $('reset').addEventListener('click', () => {
     if (!confirm('정말 모든 기록을 지우고 처음부터 시작할까요?')) return;
     Object.keys(localStorage).filter(k => k.startsWith('rp-') || k.startsWith('rainbow-')).forEach(k => localStorage.removeItem(k));
     location.reload();
   });
   // 놀이에서 돌아오면 결과를 새로 읽고, 날짜가 바뀌었으면 새로 시작해요
-  const refresh = () => { if (dayKey(new Date()) !== TODAY) return location.reload(); if (P && P.days) { R = load('rp-results', {}); renderMain(); } };
+  const refresh = () => { if (dayKey(new Date()) !== TODAY) return location.reload(); if (P && P.days) { R = load('rp-results', {}); grantTickets(); renderMain(); } };
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
   addEventListener('pageshow', refresh);
 
   /* 시작 */
   applyTheme();
   if (!P || !P.days) {
-    P = { avatar: '🦄', level: 'hard' };
-    renderPickers('avatars', 'ages');
+    P = { avatar: '', level: 'hard', chars: [] };
+    renderPickers(null, 'ages');
     $('setup').hidden = false;
   } else {
+    if (!P.v3) { P.v3 = 1; P.tickets = (P.tickets || 0) + 3; }   // 기존 사용자에게도 뽑기권 3장
+    if (!P.v4) { P.v4 = 1; P.logDone = 0; P.toward = 0; }         // 지금까지 한 놀이도 2판마다 뽑기권으로
+    grantTickets();
     if (!AGES[P.level]) P.level = 'hard';
     P.chars = P.chars || P.stickers || []; P.days = P.days || {}; P.counts = P.counts || {};
+    if (!P.name) P.name = '친구';   // 이름 없이 만든 기록은 "친구"로 들어와요 (설정에서 바꿀 수 있어요)
     if (!P.v2) {   // 새 뽑기 방식으로 한 번 옮기기: 뽑은 횟수 0, 오늘 한 놀이를 뽑기 에너지로 인정
       P.v2 = 1; P.draws = 0; P.lastDrawAt = 0; P.counts = {};
       const lg = load('rp-log', []);
       if (!lg.length) { const t = Date.now() - 1000; for (const [id, sc] of Object.entries(todayRes())) lg.push({ t, id, score: sc }); save('rp-log', lg); }
     }
     save('rp-profile', P);
-    $('app').hidden = false; $('tabs').hidden = false;
-    renderAll(); warmAudio();
+    let logged = false; try { logged = sessionStorage.getItem('rp-login') === P.name; } catch (e) {}
+    if (logged) enterApp(); else { $('login').hidden = false; setTimeout(() => $('login-in').focus(), 100); }
   }
 })();
 </script>

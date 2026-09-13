@@ -1,5 +1,5 @@
 /* 무지개 놀이터 서비스 워커: 오프라인에서도 놀 수 있게 파일을 저장해요 */
-const VERSION = 'rainbow-202609131957';
+const VERSION = 'rainbow-202609132007';
 const CORE = ['./', './index.html', './math.html', './hangul.html', './brain.html', './arcade.html', './voice.js', './audio/list.json', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

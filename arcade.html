@@ -610,9 +610,15 @@
       later(() => c.el.remove(), 400);
       checkEnd(spawnFall, 700);
     } else {
-      btn.classList.add('wrong'); btn.disabled = true; sndBad();
+      btn.classList.add('wrong'); btn.disabled = true;
       c.el.classList.remove('no'); void c.el.offsetWidth; c.el.classList.add('no');
-      say('아니에요, 다시! 🍀');
+      loseLife('아니에요! 하트 하나가 사라졌어요 💔');          // 찍기 방지: 틀리면 하트를 잃어요
+      if (state.lives <= 0) {
+        c.alive = false; c.el.classList.add('sink'); state.handled++;
+        document.querySelectorAll('#answers .btn').forEach(b => b.disabled = true);
+        later(() => c.el.remove(), 700);
+        checkEnd();
+      }
     }
   }
 

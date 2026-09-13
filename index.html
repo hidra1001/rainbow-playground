@@ -285,17 +285,16 @@
 <script>
 (function () {
   const $ = id => document.getElementById(id);
-  const AGES = { easy: "6살" };   // 지금은 6살만 (5·7살 내용은 숨김)
-  const LB = l => l === "five" ? "easy" : l;   // 5살은 6살 놀이 이름을 써요
+  const AGES = { easy: "6살" };
   const GAMES = {
     math:   { name: '산수 놀이', file: 'math.html', ico: '🔢', modes: ['a','b','c','d','e','f'], labels: {
-      easy: ['더하기 빼기','몇 개일까?','10 만들기','빠진 수 찾기','문장제','돈 세기'], hard: ['20까지 더하기 빼기','가르기와 모으기','세 수 계산','뛰어 세기','문장제','돈 세기'] } },
+      easy: ['더하기 빼기','몇 개일까?','10 만들기','빠진 수 찾기','문장제','돈 세기']} },
     hangul: { name: '한글 놀이', file: 'hangul.html', ico: '🍎', modes: ['word','syll','cons','order','e','f'], labels: {
-      easy: ['낱말 찾기','빠진 글자','글자 만들기','낱말 만들기','받아쓰기','흉내 내는 말'], hard: ['낱말 찾기','빠진 글자','첫소리 찾기','낱말 만들기','받아쓰기','흉내 내는 말'] } },
+      easy: ['낱말 찾기','빠진 글자','글자 만들기','낱말 만들기','받아쓰기','흉내 내는 말']} },
     brain:  { name: '두뇌 놀이', file: 'brain.html', ico: '🧠', modes: ['memory','pattern','simon','odd','tap'], labels: {
-      easy: ['짝 맞추기','규칙 찾기','순서 기억','다른 그림 찾기','순서대로 누르기'], hard: ['짝 맞추기','규칙 찾기','순서 기억','다른 그림 찾기','순서대로 누르기'] } },
+      easy: ['짝 맞추기','규칙 찾기','순서 기억','다른 그림 찾기','순서대로 누르기']} },
     arcade: { name: '아케이드', file: 'arcade.html', ico: '🕹️', modes: ['fall_math','fall_word','balloon','mole'], labels: {
-      easy: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'], hard: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기'] } },
+      easy: ['떨어지는 식','떨어지는 낱말','풍선 터뜨리기','두더지 잡기']} },
   };
   const THEMES = [ // 요일마다 다른 분위기 (일~토)
     { n: '무지개의 날', e: '🌈', c: '#FF5FA2', d: '#E8408A', msg: '일곱 빛깔처럼 신나게 놀아요!' },
@@ -378,7 +377,7 @@
     const res = todayRes(), n = playedToday();
     $('games').innerHTML = Object.entries(GAMES).map(([g, G]) => `<div class="card gcard ${g}"><h2><span><span class="ico">${G.ico}</span>${G.name}</span><small>${AGES[P.level]}</small></h2><div class="modes">${G.modes.map((m, i) => {
       const id = g + ':' + P.level + ':' + m, sc = res[id];
-      return `<a class="${sc != null ? 'played' : ''}" href="${G.file}?level=${P.level}&mode=${m}&n=${load('rp-count', 10)}"><span>${G.labels[LB(P.level)][i]}</span>${sc != null ? `<span class="sc">⭐ ${sc}</span>` : ''}</a>`;
+      return `<a class="${sc != null ? 'played' : ''}" href="${G.file}?level=${P.level}&mode=${m}&n=${load('rp-count', 10)}"><span>${G.labels[P.level][i]}</span>${sc != null ? `<span class="sc">⭐ ${sc}</span>` : ''}</a>`;
     }).join('')}</div></div>`).join('');
     const tk = P.tickets || 0, left = GAMES_PER_TICKET - (P.toward || 0);
     $('today-n').textContent = `🎟️ 뽑기권 ${tk}장 · 오늘 놀이 ${n}개 · ⭐ ${starsToday()} · 다음 뽑기권까지 ${left}판`;
@@ -454,8 +453,8 @@
     const agg = {};
     for (const day of Object.keys(R)) for (const [id, sc] of Object.entries(R[day])) { (agg[id] = agg[id] || []).push(sc); }
     const rows = Object.entries(agg).filter(([, a]) => a.length >= 2).map(([id, a]) => {
-      const [g, l, m] = id.split(":"); const G = GAMES[g]; if (!G || !G.labels[LB(l)]) return null;
-      return { label: G.labels[LB(l)][G.modes.indexOf(m)] || m, game: G.name, level: AGES[l] || l, avg: a.reduce((x, y) => x + y, 0) / a.length, n: a.length };
+      const [g, l, m] = id.split(":"); const G = GAMES[g]; if (!G || !G.labels[l]) return null;
+      return { label: G.labels[l][G.modes.indexOf(m)] || m, game: G.name, level: AGES[l] || l, avg: a.reduce((x, y) => x + y, 0) / a.length, n: a.length };
     }).filter(Boolean).sort((a, b) => a.avg - b.avg).slice(0, 3);
     $('weak').innerHTML = rows.length ? rows.map(r => `<div><span>${r.game} · ${r.label} (${r.level})</span><span>평균 ⭐ ${r.avg.toFixed(1)} · ${r.n}번</span></div>`).join('') : '<div><span>아직 자료가 부족해요. 같은 놀이를 두 번 이상 하면 나타나요.</span></div>';
     const total = Object.values(R).reduce((n, d) => n + Object.keys(d).length, 0);

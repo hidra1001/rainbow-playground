@@ -25,6 +25,8 @@ for f in ["hangul.html", "index.html", "arcade.html"]:
         texts.add(m.group(2)); texts.add(m.group(3))
     for m in re.finditer(r"\[\['([가-힣]+)','([가-힣]+)'\]", src):
         texts.add(m.group(1)); texts.add(m.group(2))
+PHRASES = ["일반 친구를 만났어요!", "희귀 친구를 만났어요!", "영웅 친구를 만났어요!", "전설 친구를 만났어요!", "신화 친구를 만났어요!", "새 친구를 만났어요!", "안녕! 나는 소화 놀이터 친구야", "어서 와요!", "잘했어요!", "다시 한번 해 봐요"]
+texts.update(PHRASES)
 texts = sorted(t for t in texts if 1 <= len(t) <= 40)
 print("texts:", len(texts))
 
@@ -43,6 +45,9 @@ async def one(sem, t):
 async def main():
     sem = asyncio.Semaphore(6)
     await asyncio.gather(*(one(sem, t) for t in texts))
+    keep = {safe(t) + ".mp3" for t in texts}
+    for f in os.listdir(OUT):
+        if f.endswith(".mp3") and f not in keep: os.remove(os.path.join(OUT, f))   # 이제 쓰지 않는 파일은 지워요
     files = [f for f in os.listdir(OUT) if f.endswith(".mp3")]
     total = sum(os.path.getsize(os.path.join(OUT, f)) for f in files)
     json.dump(sorted(f[:-4] for f in files), open(os.path.join(OUT, "list.json"), "w", encoding="utf-8"), ensure_ascii=False)

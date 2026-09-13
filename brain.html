@@ -160,15 +160,10 @@
     border-radius: 14px; background: var(--ground-2); border: 3px solid #FFD6E7;
   }
   .pitem.q { border: 3px dashed var(--pink); color: var(--pink); font-family: var(--display); font-size: 32px; }
-  .pitem.num { font-family: var(--display); font-size: 24px; }
-  .pitem.dots, .choice .dots { display: flex; flex-wrap: wrap; gap: 3px; padding: 7px; align-content: center; justify-content: center; }
-  .pitem.dots i, .choice .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--pink); }
-  .choice .dots { width: 54px; height: 54px; margin: 0 auto; }
   .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .choices.four { grid-template-columns: repeat(2, 1fr); }
   .choice { font-size: 36px; padding: 12px 4px; line-height: 1; }
   .choice.pc { background: #fff !important; color: var(--plum); border: 4px solid #FFD6E7; box-shadow: 0 7px 0 #FFC2DB !important; }
-  .choice.pc.num { font-size: 30px; }
   .choice:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.2) !important; }
   .choice:disabled { cursor: default; }
   .choice.right { background: var(--good) !important; color: #fff; border-color: #4DB369; box-shadow: 0 7px 0 #4DB369 !important; }
@@ -176,7 +171,6 @@
 
   /* 순서 기억 */
   .pads { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0 auto; max-width: 340px; }
-  .pads.six { grid-template-columns: repeat(3, 1fr); max-width: 400px; }
   .pad { aspect-ratio: 1; border: 0; border-radius: 28px; cursor: pointer; opacity: .5; transition: opacity .12s, transform .12s; box-shadow: 0 6px 0 rgba(0,0,0,.15); }
   .pad.lit { opacity: 1; transform: scale(1.06); box-shadow: 0 0 0 5px #fff, 0 0 26px rgba(0,0,0,.2); }
   .pad:focus-visible { outline: 4px solid var(--plum); }
@@ -309,13 +303,14 @@
   const shuffle = a => a.slice().sort(() => Math.random() - .5);
   const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답이에요!', '최고예요!', '멋져요!'];
 
-  const LEVEL_NAME = { five: "5살", easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
-  /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
+  const LEVEL_NAME = { easy: '6살' };
+  /* 난이도 조정 (-3에서 +3): 시작 전 화면에서 놀이마다 따로 정해요 */
   let DIFF = 0;
   { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
   const TS = () => 1 - EFF() * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
   const DIFF_TXT = () => DIFF ? (EFF() > 0 ? " +" + DIFF : " " + DIFF) : "";
-  const EFF = () => level === "five" ? Math.max(-3, DIFF - 2) : DIFF;   // 5살은 6살 놀이를 두 단계 더 쉽게
+  const EFF = () => DIFF;
+  const ADJ = () => EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0;
   const GAME_KEY = "brain";
   let pendingMode = null;
   const diffKey = m => "rp-diff:" + GAME_KEY + ":" + m;
@@ -328,34 +323,18 @@
     show("prestart");
   }
   const LEVEL_NOTE = {
-    five: "짝 2쌍 · 순서 1개부터 · 3×3 찾기 · 천천히",
-    easy: '짝 3쌍 · 쉬운 규칙 · 순서 2개부터 · 3×3 찾기',
-    hard: '짝 4쌍 · 세 가지 규칙 · 순서 3개부터 · 4×4 비슷한 그림',
-    pro: '짝 6쌍 · 색깔·개수 규칙 · 순서 4개부터 · 5×5 아주 비슷한 그림',
-    nine: '닮은 짝 8쌍 · 두 가지 규칙과 수열 · 6개 판 · 6×6에 10초 제한'
+    easy: '짝 3쌍 · 쉬운 규칙 · 순서 2개부터 · 3×3 찾기'
   };
   const MODE_LABEL = {
-    easy: { memory: ['🃏','짝 맞추기','카드 6장에서 같은 그림 3쌍을 찾아요'], pattern: ['🔮','규칙 찾기','다음에 올 그림을 골라요'], simon: ['🎵','순서 기억','불이 켜진 순서대로 눌러요'], odd: ['🔍','다른 그림 찾기','9개 중 다른 하나를 찾아요'] , tap: ["🔢","순서대로 누르기","1부터 10까지 빨리 눌러요"] },
-    hard: { memory: ['🃏','짝 맞추기','카드 8장에서 4쌍을 찾아요'], pattern: ['🔮','규칙 찾기','세 가지가 섞인 규칙을 찾아요'], simon: ['🎵','순서 기억','3개부터 점점 길어져요'], odd: ['🔍','다른 그림 찾기','16개 중 비슷한 그림 하나를 찾아요'] , tap: ["🔢","순서대로 누르기","1부터 15까지, 더 빨리!"] },
-    pro:  { memory: ['🃏','짝 맞추기','카드 12장에서 6쌍을 찾아요'], pattern: ['🔮','규칙 찾기','색깔이 바뀌고 점이 늘어나요'], simon: ['🎵','순서 기억','4개부터, 더 빨라져요'], odd: ['🔍','다른 그림 찾기','25개 중 아주 비슷한 하나를 찾아요'] , tap: ["🔢","순서대로 누르기","2씩 뛰어 세며 32까지"] },
-    nine: { memory: ['🃏','닮은 짝 맞추기','서로 닮은 그림 16장에서 8쌍을 찾아요'], pattern: ['🔮','규칙 찾기','두 가지 규칙과 숫자 수열'], simon: ['🎵','순서 기억','판 6개, 5개부터 시작해요'], odd: ['🔍','다른 그림 찾기','36개 중 하나를 10초 안에 찾아요'] , tap: ["🔢","순서대로 누르기","3씩 뛰어 세며 60까지"] },
+    easy: { memory: ['🃏','짝 맞추기','카드 6장에서 같은 그림 3쌍을 찾아요'], pattern: ['🔮','규칙 찾기','빈칸에 올 그림을 골라요'], simon: ['🎵','순서 기억','불이 켜진 순서대로 눌러요'], odd: ['🔍','다른 그림 찾기','9개 중 다른 하나를 찾아요'] , tap: ["🔢","순서대로 누르기","1부터 10까지 빨리 눌러요"] },
   };
-  MODE_LABEL.five = MODE_LABEL.easy;
   const modeName = (m, l) => MODE_LABEL[l][m][1];
 
   /* 그림 재료 */
   const EMO = ['🍎','🍌','🍓','🐶','🐱','🐰','⭐','🌈','🎈','🚗','🐸','🦋','🌸','🍩','🦄','🐥','🍉','🐢','🎁','🚀'];
-  const LOOK_GROUPS = [['😀','😃','😄','😁'],['🐢','🐊','🦎'],['🌝','🌕','🌞'],['🔵','🟦','🔷'],['🍎','🍅','🍒'],['🐶','🐺','🦊'],['🐱','🐯','🦁'],['🍪','🥞','🍩'],['🌲','🌳','🎄'],['🐭','🐹','🐨']];
-  const SHAPES = ['●','■','▲','★','◆'];
-  const COLORS = ['#FF6B6B','#FFB347','#7ED957','#5DADE2','#B57EDC'];
-  const ODD = {
-    easy: [['🐱','🐶'],['🍎','🍌'],['⭐','🌙'],['🐸','🐷'],['🚗','🚌'],['🌸','🌻'],['🍓','🍇'],['🐰','🐻'],['🎈','🎁'],['🦋','🐝']],
-    hard: [['🐶','🐺'],['🍎','🍅'],['🐱','🐯'],['🍪','🍩'],['🌝','🌚'],['🐢','🐊'],['🦋','🐛'],['🍋','🍊'],['🐭','🐹'],['🌷','🌹'],['🐔','🐓'],['🚗','🚙']],
-    pro:  [['😀','😃'],['😄','😁'],['🌝','🌕'],['🔵','🟦'],['🟢','🟩'],['🐢','🦎'],['🍏','🍐'],['🐑','🐐'],['🦆','🐤'],['🥛','🥤'],['🌲','🌳'],['🕐','🕑'],['🔴','🟠'],['🐈','🐆'],['🙂','😊']],
-    nine: [['😀','😃'],['😄','😁'],['🌝','🌕'],['🔵','🟦'],['🟢','🟩'],['🐢','🦎'],['🍏','🍐'],['🐑','🐐'],['🕐','🕜'],['🌛','🌜'],['◀️','▶️'],['🔺','🔻'],['🙂','🙃'],['😊','😌'],['🌞','🌝'],['🟥','🟧'],['🚙','🚗'],['🐈','🐈‍⬛']],
-  };
+  const ODD = [['🐱','🐶'],['🍎','🍌'],['⭐','🌙'],['🐸','🐷'],['🚗','🚌'],['🌸','🌻'],['🍓','🍇'],['🐰','🐻'],['🎈','🎁'],['🦋','🐝']];
 
-  let level = 'hard';
+  let level = 'easy';
   let state = null;
   let timers = [];
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
@@ -378,7 +357,7 @@
   const sndBad = () => { tone(220, 0, .25, 'triangle', .12); };
   const sndTap = () => { tone(880, 0, .08, 'sine', .1); };
   const sndWin = () => { [523,659,784,1047,784,1047].forEach((f,i)=>tone(f, i*.13, .25)); };
-  const PAD_FREQ = [262, 330, 392, 523, 659, 784];
+  const PAD_FREQ = [262, 330, 392, 523];
 
   /* 색종이 */
   const cv = $('confetti'), cx = cv.getContext('2d');
@@ -437,7 +416,7 @@
 
   function start(mode) {
     clearTimers();
-    state = { mode, level: level === "five" ? "easy" : level, age: level, round: 0, score: 0, locked: false, tried: false };
+    state = { mode, level, age: level, round: 0, score: 0, locked: false, tried: false };
     $("tag").textContent = LEVEL_NAME[level] + DIFF_TXT() + ' · ' + modeName(mode, level);
     say('');
     show('game');
@@ -453,11 +432,9 @@
 
   /* ───────── 1. 짝 맞추기 ───────── */
   function setupMemory() {
-    const pairs = Math.max(2, { easy: 3, hard: 4, pro: 6, nine: 8 }[state.level] + 0 + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0));   // 미션일 때는 두 쌍 더
-    const cols = pairs >= 10 ? 5 : pairs >= 5 ? 4 : 3;
-    let faces;
-    if (state.level === 'nine') faces = shuffle(LOOK_GROUPS).slice(0, Math.ceil(pairs / 2)).flatMap(g => shuffle(g).slice(0, 2)).slice(0, pairs);
-    else faces = shuffle(EMO).slice(0, pairs);
+    const pairs = Math.max(2, 3 + ADJ());
+    const cols = pairs >= 5 ? 4 : 3;
+    const faces = shuffle(EMO).slice(0, pairs);
     const cards = shuffle(faces.flatMap(f => [f, f]));
     state.m = { pairs, moves: 0, matched: 0, open: [] };
     setRound('한 판');
@@ -494,74 +471,19 @@
 
   /* ───────── 2. 규칙 찾기 ───────── */
   const emo = v => ({ t: 'emo', v });
-  const shp = (s, c) => ({ t: 'shape', s, c });
-  const dots = n => ({ t: 'dots', n });
-  const num = n => ({ t: 'num', n });
   const key = it => JSON.stringify(it);
-  function inner(it) {
-    if (it.t === 'emo') return it.v;
-    if (it.t === 'shape') return `<span style="color:${it.c}">${it.s}</span>`;
-    if (it.t === 'dots') return `<span class="dots">${'<i></i>'.repeat(it.n)}</span>`;
-    return String(it.n);
-  }
-  function itemHTML(it) {
-    const cls = it.t === 'dots' ? ' dots' : it.t === 'num' ? ' num' : '';
-    return `<span class="pitem${cls}">${it.t === 'dots' ? '<i></i>'.repeat(it.n) : inner(it)}</span>`;
-  }
+  const inner = it => it.v;
+  const itemHTML = it => `<span class="pitem">${inner(it)}</span>`;
   function uniq(items) { const seen = new Set(); return items.filter(i => { const k = key(i); if (seen.has(k)) return false; seen.add(k); return true; }); }
   function fromUnit(unit, map, len) {
     const seq = []; for (let i = 0; i < len; i++) seq.push(map[unit[i % unit.length]]);
     return { seq, ans: map[unit[len % unit.length]] };
   }
   function makePattern() {
-    const L = state.level;
-    if (L === 'easy') {
-      const em = shuffle(EMO).slice(0, 3);
-      const { seq, ans } = fromUnit(pick(['AB','AAB','ABB']), { A: emo(em[0]), B: emo(em[1]) }, 6);
-      const choices = uniq([ans, emo(em[0]), emo(em[1]), emo(em[2])]).slice(0, 3);
-      return { seq, ans, choices: shuffle(choices), kind: 'emo' };
-    }
-    if (L === 'hard') {
-      const em = shuffle(EMO).slice(0, 4);
-      const { seq, ans } = fromUnit(pick(['ABC','ABB','AABB','ABAC','ABCC']), { A: emo(em[0]), B: emo(em[1]), C: emo(em[2]) }, 7);
-      const choices = uniq([ans, emo(em[0]), emo(em[1]), emo(em[2]), emo(em[3])]).slice(0, 4);
-      return { seq, ans, choices: shuffle(choices), kind: 'emo' };
-    }
-    if (L === 'pro') {
-      if (rnd(3) === 0) {           // 점이 늘거나 줄어요
-        const asc = rnd(2) === 0, start = asc ? 1 + rnd(2) : 7;
-        const seq = []; for (let i = 0; i < 5; i++) seq.push(dots(asc ? start + i : start - i));
-        const a = asc ? start + 5 : start - 5;
-        const cands = [a + 1, a - 1, a + 2, a - 2].filter(n => n >= 1 && n <= 8 && n !== a);
-        return { seq, ans: dots(a), choices: shuffle(uniq([dots(a), ...cands.map(dots)]).slice(0, 4)), kind: 'dots' };
-      }
-      const sh = shuffle(SHAPES).slice(0, 3), co = shuffle(COLORS).slice(0, 3);
-      const map = { A: shp(sh[0], co[0]), B: shp(sh[1], co[1]), C: shp(sh[2], co[2]) };
-      const { seq, ans } = fromUnit(pick(['AB','ABC','AABB','ABB','ABAC']), map, 7);
-      const oc = co.find(c => c !== ans.c), os = sh.find(s => s !== ans.s);
-      const choices = uniq([ans, shp(ans.s, oc), shp(os, ans.c), shp(os, oc), map.A, map.B, map.C]).slice(0, 4);
-      return { seq, ans, choices: shuffle(choices), kind: 'shape' };
-    }
-    // 9살
-    if (rnd(3) === 0) {             // 모양과 색깔이 서로 다른 주기로 바뀌어요
-      const p1 = pick([2, 3]), p2 = p1 === 2 ? 3 : 2;
-      const sh = shuffle(SHAPES).slice(0, p1), co = shuffle(COLORS).slice(0, p2);
-      const item = i => shp(sh[i % p1], co[i % p2]);
-      const seq = []; for (let i = 0; i < 7; i++) seq.push(item(i));
-      const ans = item(7);
-      const oc = pick(co.filter(c => c !== ans.c)), os = pick(sh.filter(s => s !== ans.s));
-      return { seq, ans, choices: shuffle([ans, shp(ans.s, oc), shp(os, ans.c), shp(os, oc)]), kind: 'shape' };
-    }
-    // 숫자 수열
-    const kind = pick(['arith', 'arith', 'double', 'tri', 'grow', 'alt']);
-    let seq = [], a, step = 1;
-    if (kind === 'arith') { const s = 1 + rnd(10); step = 2 + rnd(6); seq = [0,1,2,3,4].map(i => s + i * step); a = s + 5 * step; }
-    else if (kind === 'double') { const s = pick([1, 2, 3]); seq = [0,1,2,3,4].map(i => s * 2 ** i); a = s * 32; step = a / 2; }
-    else if (kind === 'tri') { const s = pick([0, 1, 2]); seq = [1,3,6,10,15].map(n => n + s); a = 21 + s; step = 6; }
-    else if (kind === 'grow') { const s = pick([1, 2, 3]); seq = [0,1,3,6,10].map(n => n + s); a = 15 + s; step = 5; }
-    else { const s = 1 + rnd(5), d1 = 1 + rnd(3), d2 = 4 + rnd(4); seq = [s]; for (let i = 1; i < 5; i++) seq.push(seq[i-1] + (i % 2 ? d1 : d2)); a = seq[4] + d1; step = d1; }
-    const cands = uniq([a + step, a - step, a + 1, a - 1, a + 2, a - 2, a + step + 1].filter(n => n > 0 && n !== a).map(num));
-    return { seq: seq.map(num), ans: num(a), choices: shuffle([num(a), ...shuffle(cands).slice(0, 3)]), kind: 'num' };
+    const em = shuffle(EMO).slice(0, 3);
+    const { seq, ans } = fromUnit(pick(['AB','AAB','ABB']), { A: emo(em[0]), B: emo(em[1]) }, 6);
+    const choices = uniq([ans, emo(em[0]), emo(em[1]), emo(em[2])]).slice(0, 3);
+    return { seq, ans, choices: shuffle(choices) };
   }
   function nextPattern() {
     const q = makePattern(); state.tried = false;
@@ -570,10 +492,10 @@
     if (key(ans2) !== key(q.ans)) { q.ans = ans2; q.choices = shuffle(uniq([ans2, ...q.choices.filter(c => key(c) !== key(ans2))]).slice(0, q.choices.length)); }
     q.full = full; q.blank = bi; state.q = q;
     setRound();
-    ask(q.kind === 'num' ? '규칙을 찾아 빈칸의 숫자를 골라요' : q.kind === 'dots' ? '점이 어떻게 변하는지 보고 빈칸을 골라요' : '규칙을 찾아 빈칸에 올 것을 골라요');
+    ask('규칙을 찾아 빈칸에 올 것을 골라요');
     $('area').innerHTML = `<div class="prow">${q.full.map((it, i) => i === q.blank ? '<span class="pitem q">?</span>' : itemHTML(it)).join('')}</div>
       <div class="choices${q.choices.length === 4 ? ' four' : ''}">${q.choices.map((c, i) =>
-        `<button class="btn choice pc${c.t === 'num' ? ' num' : ''}" id="pch-${i}" data-i="${i}">${inner(c)}</button>`).join('')}</div>`;
+        `<button class="btn choice pc" id="pch-${i}" data-i="${i}">${inner(c)}</button>`).join('')}</div>`;
     say('');
     state.locked = false;
   }
@@ -596,13 +518,13 @@
 
   /* ───────── 3. 순서 기억 ───────── */
   function startSimon() {
-    const n = state.level === 'nine' ? 6 : 4;
-    const startLen = Math.max(1, { easy: 2, hard: 3, pro: 4, nine: 5 }[state.level] + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0));
-    const lit = Math.round({ easy: 600, hard: 500, pro: 420, nine: 340 }[state.level] * TS());
+    const n = 4;
+    const startLen = Math.max(1, 2 + ADJ());
+    const lit = Math.round(600 * TS());
     state.s = { n, seq: [], pos: 0, input: false, lit, gap: 170 };
     while (state.s.seq.length < startLen) state.s.seq.push(rnd(n));
-    const pal = ['var(--r1)','var(--r2)','var(--r4)','var(--r5)','var(--r6)','var(--r3)'];
-    $('area').innerHTML = `<div class="pads${n === 6 ? ' six' : ''}" id="pads">${Array.from({length: n}, (_, i) =>
+    const pal = ['var(--r1)','var(--r2)','var(--r4)','var(--r5)'];
+    $('area').innerHTML = `<div class="pads" id="pads">${Array.from({length: n}, (_, i) =>
       `<button class="pad" id="pad-${i}" data-i="${i}" style="background:${pal[i]}" aria-label="${i + 1}번 판"></button>`).join('')}</div>`;
     later(showSeq, 700);
   }
@@ -641,19 +563,20 @@
 
   /* ───────── 4. 다른 그림 찾기 ───────── */
   function nextOdd() {
-    const g = { easy: 3, hard: 4, pro: 5, nine: 6 }[state.level];
-    let [base, odd] = pick(ODD[state.level]);
+    const g = 3;
+    let [base, odd] = pick(ODD);
     if (rnd(2)) [base, odd] = [odd, base];
     const oddIdx = rnd(g * g);
     state.o = { oddIdx, tried: false, done: false };
     state.tried = false;
     setRound(); ask('다른 그림 하나를 찾아 눌러요'); say('');
     const fs = `calc(min(480px, 100vw - 90px) / ${g} * 0.58)`;
-    $("area").innerHTML = (state.level === "nine" || EFF() >= 2 ? `<div class="timer"><i id="tbar"></i></div>` : "") +
+    const timed = EFF() >= 2;   // 어려운 난이도에선 10초 제한
+    $("area").innerHTML = (timed ? `<div class="timer"><i id="tbar"></i></div>` : "") +
       `<div class="ogrid" style="grid-template-columns:repeat(${g},1fr)">${Array.from({length: g * g}, (_, i) =>
         `<button class="ocell" id="oc-${i}" data-i="${i}" style="font-size:${fs}">${i === oddIdx ? odd : base}</button>`).join('')}</div>`;
     state.locked = false;
-    if (state.level === "nine" || EFF() >= 2) {
+    if (timed) {
       const bar = $("tbar");
       requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = '0%'; }));
       state.o.timer = later(() => {
@@ -684,13 +607,13 @@
 
   /* ───────── 5. 순서대로 누르기 ───────── */
   function setupTap() {
-    const cfg = { easy: { n: 10, step: 1, par: 20 }, hard: { n: 15, step: 1, par: 25 }, pro: { n: 16, step: 2, par: 32 }, nine: { n: 20, step: 3, par: 45 } }[state.level];
+    const cfg = { n: 10, step: 1, par: 20 };
     const nums = Array.from({ length: cfg.n }, (_, i) => (i + 1) * cfg.step);
     const order = shuffle(nums);
     state.t = { nums, next: 0, wrong: 0, t0: Date.now(), par: cfg.par * TS() };
     setRound('한 판');
-    ask(cfg.step === 1 ? `1부터 ${cfg.n}까지 순서대로 눌러요` : `${cfg.step}씩 뛰어 세며 순서대로 눌러요 (${cfg.step}, ${cfg.step * 2}, ${cfg.step * 3}…)`);
-    const cols = cfg.n <= 10 ? 5 : cfg.n <= 16 ? 4 : 5;
+    ask(`1부터 ${cfg.n}까지 순서대로 눌러요`);
+    const cols = 5;
     $('area').innerHTML = `<p class="info" id="tinfo">⏱ 0초 · 다음 수: ${nums[0]}</p><div class="tgrid" style="grid-template-columns:repeat(${cols},1fr)">${order.map(v => `<button class="tcell" data-v="${v}">${v}</button>`).join('')}</div>`;
     state.locked = false;
     state.t.tick = setInterval(() => { const el = $('tinfo'); if (el && state.t) el.textContent = `⏱ ${Math.floor((Date.now() - state.t.t0) / 1000)}초 · 다음 수: ${state.t.nums[state.t.next] ?? '끝!'}`; }, 500);
@@ -721,15 +644,13 @@
   function finish() {
     clearTimers();
     saveBest();
-    const s = state.score, L = state.level, m = state.mode;
+    const s = state.score, m = state.mode;
     $('result-score').textContent = '⭐ ' + s + ' / ' + TOTAL;
     let extra = '';
     if (m === 'memory') extra = `뒤집은 횟수 ${state.m.moves}번으로 ${state.m.pairs}쌍을 모두 찾았어요.`;
     if (m === 'simon') extra = `순서 ${s}개까지 기억했어요.`;
-    if (s === TOTAL) {
-      $('result-emoji').textContent = '🦄'; $('result-title').textContent = '완벽해요! 두뇌 박사님!';
-      $('result-msg').textContent = extra || (L === 'easy' ? '이제 7살 놀이에 도전해 볼까요?' : L === 'hard' ? '이제 8살 놀이에 도전해 볼까요?' : L === 'pro' ? '이제 9살 놀이에 도전해 볼까요?' : '별 열 개를 모두 모았어요!');
-    } else if (s >= 7) { $('result-emoji').textContent = '🌈'; $('result-title').textContent = '정말 잘했어요!'; $('result-msg').textContent = extra || '조금만 더 하면 별을 다 모을 수 있어요.'; }
+    if (s === TOTAL) { $('result-emoji').textContent = '🦄'; $('result-title').textContent = '완벽해요! 두뇌 박사님!'; $('result-msg').textContent = extra || '별 열 개를 모두 모았어요!'; }
+    else if (s >= 7) { $('result-emoji').textContent = '🌈'; $('result-title').textContent = '정말 잘했어요!'; $('result-msg').textContent = extra || '조금만 더 하면 별을 다 모을 수 있어요.'; }
     else { $('result-emoji').textContent = '🌸'; $('result-title').textContent = '열심히 했어요!'; $('result-msg').textContent = extra || '천천히 다시 해 보면 더 잘할 수 있어요.'; }
     show('result'); sndWin(); confetti(120);
   }
@@ -750,11 +671,9 @@
       $('ico-' + m).textContent = ico;
       $('label-' + m).innerHTML = title + '<small>' + small + '</small>';
     }
-    try { localStorage.setItem('rainbow-brain-level', l); } catch (e) {}
   }
 
   /* 이벤트 */
-  document.querySelectorAll('.level button').forEach(b => b.addEventListener('click', () => setLevel(b.dataset.level)));
   document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => openPrestart(b.dataset.mode)));
   $('area').addEventListener('click', e => {
     if (!state) return;
@@ -769,8 +688,7 @@
   $("home-btn").addEventListener("click", () => { location.href = "index.html"; });
   $("quit").addEventListener("click", () => { location.href = "index.html"; });
 
-  /* 놀이터(index.html) 미션 연동 */
-  let missionId = null;
+  /* 놀이터(index.html) 연동: 놀이를 마치면 기록해요 */
   function reportMission() {
     const missionId = GAME_KEY + ":" + state.level + ":" + state.mode;   // 오늘 한 놀이로 기록
     try {
@@ -779,7 +697,7 @@
       all[day] = all[day] || {};
       all[day][missionId] = Math.max(all[day][missionId] || 0, Math.round(state.score * 10 / TOTAL));
       localStorage.setItem(key, JSON.stringify(all));
-      // 뽑기 에너지용 기록: 놀이를 마칠 때마다 한 줄씩
+      // 뽑기권용 기록: 놀이를 마칠 때마다 한 줄씩
       const lg = JSON.parse(localStorage.getItem("rp-log") || "[]"); lg.push({ t: Date.now(), id: missionId, score: Math.round(state.score * 10 / TOTAL) }); if (lg.length > 500) lg.splice(0, lg.length - 500); localStorage.setItem("rp-log", JSON.stringify(lg));
     } catch (e) {}
     $("to-hub").hidden = true; $("home-btn").hidden = false;
@@ -787,29 +705,22 @@
   }
   function launchFromUrl() {
     const p = new URLSearchParams(location.search);
-    const l = p.get("level"), m = p.get("mode");
-    if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
-    missionId = GAME_KEY + ":" + l + ":" + m;
+    const m = p.get("mode");
+    if (!m || !MODE_LABEL.easy[m]) return false;
     const n = +p.get("n"); if (n === 5 || n === 10) TOTAL = n;
-    setLevel(l); openPrestart(m); return true;
+    setLevel("easy"); openPrestart(m); return true;
   }
   function renderDiff() {
     document.querySelectorAll("#diffrow button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.diff === DIFF ? "true" : "false"));
   }
   document.querySelectorAll("#diffrow button").forEach(b => b.addEventListener("click", () => { DIFF = +b.dataset.diff; try { localStorage.setItem(diffKey(pendingMode || (state && state.mode) || "x"), DIFF); } catch (e) {} renderDiff(); }));
   $("ps-start").addEventListener("click", () => { if (pendingMode) start(pendingMode); });
-  function boot(data) {
-    let saved = 'hard';
-    try { saved = localStorage.getItem('rainbow-brain-level') || 'hard'; } catch (e) {}
-    if (data && data.level && LEVEL_NAME[data.level]) saved = data.level;
-    if (!LEVEL_NAME[saved]) saved = 'hard';
-    saved = "easy";   // 지금은 6살 놀이만 보여 줘요 (5·7·8·9살 내용은 숨김)
-    setLevel(saved);
+  function boot() {
+    setLevel("easy");
     if (launchFromUrl()) return;
     show('home');
   }
-  if (window.claude?.hot?.snapshot) window.claude.hot.snapshot(() => ({ level }));
-  window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+  boot();
 })();
 </script>
 

@@ -123,8 +123,6 @@
   .coin.c10 { width: 40px; height: 40px; font-size: 14px; background: #E9A86B; border-color: #C9853F; }
   .coin.c50 { width: 46px; height: 46px; font-size: 15px; background: #E8E8E8; border-color: #B8B8B8; color: #444; }
   .coin.c100 { width: 54px; height: 54px; font-size: 17px; background: #EDEDED; border-color: #B0B0B0; color: #333; }
-  .coin.c500 { width: 64px; height: 64px; font-size: 19px; background: #F2F2F2; border-color: #A8A8A8; color: #222; }
-  .bill { display: inline-grid; place-items: center; width: 110px; height: 54px; border-radius: 8px; background: #CFE3F5; border: 3px solid #7FA8D0; font-family: var(--display); font-size: 20px; color: #1F4E79; }
   .best { text-align: center; font-size: 15px; color: var(--plum-soft); margin: 14px 0 0; line-height: 1.6; }
 
   .stars { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -145,20 +143,6 @@
   .tenframe i { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #FFB3D1; background: #fff; }
   .tenframe i.on { background: var(--pink); border-color: var(--pink-deep); }
   .tenframe i.q { background: repeating-linear-gradient(45deg, #FFE4F0 0 4px, #fff 4px 8px); border-style: dashed; }
-  .dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .dots .g { display: grid; grid-template-columns: repeat(3, 14px); gap: 4px; padding: 6px; border-radius: 12px; background: var(--ground-2); border: 2px solid #FFD6E7; }
-  .dots .g i { width: 14px; height: 14px; border-radius: 50%; background: var(--r6); }
-  .bond { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; justify-items: center; align-items: center; font-family: var(--display); font-size: 36px; }
-  .bond .n { width: 80px; height: 80px; border-radius: 50%; display: grid; place-items: center; background: var(--ground-2); border: 4px solid var(--r5); color: var(--plum); }
-  .bond .top { grid-column: 1 / 3; border-color: var(--pink); }
-  .bond .n.q { border-style: dashed; color: var(--pink); }
-  .column { font-family: var(--display); font-size: clamp(40px, 12vw, 56px); font-variant-numeric: tabular-nums; text-align: right; line-height: 1.15; padding: 8px 18px; background: var(--ground-2); border-radius: 20px; border: 3px solid #FFD6E7; }
-  .column .row { display: flex; justify-content: flex-end; gap: .3em; }
-  .column .row.op { border-bottom: 4px solid var(--plum); padding-bottom: 4px; }
-  .column .row.op span:first-child { color: var(--pink); }
-  .column .ans { color: var(--pink); min-height: 1.15em; }
-  .column .ans.no { animation: shake .4s; color: var(--oops); }
-  .clock { width: 190px; height: 190px; }
 
   /* 식 */
   .eq {
@@ -178,7 +162,6 @@
   .eq .box.no { border-color: var(--oops); animation: shake .4s; }
   .eq .box.reveal { border-style: solid; background: var(--r2); color: #fff; border-color: #D9902E; }
   .eq.seq .cell { display: inline-grid; place-items: center; min-width: 1.4em; height: 1.35em; padding: 0 .2em; border-radius: 16px; background: var(--ground-2); border: 3px solid #FFD6E7; font-size: .8em; }
-  .eq.small { font-size: clamp(30px, 8vw, 44px); }
 
   .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .choices.four { grid-template-columns: repeat(2, 1fr); }
@@ -195,11 +178,6 @@
   .choice.wrong { background: #E9C8D6 !important; box-shadow: 0 7px 0 #C9A6B8 !important; color: #fff; }
 
   /* 숫자판 */
-  .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 320px; margin: 0 auto; }
-  .pad .btn { font-size: 30px; padding: 12px 0; background: var(--r5); box-shadow: 0 6px 0 #3F8FC2; }
-  .pad .btn:active { box-shadow: 0 2px 0 #3F8FC2; }
-  .pad .btn.del { background: var(--r2); box-shadow: 0 6px 0 #D9902E; font-size: 24px; }
-  .pad .btn.ok { background: var(--r4); box-shadow: 0 6px 0 #5FB25A; }
 
   .feedback { min-height: 34px; text-align: center; font-family: var(--display); font-size: 26px; margin-top: 16px; color: var(--pink-deep); }
   .feedback.good { color: #3FA85D; }
@@ -307,12 +285,7 @@
     <div class="stage" id="stage"></div>
     <div class="eq" id="eq"></div>
     <div class="choices" id="choices"></div>
-    <div class="pad" id="pad" hidden>
-      <button class="btn" data-k="7">7</button><button class="btn" data-k="8">8</button><button class="btn" data-k="9">9</button>
-      <button class="btn" data-k="4">4</button><button class="btn" data-k="5">5</button><button class="btn" data-k="6">6</button>
-      <button class="btn" data-k="1">1</button><button class="btn" data-k="2">2</button><button class="btn" data-k="3">3</button>
-      <button class="btn del" data-k="del">⌫</button><button class="btn" data-k="0">0</button><button class="btn ok" data-k="ok">✓</button>
-    </div>
+    <div class="pad" id="pad" hidden></div>
     <div class="feedback" id="feedback" aria-live="polite"></div>
   </section>
 
@@ -336,13 +309,13 @@
   let TOTAL = 10;
   const FRUITS = ['🍓','🍎','🍊','🍇','🌸','⭐','🍬','🍪','🧁','🎈','🐣','🦋'];
   const PRAISE = ['참 잘했어요!', '딩동댕!', '와, 대단해!', '정답이에요!', '최고예요!', '멋져요!'];
-  const LEVEL_NAME = { five: "5살", easy: '6살', hard: '7살', pro: '8살', nine: '9살' };
+  const LEVEL_NAME = { easy: '6살' };
   /* 난이도 조정 (-3에서 +3): 놀이터 설정(rp-diff)이나 주소의 diff= 로 정해요 */
   let DIFF = 0;
   { const d = new URLSearchParams(location.search).get("diff"); if (d !== null && d !== "" && Math.abs(+d) <= 3) DIFF = +d; }
   const TS = () => 1 - EFF() * .16;                                    // 시간 배율: 쉬우면 더 길게, 어려우면 더 짧게
   const DIFF_TXT = () => DIFF ? (EFF() > 0 ? " +" + DIFF : " " + DIFF) : "";
-  const EFF = () => level === "five" ? Math.max(-3, DIFF - 2) : DIFF;   // 5살은 6살 놀이를 두 단계 더 쉽게
+  const EFF = () => DIFF;
   const GAME_KEY = "math";
   let pendingMode = null;
   const diffKey = m => "rp-diff:" + GAME_KEY + ":" + m;
@@ -355,19 +328,11 @@
     show("prestart");
   }
   const LEVEL_NOTE = {
-    five: "5까지 수 · 그림 세기 · 보기 2~3개 · 아주 천천히",
     easy: '10까지 더하기·빼기 · 20까지 세기 · 10 만들기 · 빠진 수',
-    hard: '받아올림 있는 20까지 · 가르기와 모으기 · 세 수 계산 · 뛰어 세기',
-    pro: '두 자리 세로셈 · 세 수 섞어 계산 · 구구단 2~5단 · 시계 읽기 (숫자 직접 입력)',
-    nine: '세 자리 세로셈 · 구구단 2~9단과 빈칸 · 나눗셈 · 수의 규칙 찾기'
   };
   const MODE_LABEL = {
     easy: { a: ['🍓','더하기 빼기','그림을 세어 10까지 더하고 빼요'], b: ['🔢','몇 개일까?','그림을 세어 20까지 수를 찾아요'], c: ['🔟','10 만들기','몇을 더해야 10이 될까요?'], d: ['🚂','빠진 수 찾기','1부터 30까지 수의 순서를 채워요'] , e: ["📖","문장제","이야기를 읽고 몇 개인지 구해요"], f: ["🪙","돈 세기","100원, 10원 동전을 세어요"] },
-    hard: { a: ['➕','20까지 더하기 빼기','받아올림·받아내림이 있어요'], b: ['🥚','가르기와 모으기','9는 4와 몇으로 가를까요?'], c: ['🎯','세 수 계산','3 + 4 + 2 처럼 세 수를 계산해요'], d: ['🐇','뛰어 세기','2씩, 5씩, 10씩 뛰어 세어요'] , e: ["📖","문장제","버스에 몇 명? 몇 개 더 있어야 할까?"], f: ["🪙","돈 세기","100원, 50원, 10원을 세어요"] },
-    pro:  { a: ['📝','두 자리 세로셈','받아올림·받아내림 있는 두 자리 수'], b: ['🎯','세 수 섞어 계산','23 + 18 − 9 처럼 계산해요'], c: ['✖️','구구단 2~5단','묶음 그림을 보며 곱셈을 해요'], d: ['🕒','시계 읽기','몇 시, 몇 시 30분을 읽어요'] , e: ["📖","문장제","곱셈이 들어간 이야기 문제 (입력)"], f: ["🪙","돈 세기","500원까지 동전을 세어요 (입력)"] },
-    nine: { a: ['📝','세 자리 세로셈','356 + 278, 503 − 247 처럼 계산해요'], b: ['✖️','구구단 2~9단','빈칸이 있는 곱셈도 나와요'], c: ['➗','나눗셈','구구단을 거꾸로! 42 ÷ 6'], d: ["🔮","규칙 찾기·시계","수의 규칙과 5분 단위 시계 읽기"] , e: ["📖","문장제","두 단계로 푸는 이야기 문제 (입력)"], f: ["🪙","돈과 거스름돈","1000원 지폐와 거스름돈 (입력)"] },
   };
-  MODE_LABEL.five = MODE_LABEL.easy;
   const modeName = (m, l) => MODE_LABEL[l][m][1];
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -375,8 +340,8 @@
   const pick = a => a[rnd(a.length)];
   const shuffle = a => a.slice().sort(() => Math.random() - .5);
 
-  let level = 'hard';
-  let state = { mode: 'a', level, round: 0, score: 0, q: null, locked: false, tries: 0, typed: '', startedAt: 0, review: [] };
+  let level = 'easy';
+  let state = { mode: 'a', level, round: 0, score: 0, q: null, locked: false, tries: 0, startedAt: 0, review: [] };
 
   /* 소리 */
   let ac = null;
@@ -393,7 +358,6 @@
   }
   const sndGood = () => { tone(523, 0, .15); tone(659, .12, .15); tone(784, .24, .3); };
   const sndBad = () => { tone(220, 0, .25, 'triangle', .12); };
-  const sndTap = () => { tone(880, 0, .06, 'sine', .08); };
   const sndWin = () => { [523,659,784,1047,784,1047].forEach((f,i)=>tone(f, i*.13, .25)); };
 
   /* 색종이 */
@@ -456,18 +420,16 @@
     while (set.size < n && guard++ < 50) { const c = ans + rng(-12, 12); if (c >= min && c <= max) set.add(c); }
     return shuffle([...set]);
   }
-  const fmtClock = (h, m) => h + '시' + (m ? ' ' + m + '분' : '');
 
   /* 문제 만들기 -------------------------------------------------- */
   function makeQ() {
-    const L = state.level, m = state.mode, r = state.round;
-    const nC = Math.max(level === "five" ? 2 : 3, Math.min(5, (L === "easy" ? 3 : 4) + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0)));
-    if (m === "e") return wordProblem(L, nC);
-    if (m === "f") return moneyQ(L, nC);
-    if (L === "nine" && m === "d" && Math.random() < .5) return clockQ(nC);
-    const q = { kind: 'expr', ans: 0, choices: null, input: false, stage: '', eq: '', ask: '', label: '' };
+    const m = state.mode, r = state.round;
+    const nC = Math.max(3, Math.min(5, 3 + (EFF() >= 2 ? 1 : EFF() <= -2 ? -1 : 0)));
+    if (m === "e") return wordProblem(nC);
+    if (m === "f") return moneyQ(nC);
+    const q = { kind: 'expr', ans: 0, choices: null, stage: '', eq: '', ask: '', label: '' };
 
-    if (L === 'easy') {
+    {
       if (m === 'a') {            // 10까지 더하기·빼기 (그림)
         const op = EFF() <= -2 ? "+" : (r < 4 && EFF() < 2) ? "+" : pick(["+", "-"]);
         const cap = Math.max(4, Math.min(20, (r < 3 ? 6 : 10) + EFF() * 2));
@@ -510,139 +472,6 @@
         q.label = seq.map((v, i) => i === bi ? '?' : v).join(', ');
         q.choices = numChoices(q.ans, nC, { min: 1, max: 40 });
       }
-    } else if (L === 'hard') {
-      if (m === 'a') {            // 20까지, 받아올림·받아내림
-        const op = pick(['+', '+', '-']);
-        let a, b;
-        if (op === '+') { a = rng(5, 9); b = rng(11 - a, 9); q.ans = a + b; }          // 합 11~18
-        else { a = rng(11, 18); b = rng(a - 9, 9); q.ans = a - b; }                     // 받아내림
-        q.eq = `<span>${a}</span><span class="sign">${op === '+' ? '+' : '−'}</span><span>${b}</span><span class="sign">=</span><span class="box" id="ansbox">?</span>`;
-        q.label = `${a} ${op === '+' ? '+' : '−'} ${b}`;
-        q.ask = op === '+' ? '10을 먼저 만들어 더해 보세요' : '10에서 먼저 빼 보세요';
-        q.choices = numChoices(q.ans, nC, { min: 0, max: 20, extra: [q.ans + (op === '+' ? -10 : 10)] });
-      } else if (m === 'b') {     // 가르기·모으기
-        const whole = rng(5, 10), part = rng(1, whole - 1);
-        const split = Math.random() < .6;
-        q.kind = 'bond';
-        if (split) {
-          q.ans = whole - part;
-          q.stage = `<div class="bond"><div class="n top">${whole}</div><div class="n">${part}</div><div class="n q">?</div></div>`;
-          q.ask = `${whole}은(는) ${part}와(과) 몇으로 가를 수 있을까요?`;
-          q.label = `${whole} → ${part}, ?`;
-        } else {
-          q.ans = whole;
-          q.stage = `<div class="bond"><div class="n top q">?</div><div class="n">${part}</div><div class="n">${whole - part}</div></div>`;
-          q.ask = `${part}와(과) ${whole - part}을(를) 모으면 몇일까요?`;
-          q.label = `${part}, ${whole - part} → ?`;
-        }
-        q.eq = '';
-        q.choices = numChoices(q.ans, nC, { min: 1, max: 10 });
-      } else if (m === 'c') {     // 세 수 계산 (20 이하)
-        let a, b, c, ops;
-        const t = rnd(3);
-        if (t === 0) { a = rng(2, 9); b = rng(1, 9); c = rng(1, 20 - a - b > 0 ? Math.min(9, 20 - a - b) : 1); ops = ['+', '+']; q.ans = a + b + c; }
-        else if (t === 1) { a = rng(10, 20); b = rng(1, 9); c = rng(1, a - b); ops = ['-', '-']; q.ans = a - b - c; }
-        else { a = rng(3, 12); b = rng(1, 8); c = rng(1, Math.min(9, a + b)); ops = ['+', '-']; q.ans = a + b - c; }
-        const sg = o => o === '+' ? '+' : '−';
-        q.eq = `<span>${a}</span><span class="sign">${sg(ops[0])}</span><span>${b}</span><span class="sign">${sg(ops[1])}</span><span>${c}</span><span class="sign">=</span><span class="box" id="ansbox">?</span>`;
-        q.label = `${a} ${sg(ops[0])} ${b} ${sg(ops[1])} ${c}`;
-        q.ask = '앞에서부터 차례로 계산해요';
-        q.choices = numChoices(q.ans, nC, { min: 0, max: 30 });
-      } else {                    // 뛰어 세기
-        const step = pick([2, 5, 10, 2, 5]);
-        const maxStart = 100 - step * 4;
-        const start = step === 10 ? pick([10, 20, 30, 40, 50, 60]) : step === 5 ? 5 * rng(1, Math.floor(maxStart / 5)) : 2 * rng(1, Math.floor(maxStart / 2));
-        const seq = [0,1,2,3,4].map(i => start + step * i);
-        const bi = rng(1, 4); q.ans = seq[bi];
-        q.kind = 'seq';
-        q.ask = `${step}씩 뛰어 세어요. 빈칸에 들어갈 수는?`;
-        q.eq = seq.map((v, i) => i === bi ? `<span class="box" id="ansbox">?</span>` : `<span class="cell">${v}</span>`).join('');
-        q.label = seq.map((v, i) => i === bi ? '?' : v).join(', ');
-        q.choices = numChoices(q.ans, nC, { min: 1, max: 100, extra: [q.ans + step, q.ans - step, q.ans + 1] });
-      }
-    } else if (L === 'pro') {
-      if (m === 'a') {            // 두 자리 세로셈
-        const op = pick(['+', '-']);
-        let a, b;
-        if (op === '+') { do { a = rng(12, 78); b = rng(11, 99 - a); } while (a % 10 + b % 10 < 10 && Math.random() < .7); q.ans = a + b; }
-        else { do { a = rng(30, 99); b = rng(11, a - 1); } while (a % 10 >= b % 10 && Math.random() < .7); q.ans = a - b; }
-        q.kind = 'column'; q.input = true;
-        q.stage = `<div class="column"><div class="row"><span>${a}</span></div><div class="row op"><span>${op === '+' ? '+' : '−'}</span><span>${b}</span></div><div class="row ans" id="colans">&nbsp;</div></div>`;
-        q.eq = '';
-        q.label = `${a} ${op === '+' ? '+' : '−'} ${b}`;
-        q.ask = '일의 자리부터 계산하고 숫자를 눌러 답을 써요';
-      } else if (m === 'b') {     // 세 수 섞어 계산 (50 이하)
-        let a, b, c, ops;
-        const t = rnd(3);
-        if (t === 0) { a = rng(11, 30); b = rng(5, 19); c = rng(2, 15); ops = ['+', '-']; q.ans = a + b - c; }
-        else if (t === 1) { a = rng(20, 50); b = rng(5, 19); c = rng(3, 19); ops = ['-', '+']; q.ans = a - b + c; }
-        else { a = rng(30, 50); b = rng(5, 15); c = rng(3, a - b - 1); ops = ['-', '-']; q.ans = a - b - c; }
-        const sg = o => o === '+' ? '+' : '−';
-        q.input = true;
-        q.eq = `<span>${a}</span><span class="sign">${sg(ops[0])}</span><span>${b}</span><span class="sign">${sg(ops[1])}</span><span>${c}</span><span class="sign">=</span><span class="box" id="ansbox">&nbsp;</span>`;
-        q.label = `${a} ${sg(ops[0])} ${b} ${sg(ops[1])} ${c}`;
-        q.ask = '앞에서부터 차례로 계산하고 답을 눌러요';
-      } else if (m === 'c') {     // 구구단 2~5단 (묶음 그림)
-        const a = pick([2, 3, 4, 5]), b = rng(1, 9); q.ans = a * b;
-        q.stage = b <= 6 ? `<div class="dots">${Array.from({length: b}, () => `<div class="g">${Array.from({length: a}, () => '<i></i>').join('')}</div>`).join('')}</div>` : '';
-        q.eq = `<span>${a}</span><span class="sign">×</span><span>${b}</span><span class="sign">=</span><span class="box" id="ansbox">?</span>`;
-        q.label = `${a} × ${b}`;
-        q.ask = b <= 6 ? `${a}개씩 ${b}묶음이면 모두 몇 개?` : `${a}단을 외워 보세요`;
-        q.choices = numChoices(q.ans, nC, { min: 1, max: 50, extra: [a * (b + 1), a * (b - 1), a + b] });
-      } else {                    // 시계 읽기 (정각·30분)
-        const h = rng(1, 12), mm = EFF() >= 2 ? pick([0, 15, 30, 45]) : EFF() <= -2 ? 0 : pick([0, 30, 0, 30]);
-        q.kind = 'clock';
-        q.stage = clockSVG(h, mm);
-        q.ask = '시계가 가리키는 시각은?';
-        q.eq = '';
-        q.ansText = fmtClock(h, mm);
-        q.label = q.ansText;
-        const wrong = new Set();
-        const alts = [[h % 12 + 1, mm], [(h + 10) % 12 + 1, mm], [h, mm ? 0 : 30], [h % 12 + 1, mm ? 0 : 30], [mm === 30 ? h % 12 + 1 : (h + 10) % 12 + 1, 30]];
-        for (const [hh, m2] of shuffle(alts)) { if (wrong.size >= nC - 1) break; const t = fmtClock(hh, m2); if (t !== q.ansText) wrong.add(t); }
-        q.choices = shuffle([q.ansText, ...wrong]);
-      }
-    } else {
-      if (m === 'a') {            // 세 자리 세로셈
-        const op = pick(['+', '-']);
-        let a, b;
-        if (op === '+') { a = rng(125, 780); b = rng(115, 999 - a); q.ans = a + b; }
-        else { a = rng(300, 999); b = rng(105, a - 1); q.ans = a - b; }
-        q.kind = 'column'; q.input = true;
-        q.stage = `<div class="column"><div class="row"><span>${a}</span></div><div class="row op"><span>${op === '+' ? '+' : '−'}</span><span>${b}</span></div><div class="row ans" id="colans">&nbsp;</div></div>`;
-        q.eq = '';
-        q.label = `${a} ${op === '+' ? '+' : '−'} ${b}`;
-        q.ask = '받아올림·받아내림을 잊지 말고 계산해요';
-      } else if (m === 'b') {     // 구구단 2~9단 + 빈칸
-        const a = rng(2, 9), b = rng(2, 9);
-        q.input = true;
-        const t = rnd(3);
-        if (t === 0) { q.ans = a * b; q.eq = `<span>${a}</span><span class="sign">×</span><span>${b}</span><span class="sign">=</span><span class="box" id="ansbox">&nbsp;</span>`; q.label = `${a} × ${b}`; q.ask = `${a}단을 떠올려 보세요`; }
-        else if (t === 1) { q.ans = b; q.eq = `<span>${a}</span><span class="sign">×</span><span class="box" id="ansbox">&nbsp;</span><span class="sign">=</span><span>${a * b}</span>`; q.label = `${a} × ? = ${a * b}`; q.ask = `${a}에 얼마를 곱하면 ${a * b}이 될까요?`; }
-        else { q.ans = a; q.eq = `<span class="box" id="ansbox">&nbsp;</span><span class="sign">×</span><span>${b}</span><span class="sign">=</span><span>${a * b}</span>`; q.label = `? × ${b} = ${a * b}`; q.ask = `얼마에 ${b}을(를) 곱하면 ${a * b}이 될까요?`; }
-      } else if (m === 'c') {     // 나눗셈
-        const d = rng(2, 9), qq = rng(2, 9); q.ans = qq;
-        q.input = true;
-        q.eq = `<span>${d * qq}</span><span class="sign">÷</span><span>${d}</span><span class="sign">=</span><span class="box" id="ansbox">&nbsp;</span>`;
-        q.label = `${d * qq} ÷ ${d}`;
-        q.ask = `${d}단에서 ${d * qq}이 나오는 곳을 찾아요`;
-      } else {                    // 수의 규칙
-        const t = rnd(5);
-        let seq, rule;
-        if (t === 0) { const s = rng(2, 9), st = rng(1, 9); seq = [0,1,2,3,4].map(i => s + st * i); rule = `${st}씩 커져요`; }
-        else if (t === 1) { const s = rng(40, 99), st = rng(2, 9); seq = [0,1,2,3,4].map(i => s - st * i); rule = `${st}씩 작아져요`; }
-        else if (t === 2) { const s = rng(1, 3); seq = [0,1,2,3,4].map(i => s * 2 ** i); rule = '2배씩 커져요'; }
-        else if (t === 3) { const s = rng(1, 5); seq = [s, s + 1, s + 3, s + 6, s + 10]; rule = '1, 2, 3, 4씩 더 커져요'; }
-        else { const k = rng(3, 9); seq = [0,1,2,3,4].map(i => k * (i + 1)); rule = `${k}단이에요`; }
-        const bi = pick([3, 4, 4]); q.ans = seq[bi];
-        q.kind = 'seq';
-        q.ask = '규칙을 찾아 빈칸을 채워요';
-        q.eq = seq.map((v, i) => i === bi ? `<span class="box" id="ansbox">?</span>` : `<span class="cell">${v}</span>`).join('');
-        q.label = seq.map((v, i) => i === bi ? '?' : v).join(', ');
-        q.rule = rule;
-        const step = seq[1] - seq[0];
-        q.choices = numChoices(q.ans, nC, { min: 0, max: 999, extra: [q.ans + step, q.ans - step, seq[bi - 1] * 2] });
-      }
     }
     return q;
   }
@@ -654,90 +483,37 @@
   const josa = (w, a, b) => w + (hasJong(w) ? a : b);           // josa(w,'이','가') josa(w,'을','를') josa(w,'은','는')
   const emojiRow = (e, n) => n > 0 && n <= 12 ? `<div class="group">${Array.from({length: n}, () => `<i>${e}</i>`).join('')}</div>` : '';
 
-  function wordProblem(L, nC) {
-    const q = { kind: 'story', ans: 0, choices: null, input: L === 'pro' || L === 'nine', stage: '', eq: '', ask: '문제를 읽고 답을 구해요', label: '' };
+  function wordProblem(nC) {
+    const q = { kind: 'story', ans: 0, choices: null, stage: '', eq: '', ask: '문제를 읽고 답을 구해요', label: '' };
     const nm = pick(NAMES), [it, ie] = pick(ITEMS);
     const N = josa(nm, '이', '가'), T = josa(it, '을', '를');
     let text = '', hint = '', unit = '개';
     const t = rnd(4);
-    if (L === 'easy') {
+    {
       if (t < 2 || EFF() <= -2) { const a = rng(1, 6), b = rng(1, 9 - a); q.ans = a + b; text = `${N} ${it} ${a}개를 가지고 있었어요. ${b}개를 더 받았어요. ${it}은 모두 몇 개일까요?`; hint = emojiRow(ie, a) + `<span class="opsign">+</span>` + emojiRow(ie, b); q.label = `${a} + ${b}`; }
       else { const a = rng(3, 10), b = rng(1, a - 1); q.ans = a - b; text = `${it} ${a}개 중에서 ${b}개를 먹었어요. 남은 ${it}은 몇 개일까요?`; hint = emojiRow(ie, a); q.label = `${a} − ${b}`; }
-    } else if (L === 'hard') {
-      if (t === 0) { const a = rng(5, 9), b = rng(11 - a, 9); q.ans = a + b; text = `버스에 ${a}명이 타고 있었어요. 다음 정류장에서 ${b}명이 더 탔어요. 버스에는 모두 몇 명이 있을까요?`; unit = '명'; q.label = `${a} + ${b}`; }
-      else if (t === 1) { const a = rng(11, 18), b = rng(a - 9, 9); q.ans = a - b; text = `${N} ${it} ${a}개를 가지고 있어요. 동생에게 ${b}개를 주면 몇 개가 남을까요?`; q.label = `${a} − ${b}`; }
-      else if (t === 2) { const b = rng(8, 15), a = rng(2, b - 2); q.ans = b - a; text = `${it} ${a}개가 있어요. ${b}개가 되려면 몇 개가 더 있어야 할까요?`; q.label = `${a} + ? = ${b}`; }
-      else { const a = rng(6, 12), b = rng(3, 9); q.ans = Math.abs(a - b); const nm2 = pick(NAMES.filter(x => x !== nm)); text = `${nm}는 ${it} ${a}개, ${nm2}는 ${b}개를 가지고 있어요. 누가 몇 개 더 많을까요?`; q.ask = '더 많은 사람의 개수 차이를 구해요'; q.label = `${a} − ${b}`; }
-    } else if (L === 'pro') {
-      if (t === 0) { const a = rng(15, 60), b = rng(12, 39); q.ans = a + b; text = `문구점에서 ${it} ${a}개를 팔았어요. 오후에 ${b}개를 더 팔았어요. 오늘 판 ${it}은 모두 몇 개일까요?`; q.label = `${a} + ${b}`; }
-      else if (t === 1) { const a = rng(40, 95), b = rng(12, a - 10); q.ans = a - b; text = `${N} 줄넘기를 ${a}번 넘었고, 동생은 ${b}번 넘었어요. ${nm}는 동생보다 몇 번 더 넘었을까요?`; unit = '번'; q.label = `${a} − ${b}`; }
-      else if (t === 2) { const a = pick([2,3,4,5]), b = rng(2, 9); q.ans = a * b; text = `한 봉지에 ${it}이 ${a}개씩 들어 있어요. ${b}봉지에는 ${it}이 모두 몇 개 있을까요?`; q.label = `${a} × ${b}`; }
-      else { const a = rng(2, 5), b = rng(2, 6), c = rng(3, 15); q.ans = a * b + c; text = `${it}을 ${a}개씩 ${b}줄로 놓고, ${c}개를 더 놓았어요. ${it}은 모두 몇 개일까요?`; q.label = `${a} × ${b} + ${c}`; }
-    } else {
-      if (t === 0) { const a = rng(120, 480), b = rng(105, 400); q.ans = a + b; text = `도서관에 동화책이 ${a}권, 그림책이 ${b}권 있어요. 책은 모두 몇 권일까요?`; unit = '권'; q.label = `${a} + ${b}`; }
-      else if (t === 1) { const a = rng(300, 900), b = rng(105, a - 50); q.ans = a - b; text = `${N} ${a}원을 가지고 ${b}원짜리 ${it}을 샀어요. 남은 돈은 얼마일까요?`; unit = '원'; q.label = `${a} − ${b}`; }
-      else if (t === 2) { const d = rng(2, 9), k = rng(2, 9); q.ans = k; text = `${it} ${d * k}개를 ${d}명이 똑같이 나누어 가지려고 해요. 한 명이 몇 개씩 가질 수 있을까요?`; q.label = `${d * k} ÷ ${d}`; }
-      else { const a = rng(20, 60), b = rng(10, 30), c = rng(5, 25); q.ans = a + b - c; text = `${N} ${it} ${a}개를 가지고 있었어요. ${b}개를 더 사고 친구에게 ${c}개를 주었어요. 지금 ${it}은 몇 개일까요?`; q.label = `${a} + ${b} − ${c}`; }
     }
     q.stage = `<div class="story">${text}</div>` + (hint && EFF() < 2 ? `<div class="stage-hint">${hint}</div>` : "");
-    q.eq = `<span class="box" id="ansbox">${q.input ? '&nbsp;' : '?'}</span><span style="font-size:.6em">${unit}</span>`;
+    q.eq = `<span class="box" id="ansbox">?</span><span style="font-size:.6em">${unit}</span>`;
     q.unit = unit;
-    if (!q.input) q.choices = numChoices(q.ans, nC, { min: 0, max: 40 });
+    q.choices = numChoices(q.ans, nC, { min: 0, max: 40 });
     return q;
   }
 
   const COIN = (v) => `<span class="coin c${v}">${v}</span>`;
-  const BILL = () => `<span class="bill">1000</span>`;
-  function moneyQ(L, nC) {
-    const q = { kind: 'money', ans: 0, choices: null, input: L === 'pro' || L === 'nine', stage: '', eq: '', ask: '모두 얼마일까요?', label: '' };
-    let counts;
-    if (L === "easy") counts = EFF() <= -2 ? { 100: rng(1, 5) } : EFF() >= 2 ? { 100: rng(0, 5), 50: rng(0, 1), 10: rng(0, 5) } : { 100: rng(1, 5), 10: rng(0, 5) };
-    else if (L === 'hard') counts = { 100: rng(0, 6), 50: rng(0, 1), 10: rng(0, 4) };
-    else if (L === 'pro') counts = { 500: rng(0, 2), 100: rng(0, 4), 50: rng(0, 1), 10: rng(0, 4) };
-    else counts = { 1000: rng(0, 2), 500: rng(0, 1), 100: rng(0, 4), 50: rng(0, 1), 10: rng(0, 4) };
+  function moneyQ(nC) {
+    const q = { kind: 'money', ans: 0, choices: null, stage: '', eq: '', ask: '모두 얼마일까요?', label: '' };
+    const counts = EFF() <= -2 ? { 100: rng(1, 5) } : EFF() >= 2 ? { 100: rng(0, 5), 50: rng(0, 1), 10: rng(0, 5) } : { 100: rng(1, 5), 10: rng(0, 5) };
     let total = 0; const parts = [];
-    for (const v of [1000, 500, 100, 50, 10]) { const n = counts[v] || 0; total += v * n; for (let i = 0; i < n; i++) parts.push(v === 1000 ? BILL() : COIN(v)); }
+    for (const v of [100, 50, 10]) { const n = counts[v] || 0; total += v * n; for (let i = 0; i < n; i++) parts.push(COIN(v)); }
     if (total === 0) { counts[100] = 1; total = 100; parts.push(COIN(100)); }
-    if (L === 'nine' && Math.random() < .5) {
-      // 거스름돈
-      const pay = pick([1000, 1000, 500]);
-      const price = pay === 1000 ? 10 * rng(15, 95) : 10 * rng(12, 45);
-      q.ans = pay - price;
-      const [it] = pick(ITEMS);
-      q.stage = `<div class="story">${price}원짜리 ${it}을 사고 ${pay}원을 냈어요. 거스름돈은 얼마일까요?</div><div class="stage-hint">${pay === 1000 ? BILL() : COIN(500)}</div>`;
-      q.ask = '거스름돈을 구해요'; q.label = `${pay} − ${price}`;
-    } else {
-      q.ans = total;
-      q.stage = `<div class="money">${parts.join('')}</div>`;
-      q.label = Object.entries(counts).filter(([, n]) => n).map(([v, n]) => v + '원×' + n).join(' ');
-    }
-    q.eq = `<span class="box" id="ansbox">${q.input ? '&nbsp;' : '?'}</span><span style="font-size:.6em">원</span>`;
+    q.ans = total;
+    q.stage = `<div class="money">${parts.join('')}</div>`;
+    q.label = Object.entries(counts).filter(([, n]) => n).map(([v, n]) => v + '원×' + n).join(' ');
+    q.eq = `<span class="box" id="ansbox">?</span><span style="font-size:.6em">원</span>`;
     q.unit = '원';
-    if (!q.input) q.choices = numChoices(q.ans, nC, { min: 0, max: 5000, extra: [q.ans + 10, q.ans - 10, q.ans + 100, q.ans - 100, q.ans + 50] });
+    q.choices = numChoices(q.ans, nC, { min: 0, max: 5000, extra: [q.ans + 10, q.ans - 10, q.ans + 100, q.ans - 100, q.ans + 50] });
     return q;
-  }
-
-  /* 9살: 5분 단위 시계 */
-  function clockQ(nC) {
-    const h = rng(1, 12), mm = 5 * rng(0, 11);
-    const q = { kind: 'clock', ans: 0, choices: null, input: false, stage: clockSVG(h, mm), eq: '', ask: '시계가 가리키는 시각은? (5분 단위)', label: '' };
-    q.ansText = fmtClock(h, mm); q.label = q.ansText;
-    const alts = [[h % 12 + 1, mm], [h, (mm + 5) % 60], [h, (mm + 55) % 60], [(mm / 5) || 12, (h * 5) % 60], [h, (mm + 30) % 60], [(h + 10) % 12 + 1, mm]];
-    const wrong = new Set();
-    for (const [hh, m2] of shuffle(alts)) { if (wrong.size >= nC - 1) break; const t = fmtClock(hh, m2); if (t !== q.ansText) wrong.add(t); }
-    q.choices = shuffle([q.ansText, ...wrong]);
-    return q;
-  }
-
-  function clockSVG(h, m) {
-    const ha = ((h % 12) + m / 60) * 30, ma = m * 6;
-    const nums = Array.from({length: 12}, (_, i) => { const a = (i + 1) * 30 * Math.PI / 180; return `<text x="${100 + 72 * Math.sin(a)}" y="${100 - 72 * Math.cos(a) + 7}" text-anchor="middle" font-size="20" font-family="Jua, sans-serif" fill="#5B2A4E">${i + 1}</text>`; }).join('');
-    const ticks = Array.from({length: 60}, (_, i) => { const a = i * 6 * Math.PI / 180, l = i % 5 ? 4 : 8; return `<line x1="${100 + 90 * Math.sin(a)}" y1="${100 - 90 * Math.cos(a)}" x2="${100 + (90 - l) * Math.sin(a)}" y2="${100 - (90 - l) * Math.cos(a)}" stroke="#FFB3D1" stroke-width="${i % 5 ? 1.5 : 3}"/>`; }).join('');
-    return `<svg class="clock" viewBox="0 0 200 200" aria-label="시계">
-      <circle cx="100" cy="100" r="96" fill="#FFF3F8" stroke="#FF5FA2" stroke-width="6"/>${ticks}${nums}
-      <line x1="100" y1="100" x2="${100 + 46 * Math.sin(ha * Math.PI / 180)}" y2="${100 - 46 * Math.cos(ha * Math.PI / 180)}" stroke="#5B2A4E" stroke-width="8" stroke-linecap="round"/>
-      <line x1="100" y1="100" x2="${100 + 68 * Math.sin(ma * Math.PI / 180)}" y2="${100 - 68 * Math.cos(ma * Math.PI / 180)}" stroke="#FF5FA2" stroke-width="5" stroke-linecap="round"/>
-      <circle cx="100" cy="100" r="6" fill="#5B2A4E"/></svg>`;
   }
 
   /* 화면 ------------------------------------------------------ */
@@ -750,30 +526,21 @@
   function renderQ() {
     const q = state.q;
     $('round').textContent = (state.round + 1) + ' / ' + TOTAL;
-    $("tag").textContent = LEVEL_NAME[state.age || state.level] + DIFF_TXT() + ' · ' + modeName(state.mode, state.level);
+    $("tag").textContent = LEVEL_NAME[state.level] + DIFF_TXT() + ' · ' + modeName(state.mode, state.level);
     renderStars();
     $('ask').textContent = q.ask;
     $('stage').innerHTML = q.stage;
-    $('eq').className = 'eq' + (q.kind === 'seq' ? ' seq' : '') + (q.kind === 'column' ? ' small' : '');
+    $('eq').className = 'eq' + (q.kind === 'seq' ? ' seq' : '');
     $('eq').innerHTML = q.eq;
     $('eq').hidden = !q.eq;
-    if (q.input) {
-      $('choices').hidden = true; $('pad').hidden = false;
-      state.typed = ''; showTyped();
-    } else {
-      $('pad').hidden = true; $('choices').hidden = false;
+    {
+      $('choices').hidden = false;
       $("choices").className = "choices" + (q.choices.length === 4 ? " four" : q.choices.length === 5 ? " five" : "");
       $('choices').innerHTML = q.choices.map((c, i) => `<button class="btn choice ${String(c).length >= 5 ? 'long' : ''}" id="choice-${i}" data-v="${c}">${c}</button>`).join('');
     }
     $('feedback').textContent = ''; $('feedback').className = 'feedback';
     state.locked = false; state.tries = 0;
   }
-  function showTyped() {
-    const t = state.typed || '';
-    const box = $('ansbox'); if (box) box.innerHTML = t || '&nbsp;';
-    const col = $('colans'); if (col) col.innerHTML = t || '&nbsp;';
-  }
-
   function judge(v) {
     if (state.locked) return;
     const q = state.q, box = $('ansbox');
@@ -784,7 +551,6 @@
       state.review[state.round] = first;
       if (first) state.score++;
       if (box) { box.innerHTML = v; box.classList.add('ok'); }
-      const col = $('colans'); if (col) col.textContent = v;
       $('feedback').textContent = (first ? pick(PRAISE) : '이번엔 맞았어요!') + (q.rule ? ' (' + q.rule + ')' : '') + ' 🌟';
       $('feedback').className = 'feedback good';
       document.querySelectorAll('.choice').forEach(b => { b.disabled = true; if (b.dataset.v === String(v)) b.classList.add('right'); });
@@ -793,8 +559,7 @@
     } else {
       state.tries++;
       sndBad();
-      const shakeEl = box || $('colans');
-      if (shakeEl) { shakeEl.classList.remove('no'); void shakeEl.offsetWidth; shakeEl.classList.add('no'); }
+      if (box) { box.classList.remove('no'); void box.offsetWidth; box.classList.add('no'); }
       document.querySelectorAll('.choice').forEach(b => { if (b.dataset.v === String(v)) { b.classList.add('wrong'); b.disabled = true; } });
       if (state.tries >= (EFF() <= -1 ? 3 : EFF() >= 2 ? 1 : 2)) {
         // 두 번 틀리면 정답을 보여 주고 넘어가요
@@ -802,7 +567,6 @@
         state.review[state.round] = false;
         const a = q.ansText != null ? q.ansText : q.ans;
         if (box) { box.innerHTML = a; box.classList.remove('no'); box.classList.add('reveal'); }
-        const col = $('colans'); if (col) col.textContent = a;
         document.querySelectorAll('.choice').forEach(b => { b.disabled = true; if (b.dataset.v === String(a)) b.classList.add('right'); });
         $('feedback').textContent = '정답은 ' + a + '이에요. 다음에 또 해 봐요!';
         $('feedback').className = 'feedback';
@@ -811,7 +575,6 @@
       } else {
         $('feedback').textContent = '다시 한번 생각해 볼까요? 🍀';
         $('feedback').className = 'feedback';
-        if (q.input) { state.typed = ''; showTyped(); }
       }
     }
   }
@@ -824,19 +587,19 @@
     state.q = makeQ(); renderQ();
   }
   function start(mode) {
-    state = { mode, level: level === "five" ? "easy" : level, age: level, round: 0, score: 0, q: null, locked: false, tries: 0, typed: '', startedAt: Date.now(), review: [], reviewLabels: [] };
+    state = { mode, level, round: 0, score: 0, q: null, locked: false, tries: 0, startedAt: Date.now(), review: [], reviewLabels: [] };
     state.q = makeQ();
     show('game'); renderQ();
   }
   function finish() {
     saveBest();
-    const s = state.score, L = state.level;
+    const s = state.score;
     const secs = Math.round((Date.now() - state.startedAt) / 1000);
     $('result-score').textContent = '⭐ ' + s + ' / ' + TOTAL;
     $('result-time').textContent = '⏱ 걸린 시간 ' + Math.floor(secs / 60) + '분 ' + (secs % 60) + '초';
     if (s === TOTAL) {
       $('result-emoji').textContent = '🦄'; $('result-title').textContent = '완벽해요! 수학 박사님!';
-      $('result-msg').textContent = L === 'easy' ? '이제 7살 놀이에 도전해 볼까요?' : L === 'hard' ? '이제 8살 놀이에 도전해 볼까요?' : L === 'pro' ? '이제 9살 놀이에 도전해 볼까요?' : '한 번에 다 맞혔어요. 수학 왕이에요!';
+      $('result-msg').textContent = '한 번에 다 맞혔어요. 수학 왕이에요!';
     }
     else if (s >= 7) { $('result-emoji').textContent = '🌈'; $('result-title').textContent = '정말 잘했어요!'; $('result-msg').textContent = '틀린 문제를 다시 한번 풀어 보면 더 좋아요.'; }
     else { $('result-emoji').textContent = '🌸'; $('result-title').textContent = '열심히 했어요!'; $('result-msg').textContent = '천천히 다시 해 보면 별을 더 모을 수 있어요.'; }
@@ -867,20 +630,6 @@
   document.querySelectorAll('.level button').forEach(b => b.addEventListener('click', () => setLevel(b.dataset.level)));
   document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => openPrestart(b.dataset.mode)));
   $('choices').addEventListener('click', e => { const b = e.target.closest('.choice'); if (b && !b.disabled) judge(b.dataset.v); });
-  $('pad').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b || state.locked) return;
-    const k = b.dataset.k;
-    if (k === 'del') state.typed = state.typed.slice(0, -1);
-    else if (k === 'ok') { if (state.typed !== '') judge(state.typed); return; }
-    else if (state.typed.length < 4) state.typed += k;
-    sndTap(); showTyped();
-  });
-  addEventListener('keydown', e => {
-    if ($('game').hidden || $('pad').hidden || state.locked) return;
-    if (/^[0-9]$/.test(e.key) && state.typed.length < 4) { state.typed += e.key; showTyped(); }
-    else if (e.key === 'Backspace') { state.typed = state.typed.slice(0, -1); showTyped(); }
-    else if (e.key === 'Enter' && state.typed !== '') judge(state.typed);
-  });
   $('again').addEventListener('click', () => start(state.mode));
   $("home-btn").addEventListener("click", () => { location.href = "index.html"; });
   $("quit").addEventListener("click", () => { location.href = "index.html"; });
@@ -903,8 +652,8 @@
   }
   function launchFromUrl() {
     const p = new URLSearchParams(location.search);
-    const l = p.get("level"), m = p.get("mode");
-    if (!m || !LEVEL_NAME[l] || !MODE_LABEL[l] || !MODE_LABEL[l][m]) return false;
+    const l = 'easy', m = p.get("mode");
+    if (!m || !MODE_LABEL.easy[m]) return false;
     missionId = GAME_KEY + ":" + l + ":" + m;
     const n = +p.get("n"); if (n === 5 || n === 10) TOTAL = n;
     setLevel(l); openPrestart(m); return true;
@@ -915,13 +664,9 @@
   document.querySelectorAll("#diffrow button").forEach(b => b.addEventListener("click", () => { DIFF = +b.dataset.diff; try { localStorage.setItem(diffKey(pendingMode || (state && state.mode) || "x"), DIFF); } catch (e) {} renderDiff(); }));
   $("ps-start").addEventListener("click", () => { if (pendingMode) start(pendingMode); });
   function boot(data) {
-    let saved = 'hard';
-    try { saved = localStorage.getItem('rainbow-math-level') || 'hard'; } catch (e) {}
-    if (!LEVEL_NAME[saved]) saved = 'hard';
-    saved = "easy";   // 지금은 6살 놀이만 보여 줘요 (5·7·8·9살 내용은 숨김)
-    setLevel(saved);
+    setLevel('easy');
     if (launchFromUrl()) return;
-    if (data && data.state && data.state.q && data.screen === 'game' && LEVEL_NAME[data.state.level]) {
+    if (data && data.state && data.state.q && data.screen === 'game' && data.state.level === 'easy') {
       state = data.state; level = state.level; setLevel(level); show('game'); renderQ();
     } else show('home');
   }

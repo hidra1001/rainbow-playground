@@ -1,7 +1,7 @@
 {
   "name": "소화 놀이터",
   "short_name": "소화 놀이터",
-  "description": "5~7살을 위한 산수·한글·두뇌·아케이드 놀이. 매일 새로운 미션과 스티커!",
+  "description": "6살을 위한 산수·한글·두뇌·아케이드 놀이. 놀이하고 캐릭터를 모아요!",
   "lang": "ko",
   "start_url": "./index.html",
   "scope": "./",

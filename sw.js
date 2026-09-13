@@ -1,9 +1,9 @@
 /* 무지개 놀이터 서비스 워커: 오프라인에서도 놀 수 있게 파일을 저장해요 */
-const VERSION = 'rainbow-202609132235';
+const VERSION = 'rainbow-202609132247';
 const CORE = ['./', './index.html', './math.html', './hangul.html', './brain.html', './arcade.html', './voice.js', './layout.css', './layout.js', './audio/list.json', './qr.png', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {

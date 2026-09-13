@@ -175,7 +175,7 @@
   }
 </style>
 <script src="voice.js"></script>
-<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => { navigator.serviceWorker.register("sw.js").catch(() => {}); navigator.serviceWorker.addEventListener("controllerchange", () => { if (!window.__rp_reloaded) { window.__rp_reloaded = 1; location.reload(); } }); });</script>
 </head>
 <body>
 <canvas id="confetti"></canvas>

@@ -12,7 +12,7 @@
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="voice.js"></script>
 <script src="layout.js"></script>
-<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(() => {}); navigator.serviceWorker.addEventListener("controllerchange", () => { if (!window.__rp_reloaded) { window.__rp_reloaded = 1; location.reload(); } }); })</script>
 <title>무지개 두뇌 놀이</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>

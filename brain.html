@@ -248,9 +248,7 @@
     <a class="hublink" href="index.html">🏠 놀이터로 돌아가기</a>
     <p class="sub">몇 살 놀이로 할까요?</p>
     <div class="level" role="group" aria-label="난이도">
-      <button type="button" id="level-five" data-level="five" aria-pressed="false">🍼 5살</button>
-      <button type="button" id="level-easy" data-level="easy" aria-pressed="false">🌸 6살</button>
-      <button type="button" id="level-hard" data-level="hard" aria-pressed="true">🦄 7살</button>
+      <button type="button" id="level-easy" data-level="easy" aria-pressed="true">🌸 6살</button>
     </div>
     <p class="level-note" id="level-note"></p>
     <div class="modes">
@@ -803,7 +801,7 @@
     try { saved = localStorage.getItem('rainbow-brain-level') || 'hard'; } catch (e) {}
     if (data && data.level && LEVEL_NAME[data.level]) saved = data.level;
     if (!LEVEL_NAME[saved]) saved = 'hard';
-    if (saved === "pro" || saved === "nine") saved = "hard";   // 8살·9살은 숨김
+    saved = "easy";   // 지금은 6살 놀이만 보여 줘요 (5·7·8·9살 내용은 숨김)
     setLevel(saved);
     if (launchFromUrl()) return;
     show('home');

@@ -245,8 +245,6 @@
         <h2>설정</h2>
         <p class="center">이름 바꾸기</p>
         <div class="center"><input id="name-edit" class="name" type="text" maxlength="10" autocomplete="off"> <button class="btn" id="name-save" style="font-size:16px;padding:10px 14px;vertical-align:middle">저장</button></div>
-        <p class="center" style="margin-top:14px">내 친구 바꾸기</p>
-        <div class="pickrow" id="avatars2"></div>
         <p class="center">읽어 주는 목소리</p>
         <div class="seg" id="voice-seg">
           <button type="button" data-voice="clip">🎀 밝은 목소리 (녹음)</button>
@@ -484,12 +482,10 @@
     const total = Object.values(R).reduce((n, d) => n + Object.keys(d).length, 0);
     $('report-note').textContent = `지금까지 놀이 ${total}번을 했어요. 별은 한 번에 맞힌 문제에만 주니, 평균이 낮은 놀이를 함께 해 보세요.`;
   }
-  function renderPickers(avId, ageId) {
-    const all = P.chars || [];
-    if ($(avId)) $(avId).innerHTML = all.length ? all.map(a => `<button class="pick t-${tierOf(a)}" data-av="${a}" aria-pressed="${P.avatar === a}">${G(a)}</button>`).join('') : '<p class="note" style="margin:0">아직 친구가 없어요. 캐릭터 뽑기로 만나요! 🥚</p>';
+  function renderPickers(avId, ageId) {   // 내 친구는 캐릭터 도감에서만 바꿔요 (설정에는 목록이 없어요)
     if ($(ageId)) $(ageId).innerHTML = Object.keys(AGES).map(l => `<button class="pick age" data-lv="${l}" aria-pressed="${P.level === l}">${AGES[l]}</button>`).join('');
   }
-  function renderAll() { greet(); renderMain(); renderChars(); renderSettings(); renderPickers('avatars2', 'ages2'); }
+  function renderAll() { greet(); renderMain(); renderChars(); renderSettings(); renderPickers(null, 'ages2'); }
 
   function showTab(t) {
     for (const x of ['main','chars','settings']) $('tab-' + x).hidden = x !== t;
@@ -543,9 +539,8 @@
 
   /* 이벤트 */
   document.addEventListener('click', e => {
-    const av = e.target.closest('[data-av]'); if (av) { P.avatar = av.dataset.av; save('rp-profile', P); renderPickers('avatars2', 'ages2'); renderChars(); setAvatar(); return; }
-    const ch = e.target.closest('[data-char]'); if (ch && !ch.disabled) { P.avatar = ch.dataset.char; save('rp-profile', P); renderChars(); renderPickers('avatars2', 'ages2'); setAvatar(); toast((NM(P.avatar) || P.avatar) + ' 친구로 바꿨어요!'); return; }
-    const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderMain(); } renderPickers('avatars', 'ages'); if (P.days) renderPickers('avatars2', 'ages2'); return; }
+    const ch = e.target.closest('[data-char]'); if (ch && !ch.disabled) { P.avatar = ch.dataset.char; save('rp-profile', P); renderChars(); renderPickers(null, 'ages2'); setAvatar(); toast((NM(P.avatar) || P.avatar) + ' 친구로 바꿨어요!'); return; }
+    const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderMain(); } renderPickers('avatars', 'ages'); if (P.days) renderPickers(null, 'ages2'); return; }
     const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 소화 놀이터 친구야'); return; }
     const cc = e.target.closest('[data-count]'); if (cc) { save('rp-count', +cc.dataset.count); renderSettings(); renderMain(); return; }
     const tab = e.target.closest('.tabs button'); if (tab) showTab(tab.dataset.tab);

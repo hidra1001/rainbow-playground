@@ -102,6 +102,13 @@
   .reward .stage { position: relative; display: grid; place-items: center; padding: 10px 0 4px; }
   .reward .stage .big { position: relative; z-index: 1; }
   .reward .stage .nm { font-family: var(--display); font-size: 22px; color: var(--plum); margin-top: 6px; position: relative; z-index: 1; }
+  /* 캐릭터 크게 보기 창 */
+  .reward .box.view { width: 420px; }
+  .reward .box.view .big { width: 170px; height: 170px; font-size: 110px; animation: pop .45s; }
+  .reward .box.view .meta { margin: 4px 0 14px; color: var(--plum-soft); font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .reward .box.view .meta .badge { font-size: 14px; padding: 4px 12px; }
+  .reward .box.view .row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .reward .box.view .btn[disabled] { opacity: .55; cursor: default; }
   .reward .rays { display: none; position: absolute; left: 50%; top: 50%; width: 320px; height: 320px; margin: -160px 0 0 -160px; border-radius: 50%; pointer-events: none;
     background: repeating-conic-gradient(from var(--ang, 0deg), rgba(255,215,90,.55) 0deg 12deg, rgba(255,215,90,0) 12deg 24deg); -webkit-mask: radial-gradient(circle, #000 20%, transparent 70%); mask: radial-gradient(circle, #000 20%, transparent 70%); animation: spin 6s linear infinite; }
   .reward .box.r-legendary .rays { display: block; background: repeating-conic-gradient(from var(--ang, 0deg), rgba(255,107,107,.45) 0deg 10deg, rgba(255,230,109,.45) 10deg 20deg, rgba(126,217,87,.45) 20deg 30deg, rgba(93,173,226,.45) 30deg 40deg, rgba(181,126,220,.45) 40deg 50deg, rgba(255,107,107,0) 50deg 60deg); }
@@ -234,7 +241,7 @@
     <section id="tab-chars" hidden>
       <div class="card">
         <h2>캐릭터 도감 <small id="char-count"></small></h2>
-        <p class="note" style="margin:0 0 10px">놀이 2판을 하면 뽑기권 🎟️ 1장! 뽑기권으로 캐릭터를 뽑아요 (일반 62% · 희귀 24% · 영웅 9% · 전설 4% · 신화 1%). 같은 친구를 또 만나면 숫자가 올라가고, 모은 캐릭터를 누르면 내 친구로 바꿀 수 있어요.</p>
+        <p class="note" style="margin:0 0 10px">놀이 2판을 하면 뽑기권 🎟️ 1장! 뽑기권으로 캐릭터를 뽑아요 (일반 62% · 희귀 24% · 영웅 9% · 전설 4% · 신화 1%). 같은 친구를 또 만나면 숫자가 올라가고, 모은 캐릭터를 누르면 크게 보고 내 친구로 바꿀 수 있어요.</p>
         <div id="chars"></div>
       </div>
     </section>
@@ -451,6 +458,22 @@
     }, 1800);
     box.querySelector('#reward-ok').addEventListener('click', () => { box.remove(); renderAll(); showTab('chars'); });
   }
+  /* 캐릭터 크게 보기: 도감에서 누르면 뜨는 창. 여기서 "내 친구로 하기"를 눌러야 바뀌어요 */
+  function openCharView(c) {
+    const tier = tierOf(c), T = TIERS[tier], cnt = (P.counts || {})[c] || 1, mine = P.avatar === c;
+    const old = $('char-view'); if (old) old.remove();
+    const box = document.createElement('div'); box.className = 'reward'; box.id = 'char-view';
+    box.innerHTML = `<div class="box view r-${tier}">
+      <div class="stage"><div class="rays"></div><div class="big t-${tier} char" style="cursor:default">${G(c)}</div><div class="nm">${NM(c) || c}</div></div>
+      <p class="meta"><span class="badge ${T.cls}">${T.name}</span> ${cnt > 1 ? `${cnt}번 만났어요` : '1번 만났어요'}${mine ? ' · 지금 내 친구예요 💕' : ''}</p>
+      <div class="row"><button class="btn" id="cv-pick" ${mine ? 'disabled' : ''}>${mine ? '내 친구예요 ✔' : '내 친구로 하기 💕'}</button> <button class="danger" id="cv-close">닫기</button></div></div>`;
+    document.body.appendChild(box);
+    box.addEventListener('click', e => { if (e.target === box) box.remove(); });
+    box.querySelector('#cv-close').addEventListener('click', () => box.remove());
+    box.querySelector('#cv-pick').addEventListener('click', () => {
+      P.avatar = c; save('rp-profile', P); box.remove(); renderChars(); setAvatar(); toast((NM(c) || c) + ' 친구로 바꿨어요!');
+    });
+  }
   function renderChars() {
     const newest = P.lastChar, cnt = P.counts || {};
     $('chars').innerHTML = TIER_ORDER.map(t => { const T = TIERS[t], own = T.chars.filter(c => P.chars.includes(c)).length;
@@ -539,7 +562,7 @@
 
   /* 이벤트 */
   document.addEventListener('click', e => {
-    const ch = e.target.closest('[data-char]'); if (ch && !ch.disabled) { P.avatar = ch.dataset.char; save('rp-profile', P); renderChars(); renderPickers(null, 'ages2'); setAvatar(); toast((NM(P.avatar) || P.avatar) + ' 친구로 바꿨어요!'); return; }
+    const ch = e.target.closest('[data-char]'); if (ch && !ch.disabled) { openCharView(ch.dataset.char); return; }
     const lv = e.target.closest('[data-lv]'); if (lv) { P.level = lv.dataset.lv; if (P.days) { save('rp-profile', P); renderMain(); } renderPickers('avatars', 'ages'); if (P.days) renderPickers(null, 'ages2'); return; }
     const vc = e.target.closest('[data-voice]'); if (vc) { save('rp-voice', vc.dataset.voice); renderSettings(); speak('안녕! 나는 소화 놀이터 친구야'); return; }
     const cc = e.target.closest('[data-count]'); if (cc) { save('rp-count', +cc.dataset.count); renderSettings(); renderMain(); return; }

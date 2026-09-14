@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="voice.js"></script>
+<script src="chars.js"></script>
 <script src="layout.js"></script>
 <script src="fit.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(() => {}); navigator.serviceWorker.addEventListener("controllerchange", () => { if (!window.__rp_reloaded) { window.__rp_reloaded = 1; location.reload(); } }); })</script>
@@ -332,7 +333,8 @@
 
   /* 그림 재료 */
   const EMO = ['🍎','🍌','🍓','🐶','🐱','🐰','⭐','🌈','🎈','🚗','🐸','🦋','🌸','🍩','🦄','🐥','🍉','🐢','🎁','🚀'];
-  const ODD = [['🐱','🐶'],['🍎','🍌'],['⭐','🌙'],['🐸','🐷'],['🚗','🚌'],['🌸','🌻'],['🍓','🍇'],['🐰','🐻'],['🎈','🎁'],['🦋','🐝']];
+  // 색과 모양이 비슷한 짝: 잘 봐야 찾아요
+  const ODD = [["🐶","🐺"],["🍎","🍅"],["🐱","🐯"],["🍪","🍩"],["🌝","🌚"],["🐢","🐊"],["🦋","🐛"],["🍋","🍊"],["🐭","🐹"],["🌷","🌹"],["🐔","🐓"],["🚗","🚙"],["😀","😃"],["🌝","🌕"],["🔵","🟦"],["🟢","🟩"],["🐢","🦎"],["🍏","🍐"],["🐑","🐐"],["🦆","🐤"],["🌲","🌳"],["🕐","🕑"],["🔴","🟠"],["🐈","🐆"],["🙂","😊"],["🐻","🧸"],["🍇","🫐"],["🌸","🌺"],["🐸","🦖"],["⭐","🌟"]];
 
   let level = 'easy';
   let state = null;
@@ -563,7 +565,7 @@
 
   /* ───────── 4. 다른 그림 찾기 ───────── */
   function nextOdd() {
-    const g = 3;
+    const g = EFF() >= 2 ? 5 : EFF() <= -2 ? 3 : 4;   // 기본 4×4, 쉬우면 3×3, 어려우면 5×5
     let [base, odd] = pick(ODD);
     if (rnd(2)) [base, odd] = [odd, base];
     const oddIdx = rnd(g * g);
@@ -701,7 +703,7 @@
       const lg = JSON.parse(localStorage.getItem("rp-log") || "[]"); lg.push({ t: Date.now(), id: missionId, score: Math.round(state.score * 10 / TOTAL) }); if (lg.length > 500) lg.splice(0, lg.length - 500); localStorage.setItem("rp-log", JSON.stringify(lg));
     } catch (e) {}
     $("to-hub").hidden = true; $("home-btn").hidden = false;
-    try { const av = JSON.parse(localStorage.getItem("rp-profile") || "{}").avatar; if (av) $("result-emoji").textContent = av; } catch (e) {}   // 결과 화면엔 내 친구(현재 캐릭터)
+    try { const av = JSON.parse(localStorage.getItem("rp-profile") || "{}").avatar; if (av) $("result-emoji").innerHTML = window.rpGlyph ? rpGlyph(av) : av; } catch (e) {}   // 결과 화면엔 내 친구(현재 캐릭터)
   }
   function launchFromUrl() {
     const p = new URLSearchParams(location.search);

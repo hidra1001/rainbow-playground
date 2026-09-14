@@ -1,4 +1,4 @@
-<!doctype html>
+.includes(x.d.jung) && x.d.jong === 0)x.d.jong === 0<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}body{user-select:none;-webkit-user-select:none;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="voice.js"></script>
+<script src="chars.js"></script>
 <script src="layout.js"></script>
 <script src="fit.js"></script>
 <script>if("serviceWorker" in navigator)addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(() => {}); navigator.serviceWorker.addEventListener("controllerchange", () => { if (!window.__rp_reloaded) { window.__rp_reloaded = 1; location.reload(); } }); })</script>
@@ -161,6 +162,9 @@
   .word .ch.slot.filled { background: var(--r3); border-color: #E8CF4A; color: var(--plum); }
   .word .ch.slot.reveal { background: var(--r2); border-color: #D9902E; color: #fff; }
   .tile.hint { outline: 5px solid var(--r3); outline-offset: 3px; animation: hintpulse .8s infinite alternate; }
+  .tile.no { animation: shake .4s; background: var(--oops) !important; }
+  .word .ch.slot[data-ph]:empty::before { content: attr(data-ph); font-size: .34em; color: #C9A6B8; font-family: var(--body); }
+  .word .ch.blank.reveal { border-style: solid; background: var(--r2); border-color: #D9902E; color: #fff; }
   @keyframes hintpulse { from { transform: scale(1); } to { transform: scale(1.08); } }
   .word.longword { font-size: clamp(30px, 9vw, 46px); gap: 6px; }
   .word.longword .ch { border-radius: 14px; border-width: 3px; }
@@ -558,7 +562,7 @@
     return s;
   })();
   const VOWCH = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
-  const jamoTargets = w => [...w].map((ch, i) => ({ ch, i, d: decomp(ch) })).filter(x => x.d && [0, 2, 4, 6, 8, 12, 13, 17, 18, 20].includes(x.d.jung) && (x.d.jong === 0 || EFF() >= 2));
+  const jamoTargets = w => [...w].map((ch, i) => ({ ch, i, d: decomp(ch) })).filter(x => x.d && [0, 2, 4, 6, 8, 12, 13, 17, 18, 20].includes(x.d.jung) && x.d.jong === 0);   // 받침 없는 글자만 (자음 + 모음 두 단계)
   const isCommon = x => [...x].every(ch => COMMON.has(ch));
   function similarSyllables(target, w, n) {
     const d = decomp(target), out = new Set();
@@ -603,7 +607,7 @@
     const ans = entry[2];
     const others = shuffle(ONOMAT.filter(o => o[1] !== ans && o[0] !== w)).slice(0, nC - 1);
     const choices = shuffle([[ans, e], ...others.map(o => [o[1], o[2]])]);
-    return { w, e, ans, choices: choices.map(c => c[0]), choiceEmoji: EFF() < 2 ? Object.fromEntries(choices) : null, blank: -1, tiles: [], mimic: true };
+    return { w, e, ans, choices: choices.map(c => c[0]), choiceEmoji: null, blank: -1, tiles: [], mimic: true };
   }
 
   function makeQ() {
@@ -631,19 +635,16 @@
       if (dis.length < nC - 1) dis = dis.concat(randomSyllables(ans, w, nC - 1 - dis.length));
       choices = shuffle([ans, ...dis.slice(0, nC - 1)]);
     } else if (m === 'cons') {
-      // 글자 만들기: 낱말 속 한 글자를 비우고, 그 글자를 자음 + 모음(+받침)으로 만들어요
+      // 글자 만들기: 낱말 속 한 글자를 비우고(햄버?), 자음·모음 6개 보기에서 자음 → 모음 순서로 골라 그 글자를 만들어요
       let tg = jamoTargets(w);
       if (EFF() <= -2) { const ez = tg.filter(x => [0, 2, 6, 9].includes(x.d.cho) && [0, 8, 13, 20].includes(x.d.jung)); if (ez.length) tg = ez; }   // ㄱㄴㅁㅅ + ㅏㅗㅜㅣ
-      const t = pick(tg); blank = t.i; ans = w[blank];
-      const d = t.d, parts = [CHO[d.cho], VOWCH[d.jung], d.jong ? JONG[d.jong] : null];
+      const t = pick(tg); blank = t.i;
+      const d = t.d, c = CHO[d.cho], v = VOWCH[d.jung];
       const SV = [0, 2, 4, 6, 8, 12, 13, 17, 18, 20], BC = [0, 2, 3, 5, 6, 7, 9, 11, 12, 18];
-      const cands = [];
-      for (const v of shuffle(SV)) if (v !== d.jung) cands.push(makeSyl(d.cho, v, d.jong));          // 같은 자음, 다른 모음
-      for (const c of shuffle(BC)) if (c !== d.cho) cands.push(makeSyl(c, d.jung, d.jong));           // 다른 자음, 같은 모음
-      if (d.jong) for (const g of [0, 4, 21, 16, 8]) if (g !== d.jong) cands.push(makeSyl(d.cho, d.jung, g));   // 받침만 다르게
-      const dis = [...new Set(cands)].filter(x => x !== ans && !w.includes(x) && COMMON.has(x)).slice(0, nC - 1);
-      choices = shuffle([ans, ...dis]);
-      return { w, e, ans, choices, blank, tiles: [], jamo: { parts: parts.filter(Boolean) } };
+      const otherC = shuffle(BC.filter(x => x !== d.cho)).slice(0, 2).map(x => CHO[x]);
+      const otherV = shuffle(SV.filter(x => x !== d.jung)).slice(0, 2).map(x => VOWCH[x]);
+      ans = c + v;
+      return { w, e, ans, choices: [], blank, tiles: shuffle([c, v, ...otherC, ...otherV]), parts: [c, v], jamo: true };
     } else {
       // 낱말 만들기: 글자 타일 순서 맞추기
       ans = w;
@@ -666,7 +667,7 @@
 
   function renderQ() {
     const q = state.q, m = state.mode, L = state.level;
-    const useTiles = m === "order" || q.dict;
+    const useTiles = m === "order" || q.dict || q.jamo;
     $('round').textContent = (state.round + 1) + ' / ' + TOTAL;
     $("tag").textContent = LEVEL_NAME[L] + DIFF_TXT() + ' · ' + modeName(m, L);
     renderStars();
@@ -677,7 +678,7 @@
     wordEl.className = 'word' + (q.w.length >= 5 ? ' longword' : '');
     let html = '', ask = '';
     state.built = [];
-    if (q.jamo) { ask = "빈칸 글자를 자음과 모음으로 만들어요"; html = `<span class="ch hint">${q.jamo.parts.join(" + ")}</span><span class="ch hint">→</span>` + [...q.w].map((c, i) => i === q.blank ? `<span class="ch blank" id="ansbox">?</span>` : `<span class="ch">${c}</span>`).join(""); }
+    if (q.jamo) { ask = "빈칸 글자를 자음 → 모음 순서로 골라 만들어요"; html = [...q.w].map((c, i) => i === q.blank ? `<span class="ch blank" id="ansbox">?</span>` : `<span class="ch">${c}</span>`).join("") + `<span class="ch hint">=</span><span class="ch slot" data-i="0" id="slot-0" data-ph="자음"></span><span class="ch hint">+</span><span class="ch slot" data-i="1" id="slot-1" data-ph="모음"></span>`; }
     else if (q.dict) { ask = "잘 듣고 글자를 순서대로 눌러요"; html = [...q.w].map((_, i) => `<span class="ch slot" data-i="${i}" id="slot-${i}"></span>`).join(""); }
     else if (q.mimic) { ask = "무엇을 흉내 낸 말일까요?"; html = `<span class="ch" style="font-size:.7em;min-width:auto;padding:0 .35em">${q.w}</span><span class="ch hint">→</span><span class="ch blank" id="ansbox">?</span>`; }
     else if (m === 'word') {
@@ -739,7 +740,7 @@
 
   /* 타일 놀이 (낱말 만들기·받아쓰기) */
   function slotCount() { return document.querySelectorAll('.slot').length; }
-  function expectedAt(i) { return state.q.w[i]; }
+  function expectedAt(i) { return state.q.jamo ? state.q.parts[i] : state.q.w[i]; }
   function hintTile() {
     const want = expectedAt(state.built.length);
     const t = [...document.querySelectorAll(".tile")].find(x => !x.classList.contains("used") && x.dataset.c === want);
@@ -749,6 +750,7 @@
     state.locked = true; state.missed = true;
     const total = slotCount();
     for (let i = 0; i < total; i++) { const s = $("slot-" + i); s.textContent = expectedAt(i); s.classList.add("filled", "reveal"); }
+    if (state.q.jamo && $("ansbox")) { $("ansbox").textContent = state.q.w[state.q.blank]; $("ansbox").classList.add("reveal"); }
     $("feedback").textContent = "이렇게 놓는 거예요. 다음 문제로 가요!";
     document.querySelectorAll(".tile").forEach(t => t.disabled = true);
     setTimeout(next, 2200);
@@ -757,6 +759,10 @@
     if (state.locked || btn.classList.contains('used')) return;
     const q = state.q, i = state.built.length, total = slotCount();
     if (i >= total) return;
+    if (q.jamo) {   // 자음 먼저, 그다음 모음
+      const isC = CHO.includes(btn.dataset.c);
+      if ((i === 0 && !isC) || (i === 1 && isC)) { btn.classList.remove('no'); void btn.offsetWidth; btn.classList.add('no'); $("feedback").textContent = i === 0 ? "자음부터 눌러요 (ㄱ, ㄴ, ㄷ…)" : "이제 모음을 눌러요 (ㅏ, ㅓ, ㅗ…)"; sndBad(); return; }
+    }
     btn.classList.add('used'); sndTap();
     state.built.push({ c: btn.dataset.c, tile: btn.id });
     const slot = $('slot-' + i); slot.textContent = btn.dataset.c; slot.classList.add('filled');
@@ -764,6 +770,7 @@
       const made = state.built.map(b => b.c).join('');
       if (made === q.ans) {
         document.querySelectorAll('.slot').forEach(s => s.classList.add('ok'));
+        if (q.jamo && $("ansbox")) { $("ansbox").textContent = q.w[q.blank]; $("ansbox").classList.add("ok"); }
         correct(q);
       } else {
         state.missed = true;
@@ -859,7 +866,7 @@
       const lg = JSON.parse(localStorage.getItem("rp-log") || "[]"); lg.push({ t: Date.now(), id: missionId, score: Math.round(state.score * 10 / TOTAL) }); if (lg.length > 500) lg.splice(0, lg.length - 500); localStorage.setItem("rp-log", JSON.stringify(lg));
     } catch (e) {}
     $("to-hub").hidden = true; $("home-btn").hidden = false;
-    try { const av = JSON.parse(localStorage.getItem("rp-profile") || "{}").avatar; if (av) $("result-emoji").textContent = av; } catch (e) {}   // 결과 화면엔 내 친구(현재 캐릭터)
+    try { const av = JSON.parse(localStorage.getItem("rp-profile") || "{}").avatar; if (av) $("result-emoji").innerHTML = window.rpGlyph ? rpGlyph(av) : av; } catch (e) {}   // 결과 화면엔 내 친구(현재 캐릭터)
   }
   function launchFromUrl() {
     const p = new URLSearchParams(location.search);

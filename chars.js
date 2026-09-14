@@ -8,7 +8,7 @@
     '🐢': { name: '현무',   f: 'saturate(.3) brightness(.6)',     ov: [['🐍', 'tr']] },
     '🐅': { name: '백호',   f: 'saturate(0) brightness(1.35) contrast(1.15)',        ov: [['❄️', 'tl']] },
     '🦄': { name: '유니콘', f: '',                                                    ov: [['✨', 'tr']] },
-    '🐎': { name: '페가수스', f: 'saturate(0) brightness(1.6) contrast(1.05)',                       ov: [['🪽', 'wl', 'W'], ['🪽', 'wr', 'W']], alt: [['🕊️', 'tl'], ['🕊️', 'tr-flip']] },   // 날개 달린 말. 🪽가 없는 기기는 alt로
+    '🐎': { name: '페가수스', f: 'saturate(0) brightness(1.6) contrast(1.05)',                       img: 'img/pegasus.svg', ov: [['✨', 'tr']] },   // 그림 파일로 그려요 (freesvg.org CC0 "One adorable winged unicorn"에서 뿔을 뺀 것)
     '🦊': { name: '구미호', f: 'saturate(.5) brightness(1.25)',                        ov: [['🌙', 'tl'], ['✨', 'br']] },
     '🦌': { name: '기린',   f: 'hue-rotate(15deg) saturate(1.9) brightness(1.1)',     ov: [['🔥', 'bl'], ['✨', 'tr']] },
     /* 신화: 황룡·봉황·천사·우주고래 */
@@ -32,13 +32,14 @@
   function glyph(c) {
     const i = INFO[c];
     if (!i) return c || '';
-    const ov = (i.alt && i.ov.some(([e]) => !canDraw(e))) ? i.alt : i.ov;
-    return `<span class="rg" data-c="${c}" title="${i.name}"><span class="rg-e" style="filter:${i.f || 'none'}">${c}</span>${ov.map(([e, p, k]) => `<i class="rg-o${k ? ' rg-' + k : ''}" style="${POS[p]}">${e}</i>`).join('')}</span>`;
+    const body = i.img ? `<img class="rg-e rg-img" src="${i.img}" alt="${i.name}" draggable="false">` : `<span class="rg-e" style="filter:${i.f || 'none'}">${c}</span>`;
+    return `<span class="rg" data-c="${c}" title="${i.name}">${body}${i.ov.map(([e, p, k]) => `<i class="rg-o${k ? ' rg-' + k : ''}" style="${POS[p]}">${e}</i>`).join('')}</span>`;
   }
   const css = document.createElement('style');
   css.textContent = `
     .rg { position: relative; display: inline-grid; place-items: center; line-height: 1; }
     .rg-e { display: block; line-height: 1; }
+    .rg-img { width: 1.2em; height: 1.1em; object-fit: contain; }
     .rg-o { position: absolute; font-style: normal; font-size: .4em; line-height: 1; pointer-events: none; animation: rg-twinkle 1.6s ease-in-out infinite alternate; }
     .rg-W { filter: saturate(.45) brightness(1.25); animation: none; }   /* 연보라빛 하얀 날개 */
     .rg-o:nth-child(3) { animation-delay: .5s; } .rg-o:nth-child(4) { animation-delay: 1s; }

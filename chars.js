@@ -8,7 +8,7 @@
     '🐢': { name: '현무',   f: 'saturate(.3) brightness(.6)',     ov: [['🐍', 'tr']] },
     '🐅': { name: '백호',   f: 'saturate(0) brightness(1.35) contrast(1.15)',        ov: [['❄️', 'tl']] },
     '🦄': { name: '유니콘', f: '',                                                    ov: [['✨', 'tr']] },
-    '🐎': { name: '페가수스', f: 'saturate(0) brightness(1.6) contrast(1.05)',                       ov: [['🕊️', 'tl'], ['🕊️', 'tr-flip']] },
+    '🐎': { name: '페가수스', f: 'saturate(0) brightness(1.6) contrast(1.05)',                       ov: [['🪽', 'wl', 'W'], ['🪽', 'wr', 'W']], alt: [['🕊️', 'tl'], ['🕊️', 'tr-flip']] },   // 날개 달린 말. 🪽가 없는 기기는 alt로
     '🦊': { name: '구미호', f: 'saturate(.5) brightness(1.25)',                        ov: [['🌙', 'tl'], ['✨', 'br']] },
     '🦌': { name: '기린',   f: 'hue-rotate(15deg) saturate(1.9) brightness(1.1)',     ov: [['🔥', 'bl'], ['✨', 'tr']] },
     /* 신화: 황룡·봉황·천사·우주고래 */
@@ -17,17 +17,30 @@
     '👼': { name: '천사',   f: 'brightness(1.08)',                                    ov: [['🌟', 't'], ['☁️', 'b']] },
     '🐋': { name: '우주고래', f: 'hue-rotate(60deg) saturate(1.4) brightness(.95)',    ov: [['🪐', 'tr'], ['⭐', 'bl'], ['✨', 'tl']] },
   };
-  const POS = { tl: 'left:-6%;top:-6%', tr: 'right:-6%;top:-6%', 'tr-flip': 'right:-6%;top:-6%;transform:scaleX(-1)', bl: 'left:-4%;bottom:-4%', br: 'right:-4%;bottom:-4%', t: 'left:50%;top:-18%;transform:translateX(-50%)', b: 'left:50%;bottom:-14%;transform:translateX(-50%)' };
+  /* 이 기기가 이모지를 그릴 수 있는지: 그려서 '없는 글자' 모양과 같으면 못 그리는 거예요 */
+  const CAN = {};
+  function canDraw(ch) {
+    if (ch in CAN) return CAN[ch];
+    try {
+      const cv = document.createElement('canvas'); cv.width = cv.height = 32; const x = cv.getContext('2d');
+      const draw = t => { x.clearRect(0, 0, 32, 32); x.font = '24px sans-serif'; x.textBaseline = 'top'; x.fillText(t, 2, 2); return x.getImageData(0, 0, 32, 32).data.join(); };
+      CAN[ch] = draw(ch) !== draw('\u{10FFFF}');
+    } catch (e) { CAN[ch] = true; }
+    return CAN[ch];
+  }
+  const POS = { wl: 'left:-16%;top:-10%;font-size:.5em;transform:scaleX(-1)', wr: 'right:-6%;top:-10%;font-size:.5em', tl: 'left:-6%;top:-6%', tr: 'right:-6%;top:-6%', 'tr-flip': 'right:-6%;top:-6%;transform:scaleX(-1)', bl: 'left:-4%;bottom:-4%', br: 'right:-4%;bottom:-4%', t: 'left:50%;top:-18%;transform:translateX(-50%)', b: 'left:50%;bottom:-14%;transform:translateX(-50%)' };
   function glyph(c) {
     const i = INFO[c];
     if (!i) return c || '';
-    return `<span class="rg" data-c="${c}" title="${i.name}"><span class="rg-e" style="filter:${i.f || 'none'}">${c}</span>${i.ov.map(([e, p]) => `<i class="rg-o" style="${POS[p]}">${e}</i>`).join('')}</span>`;
+    const ov = (i.alt && i.ov.some(([e]) => !canDraw(e))) ? i.alt : i.ov;
+    return `<span class="rg" data-c="${c}" title="${i.name}"><span class="rg-e" style="filter:${i.f || 'none'}">${c}</span>${ov.map(([e, p, k]) => `<i class="rg-o${k ? ' rg-' + k : ''}" style="${POS[p]}">${e}</i>`).join('')}</span>`;
   }
   const css = document.createElement('style');
   css.textContent = `
     .rg { position: relative; display: inline-grid; place-items: center; line-height: 1; }
     .rg-e { display: block; line-height: 1; }
     .rg-o { position: absolute; font-style: normal; font-size: .4em; line-height: 1; pointer-events: none; animation: rg-twinkle 1.6s ease-in-out infinite alternate; }
+    .rg-W { filter: saturate(.45) brightness(1.25); animation: none; }   /* 연보라빛 하얀 날개 */
     .rg-o:nth-child(3) { animation-delay: .5s; } .rg-o:nth-child(4) { animation-delay: 1s; }
     @keyframes rg-twinkle { from { opacity: .75; } to { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) { .rg-o { animation: none; } }`;
